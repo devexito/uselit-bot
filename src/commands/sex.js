@@ -1,0 +1,55 @@
+const { getRandomInt } = require('../util/util')
+const Embed = require('../services/embedConstructor.js')
+
+module.exports = {
+  name: 'sex',
+  description: 'Sex',
+  usage: '[user]',
+  typing: true,
+  permissions: '',
+  async execute(message, args) {
+    const randomNumber = getRandomInt(256)
+    const virgin = 101 - getRandomInt(101)
+    let sexState = 'sexing'
+    let user = args
+    let embed = new Embed()
+      .color('#0019B9')
+    
+    async function mentionCheck(input, message) {
+      input.join('')
+      var regEx = /<@\!?([0-9]{17,21})>/
+      let output = regEx.exec(input)[1]
+      //console.log('blya ' + input + ' da ' + output)
+
+      if (!isNaN(output) && message.client.users.cache.get(output)) {
+        return '`' + message.client.users.cache.get(output).username + '`'
+      } else return
+    }
+
+    if (message.content.includes(message.author.id)) {
+      sexState = 'masturbating'
+      user = 'yourself'
+    } else {
+// 1st etap
+      user = await mentionCheck(user, message).catch((e) => {})
+    }
+
+    if (!user) {
+      if (args.length > 0) {
+// 2nd etap
+        user = '`' + args.join(' ').trim() + '`'
+      } else {
+// 3rd etap
+        user = '`' + message.guild.members.cache.random().user.username + '`'
+      }
+    }
+
+    embed = embed.title('You are ' + sexState + ' ' + user)
+      .description('<:nice_shit:771145344322371595>')
+      .field('Sex level', randomNumber, true)
+      .field('Virgin', virgin + '%', true)
+      .build()
+    message.reply({ embed })
+    message.channel.stopTyping()
+  }
+}
