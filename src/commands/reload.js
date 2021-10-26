@@ -5,6 +5,7 @@ module.exports = {
   name: 'reload',
   owner: true,
   description: 'Can only be used by a bot\'s owner',
+  desc: '.',
   aliases: ['rel'],
   args: true,
   permissions: 'owner',
@@ -25,7 +26,7 @@ module.exports = {
       
       console.log(`Обновляю ${command.name}`)
       message.reply(`✅ Command \`${command.name}\` successfully reloaded`)
-      } catch (error) {
+    } catch (error) {
       console.error(error)
       errorParse(`Reload Fail:\n\`${error.message}\``, message)
     }

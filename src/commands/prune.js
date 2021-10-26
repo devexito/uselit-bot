@@ -5,7 +5,8 @@ module.exports = {
   name: 'prune',
   args: true,
   owner: true,
-  description: 'Shows avatar of mentioned user',
+  description: 'Purges messages in a current channel',
+  desc: 'Purges messages in a channel',
   aliases: ['p', 'purge', 'clear'],
   permissions: 'administrator',
   async execute(message, args) {

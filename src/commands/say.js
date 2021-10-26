@@ -1,9 +1,10 @@
 ﻿module.exports = {
   name: 'say',
   description: 'Sends a message with arguments as message content, and deletes author message',
+  desc: 'Sends a message as bot',
   permissions: '',
   args: true,
-  usage: '<text>',
+  usage: '<text>',
   async execute(message, args) {
     let text = args.join(' ').trim()
     

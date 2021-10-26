@@ -1,15 +1,14 @@
 const { Client, Collection, Intents } = require("discord.js")
-const myintents = new Intents(Intents.ALL)
+const myintents = new Intents(32767)
 myintents.remove(['DIRECT_MESSAGES'])
 const client = new Client({ intents: myintents, allowedMentions: { repliedUser: false, parse: ['users'] }})
 
 const fs = require('fs')
-const unirest = require('unirest')
-//const disbut = require('discord-buttons')
-//disbut(client)
+// const disbut = require('discord-buttons')
+// disbut(client)
 
-//const GenerateController = require('./services/generateController')
-let generateController
+// const GenerateController = require('./services/generateController')
+// let generateController
 
 const Embed = require('./services/embedConstructor.js')
 const { errorParse, argsError } = require('./util/util.js')
@@ -25,7 +24,7 @@ client.on('ready', () => {
 
  // generateController = new GenerateController(client, disbut)
 
-  client.setInterval(() => {
+  setInterval(() => {
     client.user.setPresence({
       status: 'dnd',
       activity: {
@@ -43,7 +42,7 @@ for (const file of commandFiles) {
 
 const { cooldowns } = client
 
-client.on('message', async message => {
+client.on('messageCreate', async message => {
   // костыль для статуса печатания
   if (message.author.id === client.user.id) {
     return
@@ -67,14 +66,12 @@ client.on('message', async message => {
         .title(client.user.username)
         .description(`My prefix is \`${prefix}\``)
         .build()
-      return message.channel.send({ embed })
+      return message.channel.send({ embeds: [embed] })
     }
 
   const commandBody = message.content.slice(prefix.length)
   const args = commandBody.trim().replace(/ +(?= )/g,'').split(' ')
   const commandName = args.shift().toLowerCase()
-
-  
 
   const command = client.commands.get(commandName) 
       || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName))
@@ -109,7 +106,7 @@ timestamps.set(message.author.id, now)
 setTimeout(() => timestamps.delete(message.author.id), cooldownAmount)
 
   // EXECUTION
-  await command.execute(message, args, client, generateController)
+  await command.execute(message, args, client)
   .catch((e) => {
     errorParse('Critical Command Error: ' + e.message, message)
     console.error(e)
@@ -123,6 +120,7 @@ const filter = response => {
   return item.some(answer => answer.toLowerCase() === response.content.toLowerCase())
 }
 
+/*
 client.on('clickButton', async (button) => {
   switch (button.id) {
     case 'next':
@@ -143,6 +141,7 @@ client.on('clickButton', async (button) => {
       break
   }
 })
+*/
 
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
   if (oldMember.nickname === newMember.nickname) return
@@ -172,10 +171,12 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
   console.log(newMember.user.username + ' has changed from ' + oldMember.nickname + ' to ' + newMember.nickname + '! Changing back to their defaults')
 })
 
-/*client.on("messageUpdate", (messageUpdate) => {
+/*
+client.on("messageUpdate", (messageUpdate) => {
   try {
     const channel = messageDelete.guild.channels.cache.get('774628775840448522')'
   }
-})*/
+})
+*/
 
 client.login(config.token)

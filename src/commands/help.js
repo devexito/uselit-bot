@@ -6,14 +6,16 @@ const { errorParse } = require('../util/util')
 module.exports = {
   name: 'help',
   description: 'List all commands or info about a specific command',
+  desc: 'This list',
   aliases: ['commands', 'cmd'],
   permissions: '',
   usage: '[command name]',
   async execute(message, args) {
-    const data = []
     let { commands } = message.client
     let allcommands = commands
     commands = commands.filter(b => !b.owner)
+    let spaces = '         ' // 9 spaces
+    let commandList = commands.map(command => command.name + spaces.substring(command.name.length) + ' - ' + command.desc)
     
     let embed = new Embed()
       .color('#2f3136')
@@ -21,7 +23,7 @@ module.exports = {
     if (!args.length) {
       embed = embed
         .title('Command List')
-        .description(commands.map(command => command.name).join('\n'))
+        .description('```' + commandList.join('\n') + '```')
         .footer('Type ' + prefix + 'help [command name] to show more info about a specific command.')
 
     //  message.reply('List of all commands:\n```\n' + commands.map(command => command.name).join(', ') + '```\nType "' + prefix + 'help [command name]" to show more info about a specific command')
@@ -41,11 +43,12 @@ module.exports = {
       }
 
       if (command.description) embed = embed.description(command.description)
+      if (command.desc) embed = embed.field('Short Description', command.desc)
       if (command.aliases) embed = embed.field('Aliases', command.aliases)
       if (command.usage) embed = embed.field('Usage', '`' + command.usage + '`')
     }
 
     embed = embed.build()
-    message.reply({ embed })
+    message.reply({ embeds: [embed] })
   },
 }

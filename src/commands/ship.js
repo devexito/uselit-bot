@@ -6,7 +6,8 @@ module.exports = {
   name: 'ship',
   permissions: '',
   aliases: ['c', 'child'],
-  description: `Lovely shipping...\nSkip arguments for random users. You can either enter two mentions, id or words separated by spaces, or use a \`|\` as a separator for words.\n\nUse \`-s\` for server nicknames.\nUse \`-f\` to floor odd amount of characters instead of ceiling it.`,
+  description: `Ships two user names (or thing names?)\nSkip arguments for random users. You can either enter two mentions, id or words separated by spaces, or use a \`|\` as a separator for words.\n\nUse \`-s\` for server nicknames.\nUse \`-f\` to floor odd amount of characters instead of ceiling it.`,
+  desc: 'Lovely shipping...',
   usage: '[first mention or id] [second mention or id] [-s] [-f]\` **OR**\n\`[text] | [another text]',
   typing: true,
   async execute(message, args) {
@@ -142,7 +143,6 @@ module.exports = {
     }
     embed = embed.build()
 
-    message.reply({ embed })
-    message.channel.stopTyping()
+    message.reply({ embeds: [embed] })
   }
 }

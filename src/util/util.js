@@ -1,40 +1,40 @@
-﻿const { stripIndents } = require('common-tags')
+﻿// const { stripIndents } = require('common-tags')
 const Embed = require('../services/embedConstructor.js')
 
 module.exports = class Util {
   static shorten(text, maxLen = 2000) {
     return text.length > maxLen ? `${text.substr(0, maxLen - 3)}...` : text
-	}
+  }
   
   static formatNumber(number, minimumFractionDigits = 0) {
-		return Number.parseFloat(number).toLocaleString(undefined, {
-			minimumFractionDigits,
-			maximumFractionDigits: 2
-		})
-	}
+    return Number.parseFloat(number).toLocaleString(undefined, {
+      minimumFractionDigits,
+      maximumFractionDigits: 2
+    })
+  }
   
   static formatTime(time) {
     const min = Math.floor(time / 60)
-		  const sec = Math.floor(time - (min * 60))
-		  const ms = time - sec - (min * 60)
-		  return `${min}:${sec.toString().padStart(2, '0')}.${ms.toFixed(4).slice(2)}`
+      const sec = Math.floor(time - (min * 60))
+      const ms = time - sec - (min * 60)
+      return `${min}:${sec.toString().padStart(2, '0')}.${ms.toFixed(4).slice(2)}`
   }
 
-	static base64(text, mode = 'encode') {
-		if (mode === 'encode') return Buffer.from(text).toString('base64')
-		if (mode === 'decode') return Buffer.from(text, 'base64').toString('utf8') || null
-		throw new TypeError(`${mode} is not a supported base64 mode.`)
-	}
+  static base64(text, mode = 'encode') {
+    if (mode === 'encode') return Buffer.from(text).toString('base64')
+    if (mode === 'decode') return Buffer.from(text, 'base64').toString('utf8') || null
+    throw new TypeError(`${mode} is not a supported base64 mode.`)
+  }
   
-  static today(timeZone) {
-		const now = new Date()
-		now.setHours(0)
-		now.setMinutes(0)
-		now.setSeconds(0)
-		now.setMilliseconds(0)
-		now.setUTCHours(now.getUTCHours())
-		return now
-	}
+  static today() {
+    const now = new Date()
+    now.setHours(0)
+    now.setMinutes(0)
+    now.setSeconds(0)
+    now.setMilliseconds(0)
+    now.setUTCHours(now.getUTCHours())
+    return now
+  }
   
   static getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max))
@@ -52,7 +52,7 @@ module.exports = class Util {
     }
     embed = embed
       .build()
-    message.reply({ embed })
+    message.reply({ embeds: [embed] })
   }
 
   static argsError(command, message, prefix) {

@@ -2,11 +2,12 @@ const { formatNumber } = require('../util/util')
 
 module.exports = {
   name: 'ping',
-  description: 'Ping!',
+  description: 'Shows message delay',
+  desc: 'Pong',
   permissions: '',
   async execute(message, args) {
     const msg = await message.reply('Pinging...')
     const ping = Math.round(msg.createdTimestamp - message.createdTimestamp)
-    return msg.edit(`Pong!\nMessage latency: \`${formatNumber(ping)}ms\`\nAverage integral ping to API: \`${Math.round(message.client.ws.ping)}ms\``)
+    return msg.edit(`Pong!\nMessage latency: \`${formatNumber(ping)}ms\`\nHeartbeat: \`${Math.round(message.client.ws.ping)}ms\``)
   }
 }

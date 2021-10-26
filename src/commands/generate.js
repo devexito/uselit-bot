@@ -5,29 +5,31 @@ const { errorParse } = require('../util/util')
 
 module.exports = {
   name: 'generate',
-  aliases: ['g', 'gen'],
-  description: 'Completes text using Порфирьевич',
+  aliases: ['g', 'gen', 'porf', 'porfirevich'],
+  description: 'Completes text using https://porfirevich.ru/',
+  desc: 'Completes text using Porfirevich',
   permissions: '',
   cooldown: 5,
   args: true,
   usage: '<text>',
   typing: true,
-  async execute(message, args, client, disbut) {
+  async execute(message, args) {
       const msg = await message.reply('generating text...')
       
       req.query({
-        "Accept-Encoding": "gzip, deflate, br",
-        "content-type": "text/plain;charset=UTF-8"
+        'Accept-Encoding': 'gzip, deflate, br',
+        'content-type': 'text/plain;charset=UTF-8'
       })
 
       req.headers({
-        "content-type": "application/json",
-        "Accept-Language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7"
-      })
+        'content-type': 'application/json',
+        'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'
+      })
+
       
-      req.type("json")
+      req.type('json')
       req.send({
-        prompt: "" + args.join(' ').trim() + "",
+        prompt: '' + args.join(' ').trim() + '',
         length: 60
       })
 

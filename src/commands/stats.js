@@ -1,19 +1,22 @@
 const Embed = require('../services/embedConstructor.js')
 module.exports = {
-  name: 'info',
-  aliases: ['stats', 'bot', 'botinfo'],
+  name: 'stats',
+  aliases: ['info', 'bot', 'botinfo'],
   description: 'Shows a little information about bot',
+  desc: 'Stats for nerds',
   permissions: '',
   async execute(message, args, client) {
     let { commands } = message.client
     let allcommands = commands
     commands = commands.filter(b => !b.owner)
+
     const used = process.memoryUsage();
     async function mem(key) {
       return Math.round(used[key] / 1024 / 1024 * 100) / 100
     } 
     const memUsed = await mem('heapUsed')
     const memAllocate = await mem('heapTotal')
+
     async function uptime() {
       let a = client.readyAt - 1
       a = a.toString()
@@ -30,11 +33,13 @@ module.exports = {
 
       .field('Used memory', memUsed + ' MB', true)
       .field('Allocated memory', memAllocate + ' MB', true)
-      .field('Uptime', await uptime(), true)
-     // .title(thisChannel.name)
+      .field('Running since', await uptime(), true)
+
+      .title('Bot statistics')
       .author(message.author.tag, message.author.displayAvatarURL())
       .timestamp()
       .build()
-    message.reply({ embed })
+    message.reply({ embeds: [embed] })
+
   },
 }

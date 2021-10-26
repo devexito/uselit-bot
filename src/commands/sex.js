@@ -3,7 +3,8 @@ const Embed = require('../services/embedConstructor.js')
 
 module.exports = {
   name: 'sex',
-  description: 'Sex',
+  description: 'Sex a user (or a thing?)',
+  desc: 'Sex',
   usage: '[user]',
   typing: true,
   permissions: '',
@@ -49,7 +50,6 @@ module.exports = {
       .field('Sex level', randomNumber, true)
       .field('Virgin', virgin + '%', true)
       .build()
-    message.reply({ embed })
-    message.channel.stopTyping()
+    message.reply({ embeds: [embed] })
   }
 }

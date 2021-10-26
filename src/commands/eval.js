@@ -6,6 +6,7 @@ const { errorParse } = require('../util/util')
 module.exports = {
   name: 'eval',
   description: 'Can be used only by bot\'s owner',
+  desc: '.',
   permissions: 'owner',
   owner: true,
   async execute (message, args, client) {

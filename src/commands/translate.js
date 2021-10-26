@@ -8,99 +8,97 @@ module.exports = {
   name: 'translate',
   aliases: ['tr'],
   description: `Translates text using Microsoft Bing Translate\nSupported languages: \`${langList.join('`, `')}\``,
+  desc: 'Translate text with Bing',
   permissions: '',
   args: true,
   usage: '<lang in short> <text>',
   typing: true,
   async execute(message, args) {
-      const usage = '>tr ' + this.usage
-      if (!args[1] && args[0]) return errorParse('Invalid Arguments', message, usage)
+    const usage = this.usage
+    if (!args[1] && args[0]) return errorParse('Invalid Arguments', message, usage)
 
-      const langInput = args[0].toLowerCase()
-      if (!langList.includes(langInput)) {
-        return errorParse('Unsupported language. Language List: `' + langList.join('`, `') + '`', message, usage)
+    const langInput = args[0].toLowerCase()
+    if (!langList.includes(langInput)) {
+      return errorParse('Unsupported language. Language List: `' + langList.join('`, `') + '`', message, usage)
+    }
+    
+    const reqTr = unirest('POST', 'https://microsoft-translator-text.p.rapidapi.com/translate')
+
+    /*
+    const fromRegExp = new RegExp('-from (\w{2,4}(-\w{2,4})?)$', 'g')
+    if (!args.includes(fromRegExp)) {
+      inputFrom = ''
+    } else if (!fromRegExp[1].includes(inputFrom)) {
+      return errorParse('❗*Unsupported language* :( *Needs to be one of the following:* `' + langList.join('`, `') + '`', message)
+    } else {
+      inputFrom = fromRegExp[1]
+    }*/
+
+    //start of bing translate code
+    reqTr.query({
+      'to': args[0],
+      'api-version': '3.0',
+      'profanityAction': 'NoAction',
+      'textType': 'plain'
+    })
+
+    reqTr.headers({
+      'content-type': 'application/json',
+      'x-rapidapi-key': bingkey,
+      'x-rapidapi-host': 'microsoft-translator-text.p.rapidapi.com',
+      'useQueryString': true
+    })
+
+    let textToTranslate = args
+    textToTranslate.splice(0, 1)
+    textToTranslate = textToTranslate.join(' ')
+    
+    console.log('translate: ' + textToTranslate)
+    
+    reqTr.type('json')
+    reqTr.send([
+      {
+        'Text': '' + textToTranslate.trim() + ''
       }
-      
-     const reqTr = unirest('POST', 'https://microsoft-translator-text.p.rapidapi.com/translate')
+    ])
 
-      /*
-      const fromRegExp = new RegExp('-from (\w{2,4}(-\w{2,4})?)$', 'g')
-      if (!args.includes(fromRegExp)) {
-        inputFrom = ''
-      } else if (!fromRegExp[1].includes(inputFrom)) {
-        return errorParse('❗*Unsupported language* :( *Needs to be one of the following:* `' + langList.join('`, `') + '`', message)
+    reqTr.end(function (res) {
+      if (res.error) {
+        parseError('API error! Please try again later', message)
+        return console.error(res.error)
+      }
+      let outFrom
+      
+      try {
+        outFrom = res.body.map(a => a.detectedLanguage['language'])
+      } catch (e) {
+        console.error(e)
+        return message.channel.send('error')
+      }
+      let output = res.body.map(a => a.translations.map(b => b.text)[0])
+
+      let embed = new Embed()
+        .color('#0019B9')
+      
+      let parsedOutText = ''
+
+      if (!output) {
+        errorParse('API returned empty output', message)
       } else {
-        inputFrom = fromRegExp[1]
-      }*/
 
-      //start of bing translate code
-      reqTr.query({
-        "to": args[0],
-        "api-version": "3.0",
-        "profanityAction": "NoAction",
-        "textType": "plain"
-      })
-
-      reqTr.headers({
-        "content-type": "application/json",
-        "x-rapidapi-key": bingkey,
-        "x-rapidapi-host": "microsoft-translator-text.p.rapidapi.com",
-        "useQueryString": true
-      })
-
-      let textToTranslate = args
-      textToTranslate.splice(0, 1)
-      textToTranslate = textToTranslate.join(' ')
-      
-      console.log('translate: ' + textToTranslate)
-      
-      reqTr.type("json")
-      reqTr.send([
-        {
-          "Text": "" + textToTranslate.trim() + ""
-        }
-      ])
-
-      reqTr.end(function (res) {
-        if (res.error) {
-          parseError('API error! Please try again later', message)
-          return console.error(res.error)
-        }
-        let outFrom
-        
-        try {
-          outFrom = res.body.map(a => a.detectedLanguage["language"])
-        } catch (e) {
-          console.error(e)
-          return message.channel.send('error')
-        }
-        let output = res.body.map(a => a.translations.map(b => b.text)[0])
-
-        let embed = new Embed()
-          .color('#0019B9')
-        
-        let parsedOutText = ''
-
-        if (!output) {
-          errorParse('API returned empty output', message)
+        if (output[0].length > 1999) {
+          parsedOutText = output[0].substr(0, 1998) + '…'
         } else {
-
-          if (output[0].length > 1999) {
-            parsedOutText = output[0].substr(0, 1998) + "…"
-          } else {
-            parsedOutText = output[0]
-          }
-
-          embed = embed.title('`' + outFrom[0] + '` → `' + langInput + '`')
-            .description(parsedOutText)
-            .build()
-          message.reply({ embed })
+          parsedOutText = output[0]
         }
-        try {
-          console.log(parsedOutText + ' (' + outFrom[0] + ' > ' + langInput + ` in ${message.guild.name})`)
-        } catch (e) {}
-      })
-      
-      //end of bing translate code
+
+        embed = embed.title('`' + outFrom[0] + '` → `' + langInput + '`')
+          .description(parsedOutText)
+          .build()
+        message.reply({ embeds: [embed] })
+      }
+    })
+    
+    //end of bing translate code
   },
 }
