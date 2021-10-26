@@ -47,8 +47,8 @@ module.exports = {
 
     embed = embed.title('You are ' + sexState + ' ' + user)
       .description('<:nice_shit:771145344322371595>')
-      .field('Sex level', randomNumber, true)
-      .field('Virgin', virgin + '%', true)
+      .field('Sex level', randomNumber.toString(), true)
+      .field('Virgin', virgin.toString() + '%', true)
       .build()
     message.reply({ embeds: [embed] })
   }

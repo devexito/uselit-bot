@@ -30,7 +30,7 @@ module.exports = {
     })
 
     if (output) {
-      message.channel.send('https://cdn.discordapp.com/emojis/' + output)
+      message.reply('https://cdn.discordapp.com/emojis/' + output)
    //   console.log(output)
     } else {
       errorParse('i cannot do this :(', message)

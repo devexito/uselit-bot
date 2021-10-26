@@ -27,12 +27,12 @@ module.exports = {
 
     let embed = new Embed()
       .color('#0019B9')
-      .field('Guilds', client.guilds.cache.size, true)
-      .field('Users', client.users.cache.size, true)
-      .field('Commands', `${commands.size} (${allcommands.size})`, true)
+      .field('Guilds', client.guilds.cache.size.toString(), true)
+      .field('Users', client.users.cache.size.toString(), true)
+      .field('Commands', `${commands.size.toString()} (${allcommands.size.toString()})`, true)
 
-      .field('Used memory', memUsed + ' MB', true)
-      .field('Allocated memory', memAllocate + ' MB', true)
+      .field('Used memory', memUsed.toString() + ' MB', true)
+      .field('Allocated memory', memAllocate.toString() + ' MB', true)
       .field('Running since', await uptime(), true)
 
       .title('Bot statistics')
@@ -40,6 +40,5 @@ module.exports = {
       .timestamp()
       .build()
     message.reply({ embeds: [embed] })
-
   },
 }

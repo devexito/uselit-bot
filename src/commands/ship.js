@@ -135,11 +135,11 @@ module.exports = {
       .description('**' + final + '** ' + emoteList[emote])
     if (emote === 0) {
       embed = embed
-      .field('Sex level', sexLvl + newEmote, true)
-      .field('Virgin', virgin + '%', true)
+      .field('Sex level', sexLvl.toString() + newEmote, true)
+      .field('Virgin', virgin.toString() + '%', true)
     } else {
       embed = embed
-      .field('Professional ratings', rate + '/100' + newEmote)
+      .field('Professional ratings', rate.toString() + '/100' + newEmote)
     }
     embed = embed.build()
 

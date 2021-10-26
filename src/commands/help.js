@@ -14,13 +14,14 @@ module.exports = {
     let { commands } = message.client
     let allcommands = commands
     commands = commands.filter(b => !b.owner)
-    let spaces = '         ' // 9 spaces
-    let commandList = commands.map(command => command.name + spaces.substring(command.name.length) + ' - ' + command.desc)
-    
+
     let embed = new Embed()
       .color('#2f3136')
 
     if (!args.length) {
+      let spaces = '         ' // 9 spaces
+      let commandList = commands.map(command => command.name + spaces.substring(command.name.length) + ' - ' + command.desc)
+
       embed = embed
         .title('Command List')
         .description('```' + commandList.join('\n') + '```')
@@ -43,8 +44,7 @@ module.exports = {
       }
 
       if (command.description) embed = embed.description(command.description)
-      if (command.desc) embed = embed.field('Short Description', command.desc)
-      if (command.aliases) embed = embed.field('Aliases', command.aliases)
+      if (command.aliases) embed = embed.field('Aliases', command.aliases.join('\n'))
       if (command.usage) embed = embed.field('Usage', '`' + command.usage + '`')
     }
 
