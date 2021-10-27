@@ -118,9 +118,10 @@ const filter = response => {
   return item.some(answer => answer.toLowerCase() === response.content.toLowerCase())
 }
 
+/*
 client.on('interactionCreate', button => {
   if (!button.isButton()) return
-  console.log(button)
+  // console.log(button)
 
   switch (button.customId) {
     case 'vars':
@@ -142,6 +143,7 @@ client.on('interactionCreate', button => {
       break
   }
 })
+*/
 
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
   if (oldMember.nickname === newMember.nickname) return

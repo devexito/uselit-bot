@@ -1,7 +1,9 @@
-const unirest = require('unirest')
+﻿const unirest = require('unirest')
 const req = unirest('POST', 'https://pelevin.gpt.dobro.ai/generate/')
-const { getRandomInt } = require('../util/util')
-const { errorParse } = require('../util/util')
+const paginationEmbed = require('../services/embedPagination')
+const { MessageEmbed, MessageButton } = require('discord.js')
+const { getRandomInt, errorParse } = require('../util/util')
+let gen = require('../services/generateText')
 
 module.exports = {
   name: 'generate',
@@ -15,38 +17,69 @@ module.exports = {
   typing: true,
   async execute(message, args) {
     const msg = await message.reply('generating text...')
+    let output = gen.fetchText({
+      message,
+      args,
+      msg
+    }).then(async (output) => {
+      console.log(output)
+      await createPages({
+        message,
+        output,
+        args,
+        msg
+      })
+    }).catch(() => {})
+
+    function embedBase(output, args, page) {
+      return new MessageEmbed()
+        .setTitle('Result')
+        .setDescription(args.join(' ').trim() + output.splice(output[page - 1], 1))
+    }
+
     
-    req.query({
-      'Accept-Encoding': 'gzip, deflate, br',
-      'content-type': 'text/plain;charset=UTF-8'
-    })
-
-    req.headers({
-      'content-type': 'application/json',
-      'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'
-    })
-    
-    req.type('json')
-    req.send({
-      prompt: '' + args.join(' ').trim() + '',
-      length: 60
-    })
-
-    req.end(async function (res) {
-      if (res.error) {
-        errorParse('API error! Please try again later', message)
-        msg.delete()
-        return console.error(res.error)
-      }
-      let output = res.body.replies
       
-      randomNumber = getRandomInt(3)
-      // .replace(/@/g, '@\u200b')
-      
-      out = args.join(' ').trim() + output.splice(randomNumber, 1)
-      // console.log(out)
+    function createPages({
+      message,
+      output,
+      args,
+      msg = false
+    }) {
+      const embed1 = embedBase(output, args, 1)
+      const embed2 = embedBase(output, args, 2)
+      const embed3 = embedBase(output, args, 3)
 
-      msg.edit(out)
-    })
+      const button1 = new MessageButton()
+        .setCustomId('previousbtn')
+        .setLabel('')
+        .setStyle('PRIMARY')
+        .setEmoji('⬅️')
+
+      const button2 = new MessageButton()
+        .setCustomId('nextbtn')
+        .setLabel('')
+        .setStyle('PRIMARY')
+        .setEmoji('➡️')
+
+      const button3 = new MessageButton()
+        .setCustomId('regenbtn')
+        .setLabel('')
+        .setStyle('SUCCESS')
+        .setEmoji('🔄')
+
+      pages = [
+	       embed1,
+	       embed2,
+        embed3,
+      ]
+
+      buttonList = [
+        button1,
+        button2,
+        button3
+      ]
+      if (msg) msg.delete()
+      paginationEmbed(message, pages, buttonList, timeout = 120000)
+    }
   },
 }
