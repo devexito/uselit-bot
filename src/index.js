@@ -4,8 +4,6 @@ myintents.remove(['DIRECT_MESSAGES'])
 const client = new Client({ intents: myintents, allowedMentions: { repliedUser: false, parse: ['users'] }})
 
 const fs = require('fs')
-// const disbut = require('discord-buttons')
-// disbut(client)
 
 // const GenerateController = require('./services/generateController')
 // let generateController
@@ -120,63 +118,53 @@ const filter = response => {
   return item.some(answer => answer.toLowerCase() === response.content.toLowerCase())
 }
 
-/*
-client.on('clickButton', async (button) => {
-  switch (button.id) {
-    case 'next':
-      generateController.next()
-      button.defer()
+client.on('interactionCreate', button => {
+  if (!button.isButton()) return
+  console.log(button)
+
+  switch (button.customId) {
+    case 'vars':
+    //  generateController.next()
+      button.deferUpdate()
+      button.message.edit('test pass')
       break
     case 'prev':
-      generateController.prev()
-      button.defer()
+    //  generateController.prev()
+      button.deferUpdate()
       break
     case 'stop':
-      generateController.stop()
-      button.defer()
+    //  generateController.stop()
+      button.deferUpdate()
       break
     case 'regen':
-     // generateController.regen()
-      button.defer()
+    //  generateController.regen()
+      button.deferUpdate()
       break
   }
 })
-*/
 
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
   if (oldMember.nickname === newMember.nickname) return
   let guild = 467759978716069888
-  let m1 = 350177157550571521
-  let n1 = '❤nikitochka femboy lover❤'
-  let m2 = 761943058924830740
-  let n2 = '❤femboy debil❤'
-
-  let m3 = 567411443276840984
-  let n3 = '❤serafemboy❤'
+  let m = [350177157550571521, 761943058924830740, 567411443276840984]
+  let n = ['❤nikitochka femboy lover❤', '❤femboy debil❤', '❤serafemboy❤']
 
   if (oldMember.guild.id != guild) return console.log('escaped guild')
-  if (newMember.user.id == m1) {
-    if (newMember.nickname != n1) {
-      newMember.setNickname(n1)
+  if (newMember.user.id == m[0]) {
+    if (newMember.nickname != n[0]) {
+      newMember.setNickname(n[0])
     }
-  } else if (newMember.user.id == m2) {
-    if (newMember.nickname != n2) {
-      newMember.setNickname(n2)
+  } else if (newMember.user.id == m[1]) {
+    if (newMember.nickname != n[1]) {
+      newMember.setNickname(n[1])
     }
-  } else if (newMember.user.id == m3) {
-    if (newMember.nickname != n3) {
-      newMember.setNickname(n3)
+  } else if (newMember.user.id == m[2]) {
+    if (newMember.nickname != n[2]) {
+      newMember.setNickname(n[2])
     }
   } else return console.log('escaped member')
   console.log(newMember.user.username + ' has changed from ' + oldMember.nickname + ' to ' + newMember.nickname + '! Changing back to their defaults')
 })
 
-/*
-client.on("messageUpdate", (messageUpdate) => {
-  try {
-    const channel = messageDelete.guild.channels.cache.get('774628775840448522')'
-  }
-})
-*/
 
 client.login(config.token)
