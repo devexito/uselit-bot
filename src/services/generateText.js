@@ -1,12 +1,10 @@
 const unirest = require('unirest')
-const req = unirest('POST', 'https://pelevin.gpt.dobro.ai/generate/')
-const { errorParse } = require('../util/util')
+ const req = unirest('POST', 'https://pelevin.gpt.dobro.ai/generate/')
+ const { errorParse } = require('../util/util')
 
-  async function fetchText({
-    message,
-    args,
-    msg = false
-  }) {
+  async function fetchText(message, args, msg = false) {
+
+    let a = null
     
     req.query({
       'Accept-Encoding': 'gzip, deflate, br',
@@ -24,17 +22,23 @@ const { errorParse } = require('../util/util')
       length: 60
     })
 
-    req.end(async function (res) {
-      if (res.error) {
-        if (msg) {
-          errorParse('API error! Please try again later', message)
-          await msg.delete()
+    let promise = new Promise((resolve, reject) => {
+      req.end(async function (res) {
+        if (res.error) {
+          if (msg) {
+            errorParse('API error! Please try again later', message)
+            await msg.delete()
+          } else {
+            a = 'Error!'
+          }
+          return console.error(res.error)
+        } else {
+          a = res.body.replies
+          console.log(a)
+          return resolve(a)
+        
         }
-        return console.error(res.error)
-      }
-
-// let output =
-      return res.body.replies
+      })
     })
   }
 

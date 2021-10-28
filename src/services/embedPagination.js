@@ -6,7 +6,7 @@ const {
   MessageEmbed,
   MessageButton,
 } = require("discord.js");
-const fetchText = require("../services/generateText");
+const gen = require("../services/generateText");
 
 /**
  * Creates a pagination embed
@@ -46,6 +46,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
 
   collector.on("collect", async (i) => {
     console.log(i);
+    let output
     
     switch (i.customId) {
       case buttonList[0].customId:
@@ -59,21 +60,24 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
         const reference = i.message.channel.messages.cache.get(i.message.reference.messageId);
         let commandBody = reference.content.slice(1);
         const args = commandBody.trim().replace(/ +(?= )/g,'');
-        var generator = new fetchText({
-          reference,
-          args
-        });
-        await generator();
+        output = await gen.fetchText(reference, args);
         page = 0;
         break;
       default:
         break;
     }
     await i.deferUpdate();
-    await i.editReply({
-      embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
-      components: [row],
-    });
+    if (output) {
+      await i.editReply({
+        embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`).setDescription(output[page])],
+        components: [row],
+      });
+    } else {
+      await i.editReply({
+        embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
+        components: [row],
+      });
+    }
     collector.resetTimer();
   });
 

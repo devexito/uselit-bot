@@ -64,7 +64,7 @@ client.on('messageCreate', async message => {
         .title(client.user.username)
         .description(`My prefix is \`${prefix}\``)
         .build()
-      return message.channel.send({ embeds: [embed] })
+      return message.reply({ embeds: [embed] })
     }
 
   const commandBody = message.content.slice(prefix.length)

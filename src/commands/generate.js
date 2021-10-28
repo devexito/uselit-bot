@@ -1,9 +1,7 @@
-﻿const unirest = require('unirest')
-const req = unirest('POST', 'https://pelevin.gpt.dobro.ai/generate/')
-const paginationEmbed = require('../services/embedPagination')
+﻿const paginationEmbed = require('../services/embedPagination')
 const { MessageEmbed, MessageButton } = require('discord.js')
-const { getRandomInt, errorParse } = require('../util/util')
-let gen = require('../services/generateText')
+const { errorParse } = require('../util/util')
+const gen = require('../services/generateText')
 
 module.exports = {
   name: 'generate',
@@ -17,21 +15,18 @@ module.exports = {
   typing: true,
   async execute(message, args) {
     const msg = await message.reply('generating text...')
-    let output = gen.fetchText({
-      message,
-      args,
-      msg
-    }).then(async (output) => {
-      console.log(output)
+    const out = await gen.fetchText(message, args, msg)
+    .then(async (output) => {
+     // console.log(output)
       await createPages({
         message,
         output,
         args,
         msg
       })
-    }).catch(() => {})
+    }).catch((e) => {console.log(e)})
 
-    function embedBase(output, args, page) {
+    async function embedBase(output, args, page) {
       return new MessageEmbed()
         .setTitle('Result')
         .setDescription(args.join(' ').trim() + output.splice(output[page - 1], 1))
@@ -39,7 +34,7 @@ module.exports = {
 
     
       
-    function createPages({
+    async function createPages({
       message,
       output,
       args,
@@ -65,6 +60,7 @@ module.exports = {
         .setCustomId('regenbtn')
         .setLabel('')
         .setStyle('SUCCESS')
+       // .setDisabled(true)
         .setEmoji('🔄')
 
       pages = [
