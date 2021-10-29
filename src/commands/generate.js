@@ -14,10 +14,13 @@ module.exports = {
   usage: '<text>',
   typing: true,
   async execute(message, args) {
-    const msg = await message.reply('generating text...')
+    const embed = new MessageEmbed()
+      .setColor('#3131BB')
+      .setTitle('Generating text...')
+      .setDescription('<:clueless:896283754652381214>')
+    const msg = await message.reply({ embeds: [embed] })
     const out = await gen.fetchText(message, args, msg)
     .then(async (output) => {
-     // console.log(output)
       await createPages({
         message,
         output,
@@ -25,57 +28,58 @@ module.exports = {
         msg
       })
     }).catch((e) => {console.log(e)})
-
-    async function embedBase(output, args, page) {
-      return new MessageEmbed()
-        .setTitle('Result')
-        .setDescription(args.join(' ').trim() + output.splice(output[page - 1], 1))
-    }
-
     
-      
     async function createPages({
       message,
       output,
       args,
       msg = false
     }) {
-      const embed1 = embedBase(output, args, 1)
-      const embed2 = embedBase(output, args, 2)
-      const embed3 = embedBase(output, args, 3)
+      if (!output) {
+        if (msg) {
+          msg.delete()
+          return errorParse('Received no output while creating pages', message)
+        } else return
+      }
+      const embed1 = await gen.embedBase(output, args, 1)
+      const embed2 = await gen.embedBase(output, args, 2)
+      const embed3 = await gen.embedBase(output, args, 3)
 
       const button1 = new MessageButton()
         .setCustomId('previousbtn')
-        .setLabel('')
+     //   .setLabel('')
         .setStyle('PRIMARY')
         .setEmoji('⬅️')
 
       const button2 = new MessageButton()
         .setCustomId('nextbtn')
-        .setLabel('')
         .setStyle('PRIMARY')
         .setEmoji('➡️')
 
       const button3 = new MessageButton()
         .setCustomId('regenbtn')
-        .setLabel('')
-        .setStyle('SUCCESS')
+        .setStyle('SECONDARY')
        // .setDisabled(true)
         .setEmoji('🔄')
+
+      const button4 = new MessageButton()
+        .setCustomId('stopbtn')
+        .setStyle('DANGER')
+        .setEmoji('✖️')
 
       pages = [
 	       embed1,
 	       embed2,
-        embed3,
+        embed3
       ]
 
       buttonList = [
         button1,
         button2,
-        button3
+        button3,
+        button4,
       ]
-      if (msg) msg.delete()
-      paginationEmbed(message, pages, buttonList, timeout = 120000)
+      msg ? paginationEmbed(msg, pages, buttonList, timeout = 120000) : errorParse('No message to reply to', message)
     }
   },
 }

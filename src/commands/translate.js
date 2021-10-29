@@ -78,7 +78,7 @@ module.exports = {
       let output = res.body.map(a => a.translations.map(b => b.text)[0])
 
       let embed = new Embed()
-        .color('#0019B9')
+        .color('#3131BB')
       
       let parsedOutText = ''
 

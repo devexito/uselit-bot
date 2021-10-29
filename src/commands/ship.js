@@ -46,7 +46,7 @@ module.exports = {
     let user2 = args[1]
 
     let embed = new Embed()
-      .color('#0019B9')
+      .color('#3131BB')
 
     async function randUser(message, isServNick) {
       let random = message.guild.members.cache.random()

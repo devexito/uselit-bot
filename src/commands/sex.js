@@ -14,7 +14,7 @@ module.exports = {
     let sexState = 'sexing'
     let user = args
     let embed = new Embed()
-      .color('#0019B9')
+      .color('#3131BB')
     
     async function mentionCheck(input, message) {
       input.join('')

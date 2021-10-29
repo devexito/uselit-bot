@@ -16,7 +16,8 @@ module.exports = {
     commands = commands.filter(b => !b.owner)
 
     let embed = new Embed()
-      .color('#2f3136')
+    //  .color('#2f3136')
+      .color('#3131BB')
 
     if (!args.length) {
       let spaces = '         ' // 9 spaces

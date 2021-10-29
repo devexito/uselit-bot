@@ -1,10 +1,11 @@
 const unirest = require('unirest')
- const req = unirest('POST', 'https://pelevin.gpt.dobro.ai/generate/')
- const { errorParse } = require('../util/util')
+const req = unirest('POST', 'https://pelevin.gpt.dobro.ai/generate/')
+const { MessageEmbed } = require('discord.js')
+const { errorParse } = require('../util/util')
 
   async function fetchText(message, args, msg = false) {
 
-    let a = null
+    if (!args) return errorParse('no args?', message)
     
     req.query({
       'Accept-Encoding': 'gzip, deflate, br',
@@ -22,26 +23,36 @@ const unirest = require('unirest')
       length: 60
     })
 
-    let promise = new Promise((resolve, reject) => {
+    return new Promise(function(resolve, reject) {
       req.end(async function (res) {
         if (res.error) {
           if (msg) {
             errorParse('API error! Please try again later', message)
             await msg.delete()
+            reject(res.error.code)
           } else {
-            a = 'Error!'
+            reject(res.error.code)
           }
           return console.error(res.error)
         } else {
-          a = res.body.replies
-          console.log(a)
-          return resolve(a)
-        
+          resolve(res.body.replies)
         }
       })
+    }).catch(async (e) => {
+      errorParse('Couldn\'t generate text.', msg ? msg : message)
+      console.error(e)
     })
   }
 
+  async function embedBase(output, args, page) {
+    if (!output) return console.error('no output')
+    return new MessageEmbed()
+      .setColor('#3131BB')
+      .setTitle('Result')
+      .setDescription(args.join(' ').trim() + output.splice(output[page - 1], 1))
+  }
+
 module.exports = {
-  fetchText
+  fetchText,
+  embedBase,
 }

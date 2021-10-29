@@ -5,9 +5,6 @@ const client = new Client({ intents: myintents, allowedMentions: { repliedUser: 
 
 const fs = require('fs')
 
-// const GenerateController = require('./services/generateController')
-// let generateController
-
 const Embed = require('./services/embedConstructor.js')
 const { errorParse, argsError } = require('./util/util.js')
 const config = require('./config.js')
@@ -19,8 +16,6 @@ const prefix = config.defaultPrefix
 
 client.on('ready', () => {
   console.log(`[READY] Logged in as ${client.user.tag}`)
-
- // generateController = new GenerateController(client, disbut)
 
   setInterval(() => {
     client.user.setPresence({

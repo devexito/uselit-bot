@@ -26,7 +26,7 @@ module.exports = {
     }
 
     let embed = new Embed()
-      .color('#0019B9')
+      .color('#3131BB')
       .field('Guilds', client.guilds.cache.size.toString(), true)
       .field('Users', client.users.cache.size.toString(), true)
       .field('Commands', `${commands.size.toString()} (${allcommands.size.toString()})`, true)
