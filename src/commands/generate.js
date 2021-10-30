@@ -18,8 +18,8 @@ module.exports = {
       .setColor('#3131BB')
       .setTitle('Generating text...')
       .setDescription('<:clueless:896283754652381214>')
-    const msg = await message.reply({ embeds: [embed] })
-    const out = await gen.fetchText(message, args, msg)
+    const msg = await message.reply({ embeds: [embed] }).catch()
+    const out = await gen.fetchText(message, args, msg).catch()
     .then(async (output) => {
       await createPages({
         message,
@@ -79,7 +79,7 @@ module.exports = {
         button3,
         button4,
       ]
-      msg ? paginationEmbed(msg, pages, buttonList, timeout = 120000) : errorParse('No message to reply to', message)
+      msg ? paginationEmbed(msg, pages, buttonList, timeout = 120000) : errorParse('Unexpected error occurred!', message)
     }
   },
 }

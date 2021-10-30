@@ -29,10 +29,16 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
   let page = 0;
 
   const row = new MessageActionRow().addComponents(buttonList);
-  const curPage = await msg.edit({
-    embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
-    components: [row],
-  });
+  let curPage;
+  if (msg) {
+    curPage = await msg.edit({
+      embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
+      components: [row],
+    }).catch(() => {});
+  } else {
+    console.log('no message? skipping');
+    return null
+  };
 
   const disabledRow = new MessageActionRow().addComponents(
     buttonList[0].setDisabled(true),
@@ -46,28 +52,41 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
     i.customId === buttonList[1].customId ||
     i.customId === buttonList[2].customId ||
     i.customId === buttonList[3].customId;
-
-  const collector = await curPage.createMessageComponentCollector({
-    filter,
-    time: timeout,
-  });
+  let collector;
+  try {
+    collector = await curPage.createMessageComponentCollector({
+      filter,
+      time: timeout,
+    });
+  } catch (e) {
+    return console.error(e)
+  }
 
   let isPaging = false;
   let commandBody;
   let args;
+  let msgIsDeleted = false;
 
   collector.on("collect", async (i) => {
     let output;
     let author;
-    await msg.channel.messages.fetch(i.message.reference.messageId)
-      .then(message => {
-        commandBody = message.content.slice(1);
-        args = commandBody.trim().replace(/ +(?= )/g,'').split(' ');
-        if (args) args.splice(0, 1);
-        author = message.author.id;
-    }).catch(e => {
-      console.error(e);
-    });
+
+    if (curPage.deleted) return;
+      args = await msg.channel.messages.fetch(i.message.reference.messageId)
+        .then(message => {
+          (!author) ? author = message.author.id : author;
+          msgIsDeleted = message.deleted;
+          if (!args) {
+            commandBody = message.content.slice(1);
+            let arg = commandBody.trim().replace(/ +(?= )/g,'').split(' ');
+            arg.splice(0, 1);
+            return arg;
+          } else {
+            return args;
+          }
+      }).catch(e => {
+    //  console.error(e);
+      });
     
     switch (i.customId) {
       case buttonList[0].customId:
@@ -79,7 +98,9 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
         isPaging = true;
         break;
       case buttonList[2].customId:
-        if (!i.message.reference || !args) {
+        isPaging = false;
+        if (msgIsDeleted || !args) {
+          console.log(msgIsDeleted + ' ' + args)
           await i.deferUpdate();
           collector.stop();
           break;
@@ -95,9 +116,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
       case buttonList[3].customId:
         isPaging = false;
         await i.deferUpdate();
-        if (i.user.id == author) {
-          collector.stop();
-        }
+        if ((i.user.id == author) || msgIsDeleted || !args || !author) collector.stop();
         break;
       default:
         break;
@@ -116,7 +135,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
         embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
         components: [row],
       });
-    }
+    };
     collector.resetTimer();
   });
 
@@ -126,7 +145,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
         embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
         components: [],
       });
-    }
+    };
   });
 
   return curPage;

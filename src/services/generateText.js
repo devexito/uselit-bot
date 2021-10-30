@@ -28,7 +28,6 @@ const { errorParse } = require('../util/util')
         if (res.error) {
           if (msg) {
             errorParse('API error! Please try again later', message)
-            await msg.delete()
             reject(res.error.code)
           } else {
             reject(res.error.code)
