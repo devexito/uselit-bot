@@ -6,7 +6,7 @@ const client = new Client({ intents: myintents, allowedMentions: { repliedUser: 
 const fs = require('fs')
 
 const Embed = require('./services/embedConstructor.js')
-const { errorParse, argsError } = require('./util/util.js')
+const { shorten, errorParse, argsError } = require('./util/util.js')
 const config = require('./config.js')
 client.cooldowns = new Collection()
 client.commands = new Collection()
@@ -105,7 +105,7 @@ setTimeout(() => timestamps.delete(message.author.id), cooldownAmount)
     console.error(e)
   })
         //   logs   //
-  if (!command || !prefix) return; else console.log(`${command.name}  ${args} in: ${message.guild.name}`)
+  (!command || !prefix) ? return : console.log(`${command.name}  ${shorten(args, 1000)} in: ${message.guild.name}`)
 
 })
 

@@ -50,7 +50,7 @@ class EmbedBuilder {
    * @return {EmbedBuilder}
    */
   description(description) {
-      if (description.length > 2048) throw new Error('The description should not be longer than 2048 characters.');
+      if (description.length > 4000) throw new Error('The description should not be longer than 4000 characters.');
       this._description = description;
       return this;
   }

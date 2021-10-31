@@ -51,9 +51,7 @@ module.exports = {
 
     let textToTranslate = args
     textToTranslate.splice(0, 1)
-    textToTranslate = textToTranslate.join(' ')
-    
-    console.log('translate: ' + textToTranslate)
+    textToTranslate = textToTranslate.join(' ')
     
     reqTr.type('json')
     reqTr.send([
