@@ -105,7 +105,7 @@ setTimeout(() => timestamps.delete(message.author.id), cooldownAmount)
     console.error(e)
   })
         //   logs   //
-  (!command || !prefix) ? return : console.log(`${command.name}  ${shorten(args, 1000)} in: ${message.guild.name}`)
+  return !command || !prefix ? null : console.log(`${command.name}  ${shorten(args, 1000)} in: ${message.guild.name}`)
 
 })
 
