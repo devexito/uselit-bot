@@ -1,9 +1,8 @@
-﻿// const { stripIndents } = require('common-tags')
-const Embed = require('../services/embedConstructor.js')
+﻿const Embed = require('../services/embedConstructor.js')
 
 module.exports = class Util {
-  static shorten(text, maxLen = 2000) {
-    return text.length > maxLen ? `${text.substr(0, maxLen - 3)}...` : text
+  static shorten(text, maxLen = 4000) {
+    return text.length > maxLen ? `${text.substr(0, maxLen - 3)}…` : text
   }
   
   static formatNumber(number, minimumFractionDigits = 0) {
