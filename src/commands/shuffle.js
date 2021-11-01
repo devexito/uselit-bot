@@ -1,4 +1,5 @@
-const { errorParse } = require('../util/util')
+const { shorten, errorParse } = require('../util/util')
+const { repliedMessage } = require('../util/message')
 
 module.exports = {
   name: 'shuffle',
@@ -6,26 +7,8 @@ module.exports = {
   desc: 'Shuffle your words',
   permissions: '',
   aliases: ['s', 'randomize'],
-  args: true,
-  usage: '<message ID|text>',
+  usage: '<text>',
   async execute(message, args) {
-    let isError
-    async function messageCheck(input, message) {
-        const regEx = /([0-9]{17,21})/
-        console.log('eba ' + input + regEx.test(input))
-        if (regEx.test(input)) {
-          console.log('blya ' + input)
-        } else return
-
-      let content
-      await message.channel.messages.fetch(input)
-        .then(msg => {
-          content = msg.content.split(' ')
-      }).catch(e => isError = true)
-
-      return content ? content : isError = true
-    }
-
     function shuffle(array) {
       var currentIndex = array.length, temporaryValue, randomIndex
 
@@ -44,11 +27,16 @@ module.exports = {
       return array
     }
 
-    let msgId = await messageCheck(args[0], message)
-    if (isError) return errorParse('Couldn\'t find the message', message)
-    if (msgId) args = msgId
-    shuffle(args)
-    console.log(args)
-    message.reply(args.join(' ').trim())
+    let reply = await repliedMessage(message).catch((e) => console.error(e))
+    if (undefined != args && args.length) {
+      shuffle(args)
+      message.reply(shorten(args.join(' ').trim(), 2000))
+    } else if (undefined != reply && reply.length) {
+      shuffle(reply)
+      message.reply(shorten(reply.join(' ').trim(), 2000))
+    } else {
+      console.log('no text')
+      errorParse('No text provided', message)
+    }
   },
 }
