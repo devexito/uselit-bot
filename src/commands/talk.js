@@ -1,6 +1,7 @@
 const unirest = require('unirest')
 // const ctkey = '00IGfYo3R5USlx45tAVLoAAid'
 const { errorParse } = require('../util/util')
+const { repliedMessage } = require('../util/message')
 const XRegExp = require('xregexp')
 
 module.exports = {
@@ -11,8 +12,16 @@ module.exports = {
   permissions: '',
   cooldown: 3,
   usage: '<text>',
-  args: true,
   async execute(message, args, client) {
+    let reply = await repliedMessage(message).catch((e) => console.error(e))
+    if (undefined != args && args.length) {
+    } else if (undefined != reply && reply.length) {
+      args = reply
+    } else {
+      console.log('no text')
+      return errorParse('No text provided', message)
+    }
+
     args = args.join(' ')
 
     function detectLanguage(text) {
@@ -124,7 +133,7 @@ module.exports = {
         message.reply(res.body.message)
       } else {
         try {
-          errorParse(out)
+          errorParse(out, message)
           console.log(`'${text}' - ${res.body.response}`)
         }
         catch (e) {
