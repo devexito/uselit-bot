@@ -14,10 +14,12 @@ module.exports = {
   usage: '<text>',
   typing: true,
   async execute(message, args) {
+    let replied = false
     let reply = await repliedMessage(message).catch((e) => console.error(e))
     if (undefined != args && args.length) {
     } else if (undefined != reply && reply.length) {
       args = reply
+      replied = true
     } else {
       console.log('no text')
       return errorParse('No text provided', message)
@@ -33,7 +35,8 @@ module.exports = {
         message,
         output,
         args,
-        msg
+        msg,
+        replied
       })
     }).catch((e) => {console.log(e)})
     
@@ -41,7 +44,8 @@ module.exports = {
       message,
       output,
       args,
-      msg = false
+      msg = false,
+      replied = false
     }) {
       if (!output) {
         if (msg) {
@@ -53,24 +57,25 @@ module.exports = {
       const embed2 = await gen.embedBase(output, args, 2)
       const embed3 = await gen.embedBase(output, args, 3)
 
-      const button1 = new MessageButton()
+      let button1 = new MessageButton()
         .setCustomId('previousbtn')
      //   .setLabel('')
         .setStyle('PRIMARY')
         .setEmoji('⬅️')
 
-      const button2 = new MessageButton()
+      let button2 = new MessageButton()
         .setCustomId('nextbtn')
         .setStyle('PRIMARY')
         .setEmoji('➡️')
 
-      const button3 = new MessageButton()
+      let button3 = new MessageButton()
         .setCustomId('regenbtn')
         .setStyle('SECONDARY')
-       // .setDisabled(true)
         .setEmoji('🔄')
 
-      const button4 = new MessageButton()
+      if (replied) button3.setDisabled(true)
+
+      let button4 = new MessageButton()
         .setCustomId('stopbtn')
         .setStyle('DANGER')
         .setEmoji('✖️')
