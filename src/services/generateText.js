@@ -5,7 +5,7 @@ const { errorParse } = require('../util/util')
 
   async function fetchText(message, args, msg = false) {
 
-    if (!args) return errorParse('no args?', message)
+    if (!args) return errorParse('No args?', message)
     
     req.query({
       'Accept-Encoding': 'gzip, deflate, br',
@@ -27,10 +27,9 @@ const { errorParse } = require('../util/util')
       req.end(async function (res) {
         if (res.error) {
           if (msg) {
-            errorParse('API error! Please try again later', message)
-            reject(res.error.code)
+            reject('API error! Please try again later')
           } else {
-            reject(res.error.code)
+            reject('Couldn\'t generate text')
           }
           return console.error(res.error)
         } else {
@@ -38,13 +37,13 @@ const { errorParse } = require('../util/util')
         }
       })
     }).catch(async (e) => {
-      errorParse('Couldn\'t generate text.', msg ? msg : message)
+      errorParse(e, message)
       console.error(e)
     })
   }
 
   async function embedBase(output, args, page) {
-    if (!output) return console.error('no output')
+    if (!output) return console.error('no output for embedding pages')
     return new MessageEmbed()
       .setColor('#3131BB')
       .setTitle('Result')

@@ -1,6 +1,7 @@
 ﻿const paginationEmbed = require('../services/embedPagination')
 const { MessageEmbed, MessageButton } = require('discord.js')
 const { errorParse } = require('../util/util')
+const { repliedMessage } = require('../util/message')
 const gen = require('../services/generateText')
 
 module.exports = {
@@ -10,10 +11,17 @@ module.exports = {
   desc: 'Complete text using Porfirevich',
   permissions: '',
   cooldown: 5,
-  args: true,
   usage: '<text>',
   typing: true,
   async execute(message, args) {
+    let reply = await repliedMessage(message).catch((e) => console.error(e))
+    if (undefined != args && args.length) {
+    } else if (undefined != reply && reply.length) {
+      args = reply
+    } else {
+      console.log('no text')
+      return errorParse('No text provided', message)
+    }
     const embed = new MessageEmbed()
       .setColor('#3131BB')
       .setTitle('Generating text...')
