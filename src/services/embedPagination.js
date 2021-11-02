@@ -5,8 +5,9 @@ const {
   Message,
   MessageEmbed,
   MessageButton,
-} = require("discord.js");
-const gen = require("../services/generateText");
+} = require('discord.js');
+const { shorten } = require('../util/util');
+const gen = require('../services/generateText');
 
 /**
  * Creates a pagination embed
@@ -17,18 +18,20 @@ const gen = require("../services/generateText");
  * @returns
  */
 const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, replied = false) => {
-  if (!msg && !msg.channel) throw new Error("Channel is inaccessible.");
-  if (!pages) throw new Error("Pages are not given.");
-  if (!buttonList) throw new Error("Buttons are not given.");
-  if (buttonList[0].style === "LINK" || buttonList[1].style === "LINK")
+  if (!msg && !msg.channel) throw new Error('Channel is inaccessible.');
+  if (!pages) throw new Error('Pages are not given.');
+  if (!buttonList) throw new Error('Buttons are not given.');
+  if (buttonList[0].style === 'LINK' || buttonList[1].style === 'LINK')
     throw new Error(
-      "Link buttons are not supported with discordjs-button-pagination"
+      'Link buttons are not supported with discordjs-button-pagination'
     );
-  if (buttonList.length < 5) throw new Error("Need five buttons.");
+  if (buttonList.length < 5) throw new Error('Need five buttons.');
 
   let page = 0;
 
   if (replied) buttonList[2].setDisabled(true);
+  if (pages[0].description.length > 2999) buttonList[3].setDisabled(true);
+
   const row = new MessageActionRow().addComponents(buttonList);
   let curPage;
   if (msg) {
@@ -38,7 +41,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, replied
     }).catch(() => {});
   } else {
     console.log('no message? skipping');
-    return null
+    return null;
   };
 
   const disabledRow = new MessageActionRow().addComponents(
@@ -62,7 +65,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, replied
       time: timeout,
     });
   } catch (e) {
-    return console.error(e)
+    return console.error(e);
   }
 
   let isPaging = false;
@@ -70,7 +73,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, replied
   let args;
   let msgIsDeleted = false;
 
-  collector.on("collect", async (i) => {
+  collector.on('collect', async (i) => {
     let output;
     let author;
 
@@ -112,7 +115,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, replied
         await i.editReply({
           embeds: [pages[page].setFooter('Regenerating text...')],
           components: [disabledRow],
-        });
+        }).catch(() => {});
         output = await gen.fetchText(msg, args);
         page = 0;
         break;
@@ -122,10 +125,10 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, replied
         await i.editReply({
           embeds: [pages[page].setFooter('Generating more text...')],
           components: [disabledRow],
-        });
+        }).catch(() => {});
         let embedText = pages[page].description.split(' ');
         output = await gen.fetchText(msg, embedText);
-        args = output.input.split(' ');
+        if (output) args = output.input.split(' ');
         page = 0;
         break;
       case buttonList[4].customId: // CLOSE BUTTONS
@@ -137,29 +140,32 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, replied
         break;
     }
     if (output) {
-      pages[0] = pages[0].setDescription(output.input + output.res[0]);
-      pages[1] = pages[1].setDescription(output.input + output.res[1]);
-      pages[2] = pages[2].setDescription(output.input + output.res[2]);
+      pages[0] = pages[0].setDescription(shorten(output.input + output.res[0]));
+      pages[1] = pages[1].setDescription(shorten(output.input + output.res[1]));
+      pages[2] = pages[2].setDescription(shorten(output.input + output.res[2]));
+      if (pages[page].description.length > 2999) {
+        row.spliceComponents(3, 1, buttonList[3].setDisabled(true))
+      }
       await i.editReply({
         embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
         components: [row],
-      });
+      }).catch(() => {});
     } else if (isPaging) {
       await i.deferUpdate();
       await i.editReply({
         embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
         components: [row],
-      });
+      }).catch(() => {});
     };
     collector.resetTimer();
   });
 
-  collector.on("end", () => {
+  collector.on('end', () => {
     if (!curPage.deleted) {
       curPage.edit({
         embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
         components: [],
-      });
+      }).catch(() => {});
     };
   });
 

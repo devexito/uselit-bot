@@ -105,40 +105,10 @@ setTimeout(() => timestamps.delete(message.author.id), cooldownAmount)
     console.error(e)
   })
         //   logs   //
-  return !command || !prefix ? null : console.log(`${command.name}  ${shorten(args, 1000)} in: ${message.guild.name}`)
+  return !command || !prefix ? null : console.log(`${command.name}  ${shorten(args.join(' '), 1000)} in: ${message.guild.name}`)
 
 })
 
-const filter = response => {
-  return item.some(answer => answer.toLowerCase() === response.content.toLowerCase())
-}
-
-/*
-client.on('interactionCreate', button => {
-  if (!button.isButton()) return
-  // console.log(button)
-
-  switch (button.customId) {
-    case 'vars':
-    //  generateController.next()
-      button.deferUpdate()
-      button.message.edit('test pass')
-      break
-    case 'prev':
-    //  generateController.prev()
-      button.deferUpdate()
-      break
-    case 'stop':
-    //  generateController.stop()
-      button.deferUpdate()
-      break
-    case 'regen':
-    //  generateController.regen()
-      button.deferUpdate()
-      break
-  }
-})
-*/
 
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
   if (oldMember.nickname === newMember.nickname) return
