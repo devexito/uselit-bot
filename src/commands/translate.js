@@ -63,7 +63,7 @@ module.exports = {
 
     reqTr.end(function (res) {
       if (res.error) {
-        parseError('API error! Please try again later', message)
+        errorParse('API error! Please try again later', message)
         return console.error(res.error)
       }
       let outFrom
@@ -88,7 +88,7 @@ module.exports = {
         embed = embed.title('`' + outFrom[0] + '` → `' + langInput + '`')
           .description(parsedOutText)
           .build()
-        message.reply({ embeds: [embed] })
+        message.reply({ embeds: [embed] }).catch(e => errorParse(e.toString(), message))
       }
     })
     

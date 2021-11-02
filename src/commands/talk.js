@@ -130,7 +130,7 @@ module.exports = {
       }
 
       if (res.ok) {
-        message.reply(res.body.message)
+        message.reply(res.body.message).catch(e => errorParse(e.toString(), message))
       } else {
         try {
           errorParse(out, message)

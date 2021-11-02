@@ -16,7 +16,7 @@ const gen = require("../services/generateText");
  * @param {number} timeout
  * @returns
  */
-const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
+const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, replied = false) => {
   if (!msg && !msg.channel) throw new Error("Channel is inaccessible.");
   if (!pages) throw new Error("Pages are not given.");
   if (!buttonList) throw new Error("Buttons are not given.");
@@ -24,10 +24,11 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
     throw new Error(
       "Link buttons are not supported with discordjs-button-pagination"
     );
-  if (buttonList.length < 2) throw new Error("Need two buttons.");
+  if (buttonList.length < 5) throw new Error("Need five buttons.");
 
   let page = 0;
 
+  if (replied) buttonList[2].setDisabled(true);
   const row = new MessageActionRow().addComponents(buttonList);
   let curPage;
   if (msg) {
@@ -44,14 +45,16 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
     buttonList[0].setDisabled(true),
     buttonList[1].setDisabled(true),
     buttonList[2].setDisabled(true),
-    buttonList[3].setDisabled(true)
+    buttonList[3].setDisabled(true),
+    buttonList[4].setDisabled(true)
   );
 
   const filter = (i) =>
     i.customId === buttonList[0].customId ||
     i.customId === buttonList[1].customId ||
     i.customId === buttonList[2].customId ||
-    i.customId === buttonList[3].customId;
+    i.customId === buttonList[3].customId ||
+    i.customId === buttonList[4].customId;
   let collector;
   try {
     collector = await curPage.createMessageComponentCollector({
@@ -76,7 +79,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
         .then(message => {
           (!author) ? author = message.author.id : author;
           msgIsDeleted = message.deleted;
-          if (!args) {
+          if (!args && !msgIsDeleted) {
             commandBody = message.content.slice(1);
             let arg = commandBody.trim().replace(/ +(?= )/g,'').split(' ');
             arg.splice(0, 1);
@@ -89,17 +92,17 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
       });
     
     switch (i.customId) {
-      case buttonList[0].customId:
+      case buttonList[0].customId: // PREVIOUS
         page = page > 0 ? --page : pages.length - 1;
         isPaging = true;
         break;
-      case buttonList[1].customId:
+      case buttonList[1].customId: // NEXT
         page = page + 1 < pages.length ? ++page : 0
         isPaging = true;
         break;
-      case buttonList[2].customId:
+      case buttonList[2].customId: // REGENERATE TEXT
         isPaging = false;
-        if (msgIsDeleted || !args) {
+        if (!args) {
           console.log(msgIsDeleted + ' ' + args)
           await i.deferUpdate();
           collector.stop();
@@ -107,13 +110,25 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
         }
         await i.deferUpdate();
         await i.editReply({
-          embeds: [pages[page].setFooter('Generating new text...')],
+          embeds: [pages[page].setFooter('Regenerating text...')],
           components: [disabledRow],
         });
         output = await gen.fetchText(msg, args);
         page = 0;
         break;
-      case buttonList[3].customId:
+      case buttonList[3].customId: // GENERATE MORE TEXT
+        isPaging = false;
+        await i.deferUpdate();
+        await i.editReply({
+          embeds: [pages[page].setFooter('Generating more text...')],
+          components: [disabledRow],
+        });
+        let embedText = pages[page].description.split(' ');
+        output = await gen.fetchText(msg, embedText);
+        args = output.input.split(' ');
+        page = 0;
+        break;
+      case buttonList[4].customId: // CLOSE BUTTONS
         isPaging = false;
         await i.deferUpdate();
         if ((i.user.id == author) || msgIsDeleted || !args || !author) collector.stop();
@@ -122,9 +137,9 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000) => {
         break;
     }
     if (output) {
-      pages[0] = pages[0].setDescription(args.join(' ').trim() + output[0]);
-      pages[1] = pages[1].setDescription(args.join(' ').trim() + output[1]);
-      pages[2] = pages[2].setDescription(args.join(' ').trim() + output[2]);
+      pages[0] = pages[0].setDescription(output.input + output.res[0]);
+      pages[1] = pages[1].setDescription(output.input + output.res[1]);
+      pages[2] = pages[2].setDescription(output.input + output.res[2]);
       await i.editReply({
         embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
         components: [row],

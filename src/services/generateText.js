@@ -33,7 +33,10 @@ const { errorParse } = require('../util/util')
           }
           return console.error(res.error)
         } else {
-          resolve(res.body.replies)
+          resolve({
+            res: res.body.replies,
+            input: req.options.body.prompt
+          })
         }
       })
     }).catch(async (e) => {
@@ -42,12 +45,12 @@ const { errorParse } = require('../util/util')
     })
   }
 
-  async function embedBase(output, args, page) {
+  async function embedBase(output, page) {
     if (!output) return console.error('no output for embedding pages')
     return new MessageEmbed()
       .setColor('#3131BB')
       .setTitle('Result')
-      .setDescription(args.join(' ').trim() + output.splice(output[page - 1], 1))
+      .setDescription(output.input + output.res.splice(output.res[page - 1], 1))
   }
 
 module.exports = {

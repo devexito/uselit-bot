@@ -25,10 +25,8 @@ module.exports = {
 
       embed = embed
         .title('Command List')
-        .description('```' + commandList.join('\n') + '```')
-        .footer('Type ' + prefix + 'help [command name] to show more info about a specific command.')
-
-    //  message.reply('List of all commands:\n```\n' + commands.map(command => command.name).join(', ') + '```\nType "' + prefix + 'help [command name]" to show more info about a specific command')
+        .description('```\n' + commandList.join('\n') + '```')
+        .footer('Type ' + prefix + 'help [command name] to show more info about a specific command.\nHint: Commands with any text input support message references. Try replying to a message while executing a ">generate", ">shuffle" or ">talk" command without arguments!')
     } else {
       const name = args[0].toLowerCase()
       const command = allcommands.get(name)

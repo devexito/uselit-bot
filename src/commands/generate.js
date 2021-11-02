@@ -17,9 +17,10 @@ module.exports = {
     let replied = false
     let reply = await repliedMessage(message).catch((e) => console.error(e))
     if (undefined != args && args.length) {
-    } else if (undefined != reply && reply.length) {
+    } else if (undefined != reply && reply[0] !== '' && reply.length) {
       args = reply
       replied = true
+console.log(reply)
     } else {
       console.log('no text')
       return errorParse('No text provided', message)
@@ -28,34 +29,29 @@ module.exports = {
       .setColor('#3131BB')
       .setTitle('Generating text...')
       .setDescription('<:clueless:896283754652381214>')
-    const msg = await message.reply({ embeds: [embed] }).catch()
-    const out = await gen.fetchText(message, args, msg).catch()
+    const msg = await message.reply({ embeds: [embed] }).catch(e => errorParse(e.toString(), message))
+    if (!msg) return
+    const out = await gen.fetchText(message, args, msg)
     .then(async (output) => {
+      if (!output) return msg.delete()
       await createPages({
         message,
         output,
-        args,
         msg,
         replied
       })
-    }).catch((e) => {console.log(e)})
+    }).catch((e) => console.log(e))
     
     async function createPages({
       message,
       output,
-      args,
       msg = false,
       replied = false
     }) {
-      if (!output) {
-        if (msg) {
-          msg.delete()
-          return errorParse('Received no output while creating pages', message)
-        } else return
-      }
-      const embed1 = await gen.embedBase(output, args, 1)
-      const embed2 = await gen.embedBase(output, args, 2)
-      const embed3 = await gen.embedBase(output, args, 3)
+      
+      const embed1 = await gen.embedBase(output, 1)
+      const embed2 = await gen.embedBase(output, 2)
+      const embed3 = await gen.embedBase(output, 3)
 
       let button1 = new MessageButton()
         .setCustomId('previousbtn')
@@ -76,6 +72,11 @@ module.exports = {
       if (replied) button3.setDisabled(true)
 
       let button4 = new MessageButton()
+        .setCustomId('genmorebtn')
+        .setStyle('SECONDARY')
+        .setEmoji('⏩')
+
+      let button5 = new MessageButton()
         .setCustomId('stopbtn')
         .setStyle('DANGER')
         .setEmoji('✖️')
@@ -91,6 +92,7 @@ module.exports = {
         button2,
         button3,
         button4,
+        button5
       ]
       msg ? paginationEmbed(msg, pages, buttonList, timeout = 120000) : errorParse('Unexpected error occurred!', message)
     }
