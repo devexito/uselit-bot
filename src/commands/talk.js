@@ -102,7 +102,7 @@ module.exports = {
 
       let out = ''
 
-      switch (res.code) { // ���� ��������� ������
+      switch (res.code) { // оьвалыьлдваьплдьвлдпватлдпвалдтоьплд
         case 500:
           out = 'Oops! Something weird happened. Please try again.'
         break

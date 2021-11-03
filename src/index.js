@@ -53,21 +53,20 @@ client.on('messageCreate', async message => {
   if (!message.guild) return
 
   if (message.content.startsWith(`<@${client.user.id}>`) || message.content.startsWith(`<@!${client.user.id}>`) ) {
-
-      let embed = new Embed()
-        .color('#3131BB')
-        .title(client.user.username)
-        .description(`My prefix is \`${prefix}\``)
-        .build()
-      return message.reply({ embeds: [embed] })
-    }
+    let embed = new Embed()
+      .color('#3131BB')
+      .title(client.user.username)
+      .description(`My prefix is \`${prefix}\``)
+      .build()
+    return message.reply({ embeds: [embed] })
+  }
 
   const commandBody = message.content.slice(prefix.length)
   const args = commandBody.trim().replace(/ +(?= )/g,'').split(' ')
   const commandName = args.shift().toLowerCase()
 
   const command = client.commands.get(commandName) 
-      || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName))
+    || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName))
 
   if (!message.content.startsWith(prefix)) return
 
@@ -77,26 +76,26 @@ client.on('messageCreate', async message => {
     return argsError(command, message, prefix)
   }
 
-  // COOLDOWNS
-if (!cooldowns.has(command.name)) {
-  cooldowns.set(command.name, new Collection())
-}
-
-const now = Date.now()
-const timestamps = cooldowns.get(command.name)
-const cooldownAmount = (command.cooldown || 2) * 1000
-
-if (timestamps.has(message.author.id)) {
-  	const expirationTime = timestamps.get(message.author.id) + cooldownAmount
-
-	 if (now < expirationTime) {
-	   	const timeLeft = (expirationTime - now) / 1000
-	   	return message.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`)
+    // COOLDOWNS
+  if (!cooldowns.has(command.name)) {
+    cooldowns.set(command.name, new Collection())
   }
-}
 
-timestamps.set(message.author.id, now)
-setTimeout(() => timestamps.delete(message.author.id), cooldownAmount)
+  const now = Date.now()
+  const timestamps = cooldowns.get(command.name)
+  const cooldownAmount = (command.cooldown || 2) * 1000
+
+  if (timestamps.has(message.author.id)) {
+    const expirationTime = timestamps.get(message.author.id) + cooldownAmount
+
+    if (now < expirationTime) {
+      const timeLeft = (expirationTime - now) / 1000
+      return message.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`)
+    }
+  }
+
+  timestamps.set(message.author.id, now)
+  setTimeout(() => timestamps.delete(message.author.id), cooldownAmount)
 
   // EXECUTION
   await command.execute(message, args, client)
