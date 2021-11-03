@@ -20,7 +20,7 @@ module.exports = {
     console.log('https://texttospeech.responsivevoice.org/v1/text:synthesize?text=' + encodeURI(args.join(' ')) + '&lang=pl&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=0POmS5Y2&gender=male')
     
     const res = await axios.get(
-      'https://texttospeech.responsivevoice.org/v1/text:synthesize?text=' + encodeURI(args.join(' ')) + '&lang=mo&engine=g2&name=&pitch=0.5&rate=0.5&volume=1&key=0POmS5Y2&gender=female',
+      'https://texttospeech.responsivevoice.org/v1/text:synthesize?text=' + encodeURI(args.join(' ')) + '&lang=tr&engine=g3&name=&pitch=0.5&rate=0.5&volume=1&key=0POmS5Y2&gender=male',
       {
         headers: {
           'accept': '*/*',
