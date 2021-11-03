@@ -35,7 +35,6 @@ module.exports = {
       shuffle(reply)
       message.reply(shorten(reply.join(' ').trim(), 2000)).catch(e => errorParse(e.toString(), message))
     } else {
-      console.log('no text')
       errorParse('No text provided', message)
     }
   },

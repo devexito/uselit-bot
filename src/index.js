@@ -114,7 +114,7 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
   if (oldMember.nickname === newMember.nickname) return
   let guild = 467759978716069888
   let m = [350177157550571521, 761943058924830740, 567411443276840984]
-  let n = ['❤nikitochka femboy lover❤', '❤femboy debil❤', '❤serafemboy❤']
+  let n = ['❤Nikitock Fanta❤', '❤femboy debil❤', '❤serafemboy❤']
 
   if (oldMember.guild.id != guild) return console.log('escaped guild')
   if (newMember.user.id == m[0]) {

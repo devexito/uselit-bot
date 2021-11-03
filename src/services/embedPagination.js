@@ -11,13 +11,15 @@ const gen = require('../services/generateText');
 
 /**
  * Creates a pagination embed
- * @param {Message} msg
+ * @param {Message} msg (of bot)
  * @param {MessageEmbed[]} pages
  * @param {MessageButton[]} buttonList
  * @param {number} timeout
+ * @param {Message} message (of user)
+ * @param {boolean} replied
  * @returns
  */
-const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, replied = false) => {
+const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message, args, replied = false) => {
   if (!msg && !msg.channel) throw new Error('Channel is inaccessible.');
   if (!pages) throw new Error('Pages are not given.');
   if (!buttonList) throw new Error('Buttons are not given.');
@@ -29,7 +31,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, replied
 
   let page = 0;
 
-  if (replied) buttonList[2].setDisabled(true);
+  // if (replied) buttonList[2].setDisabled(true);
   if (pages[0].description.length > 2999) buttonList[3].setDisabled(true);
 
   const row = new MessageActionRow().addComponents(buttonList);
@@ -69,31 +71,29 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, replied
   }
 
   let isPaging = false;
-  let commandBody;
-  let args;
   let msgIsDeleted = false;
 
   collector.on('collect', async (i) => {
     let output;
-    let author;
 
     if (curPage.deleted) return;
+/*
       args = await msg.channel.messages.fetch(i.message.reference.messageId)
         .then(message => {
-          (!author) ? author = message.author.id : author;
-          msgIsDeleted = message.deleted;
+          (!author) ? author = message.author.id
+    msgIsDeleted = message.deleted;
           if (!args && !msgIsDeleted) {
             commandBody = message.content.slice(1);
             let arg = commandBody.trim().replace(/ +(?= )/g,'').split(' ');
             arg.splice(0, 1);
+            console.log('IT IS USED')
             return arg;
           } else {
             return args;
           }
-      }).catch(e => {
-    //  console.error(e);
-      });
-    
+      }).catch(e => {});
+    */
+
     switch (i.customId) {
       case buttonList[0].customId: // PREVIOUS
         page = page > 0 ? --page : pages.length - 1;
@@ -134,7 +134,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, replied
       case buttonList[4].customId: // CLOSE BUTTONS
         isPaging = false;
         await i.deferUpdate();
-        if ((i.user.id == author) || msgIsDeleted || !args || !author) collector.stop();
+        if ((i.user.id == message.author.id) || message.deleted || !args) collector.stop();
         break;
       default:
         break;

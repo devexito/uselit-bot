@@ -15,10 +15,9 @@ module.exports = {
   async execute(message, args, client) {
     let reply = await repliedMessage(message).catch((e) => console.error(e))
     if (undefined != args && args.length) {
-    } else if (undefined != reply && reply.length) {
+    } else if (undefined != reply && reply[0] !== '' && reply.length) {
       args = reply
     } else {
-      console.log('no text')
       return errorParse('No text provided', message)
     }
 

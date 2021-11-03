@@ -14,15 +14,11 @@ module.exports = {
   usage: '<text>',
   typing: true,
   async execute(message, args) {
-    let replied = false
     let reply = await repliedMessage(message).catch((e) => console.error(e))
     if (undefined != args && args.length) {
     } else if (undefined != reply && reply[0] !== '' && reply.length) {
       args = reply
-      replied = true
-console.log(reply)
     } else {
-      console.log('no text')
       return errorParse('No text provided', message)
     }
     const embed = new MessageEmbed()
@@ -38,7 +34,7 @@ console.log(reply)
         message,
         output,
         msg,
-        replied
+        args
       })
     }).catch((e) => console.log(e))
     
@@ -46,7 +42,7 @@ console.log(reply)
       message,
       output,
       msg = false,
-      replied = false
+      args
     }) {
       
       const embed1 = await gen.embedBase(output, 1)
@@ -55,7 +51,6 @@ console.log(reply)
 
       let button1 = new MessageButton()
         .setCustomId('previousbtn')
-     //   .setLabel('')
         .setStyle('PRIMARY')
         .setEmoji('⬅️')
 
@@ -68,8 +63,6 @@ console.log(reply)
         .setCustomId('regenbtn')
         .setStyle('SECONDARY')
         .setEmoji('🔄')
-
-      if (replied) button3.setDisabled(true)
 
       let button4 = new MessageButton()
         .setCustomId('genmorebtn')
@@ -94,7 +87,7 @@ console.log(reply)
         button4,
         button5
       ]
-      msg ? paginationEmbed(msg, pages, buttonList, timeout = 120000) : errorParse('Unexpected error occurred!', message)
+      msg ? paginationEmbed(msg, pages, buttonList, timeout = 120000, message, args) : errorParse('Unexpected error occurred!', message)
     }
   },
 }
