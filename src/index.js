@@ -17,13 +17,13 @@ const prefix = config.defaultPrefix
 client.on('ready', () => {
   console.log(`[READY] Logged in as ${client.user.tag}`)
 
-  setInterval(() => {
+  setTimeout(() => {
     client.user.setPresence({
-      status: 'dnd',
-      activity: {
-        name: 'the largest amount of undefined values', 
+      activities: [{
+        name: 'the largest amount of undefined', 
         type: 'COMPETING'
-      }
+      }],
+      status: 'online'
     })
   }, 60000) // каждую минуту
 })
@@ -41,7 +41,7 @@ client.on('messageCreate', async message => {
     return
   } else if (message.content == 'undefined') {
     message.channel.send('undefined')
-    return message.react('<a:dieass:869488306314936370>')
+    return message.react('<a:dieass:869488306314936370>').catch(() => {})
   } else if (message.content == 'null') {
     return message.channel.send('null')
   } else if (message.content == 'NaN') {

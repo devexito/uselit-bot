@@ -53,25 +53,30 @@ module.exports = {
         .setCustomId('previousbtn')
         .setStyle('PRIMARY')
         .setEmoji('⬅️')
+       // .setLabel('Prev')
 
       let button2 = new MessageButton()
         .setCustomId('nextbtn')
         .setStyle('PRIMARY')
         .setEmoji('➡️')
+      //  .setLabel('Next')
 
       let button3 = new MessageButton()
         .setCustomId('regenbtn')
         .setStyle('SECONDARY')
+       // .setLabel('Regen')
         .setEmoji('🔄')
 
       let button4 = new MessageButton()
         .setCustomId('genmorebtn')
         .setStyle('SECONDARY')
+       // .setLabel('More')
         .setEmoji('⏩')
 
       let button5 = new MessageButton()
         .setCustomId('stopbtn')
         .setStyle('DANGER')
+      //  .setLabel('Stop')
         .setEmoji('✖️')
 
       pages = [
