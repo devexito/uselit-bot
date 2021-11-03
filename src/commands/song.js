@@ -3,24 +3,26 @@ const fs = require('fs')
 const axios = require('axios')
 const ffmpeg = require('fluent-ffmpeg-extended')
 const exec = require('child_process').exec
+const { getPackedSettings } = require('http2')
 
 module.exports = {
   name: 'song',
   description: 'Makes a very funny song!!!!',
   desc: 'Makes a song.',
   permissions: '',
-  usage: '<text>',
+  usage: '<<lang>-<LANG>_<male/female>>(ru-RU_female) <text>',
   async execute(message, args) {
     const msg = await message.reply('Making a song...')
+
+    const [ setting, ...arges ] = args
     
     if (!args[0]) return errorParse('Invalid Arguments', message, usage)
 
     let code = randomText()
     let write = fs.createWriteStream('./musics/translate' + code + '.mp3')
-    console.log('https://texttospeech.responsivevoice.org/v1/text:synthesize?text=' + encodeURI(args.join(' ')) + '&lang=pl&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=0POmS5Y2&gender=male')
     
     const res = await axios.get(
-      'https://texttospeech.responsivevoice.org/v1/text:synthesize?text=' + encodeURI(args.join(' ')) + '&lang=tr&engine=g3&name=&pitch=0.5&rate=0.5&volume=1&key=0POmS5Y2&gender=male',
+      'https://texttospeech.responsivevoice.org/v1/text:synthesize?text=' + encodeURI(arges.join(' ')) + '&lang=' + setting.split('_')[0] + '&engine=g3&name=&pitch=0.5&rate=0.5&volume=1&key=0POmS5Y2&gender=' + setting.split('_')[1],
       {
         headers: {
           'accept': '*/*',
