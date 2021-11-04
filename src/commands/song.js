@@ -8,10 +8,10 @@ const { getPackedSettings } = require('http2')
 
 module.exports = {
   name: 'song',
-  description: 'Makes a very funny song!!!!',
+  description: 'Makes a very funny song!!!!\n\nSupports message replies.\nExample usage: `>song ru-RU_female your text here`',
   desc: 'Make a song',
   permissions: '',
-  usage: '<<lang>-<LANG>_<male/female>>(ru-RU_female) <text>',
+  usage: '<lang>-<LANG>_<male/female> <text>',
   args: true,
   async execute(message, args) {
     let [ setting, ...arges ] = args
@@ -28,10 +28,13 @@ module.exports = {
       return errorParse('No text provided', message)
     }
 
-    var regEx = /[a-z]{2,7}-[A-Z]{2,7}_(female|male)/
-    if (!regEx.test(setting)) {
-      return errorParse('Invalid format of the parameter!', message, this.usage)
+    var regEx = /[a-z]{2,7}(-[A-Z]{2,7})?_(female|male)/g
+    if (regEx.test(setting)) {
+      regEx.exec(setting)
+    } else {
+      return errorParse('Invalid format of the parameter!', message, '`' + this.usage + '`')
     }
+
 // ÍÀ×ÀËÎ ÑÎÇÄÀÍÈß ×ÀÑÒÓØÊÈ
     const msg = await message.reply('Making a song...')
 

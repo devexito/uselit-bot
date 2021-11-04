@@ -4,6 +4,7 @@ module.exports = {
   desc: 'bar',
   permissions: '',
   cooldown: -1,
+  owner: true,
   async execute(message) {
     message.react('🇧')
     message.react('🇦')

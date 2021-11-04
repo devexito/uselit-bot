@@ -7,7 +7,7 @@ const gen = require('../services/generateText')
 module.exports = {
   name: 'generate',
   aliases: ['g', 'gen', 'porf', 'porfirevich'],
-  description: 'Completes text using https://porfirevich.ru/',
+  description: 'Completes text using https://porfirevich.ru/\n\nSupports message replies.',
   desc: 'Complete text using Porfirevich',
   permissions: '',
   cooldown: 5,

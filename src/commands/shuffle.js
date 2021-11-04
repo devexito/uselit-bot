@@ -3,7 +3,7 @@ const { repliedMessage } = require('../util/message')
 
 module.exports = {
   name: 'shuffle',
-  description: 'Shuffles words around in your message',
+  description: 'Shuffles words around in your message.\n\nSupports message replies.',
   desc: 'Shuffle your words',
   permissions: '',
   aliases: ['s', 'randomize'],
