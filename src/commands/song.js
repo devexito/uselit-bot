@@ -1,4 +1,5 @@
-const { formatNumber } = require('../util/util')
+const { errorParse } = require('../util/util')
+const { repliedMessage } = require('../util/message')
 const fs = require('fs')
 const axios = require('axios')
 const ffmpeg = require('fluent-ffmpeg-extended')
@@ -8,15 +9,31 @@ const { getPackedSettings } = require('http2')
 module.exports = {
   name: 'song',
   description: 'Makes a very funny song!!!!',
-  desc: 'Makes a song.',
+  desc: 'Make a song',
   permissions: '',
   usage: '<<lang>-<LANG>_<male/female>>(ru-RU_female) <text>',
-  async execute(message, args) {
-    const msg = await message.reply('Making a song...')
+  args: true,
+  async execute(message, args) {
+    let [ setting, ...arges ] = args
 
-    const [ setting, ...arges ] = args
-    
-    if (!args[0]) return errorParse('Invalid Arguments', message, usage)
+    if (arges) arges = arges.join(' ').trim().split(' ')
+
+    let reply = await repliedMessage(message).catch((e) => console.error(e))
+    if (arges && arges[0] !== '' && arges.length) {
+    } else if (reply && reply[0] !== '' && reply.length) {
+      arges = reply
+    } else if (reply && reply[0] == '') {
+      return errorParse('No text provided in reply', message)
+    } else if (arges[0] === '') {
+      return errorParse('No text provided', message)
+    }
+
+    var regEx = /[a-z]{2,7}-[A-Z]{2,7}_(female|male)/
+    if (!regEx.test(setting)) {
+      return errorParse('Invalid format of the parameter!', message, this.usage)
+    }
+// Õ¿◊¿ÀŒ —Œ«ƒ¿Õ»ﬂ ◊¿—“”ÿ »
+    const msg = await message.reply('Making a song...')
 
     let code = randomText()
     let write = fs.createWriteStream('./musics/translate' + code + '.mp3')
@@ -41,14 +58,14 @@ module.exports = {
       try {
         new ffmpeg.Metadata('./musics/translate' + code + '.mp3', (dat, err) => {
           exec('ffmpeg -i ./musics/garmoshka1.mp3 -i ./musics/translate' + code + '.mp3 -i ./musics/garmoshka2.mp3 -filter_complex "[1]adelay=3300,volume=5[s1];[0]adelay=3300[s0];[2]adelay=' + (dat.durationsec * 1000 + 3600) + '[s2];[0][s0][s1][s2]amix=4[mixout]" -map [mixout] ./musics/msg' + code + '.mp3', async () => {
-            await msg.edit({ content: 'Done! <:nice_shit:895272991099867147>', files: ['./musics/msg' + code + '.mp3'] })
+            await msg.edit({ content: 'Done! <:nice_shit:895272991099867147>', files: ['./musics/msg' + code + '.mp3'] }).catch(() => {})
             fs.unlinkSync('./musics/translate' + code + '.mp3')
             fs.unlinkSync('./musics/msg' + code + '.mp3')
           })
         })
       } catch (e) {
-        console.log(e)
-        msg.reply('–ì—É–≥–ª –Ω–µ –∑–∞—Ö–æ—Ç–µ–ª —ç—Ç–æ –ø–µ—Ç—å.')
+        console.error(e)
+        msg.reply('Google does not want to sing that.')
       }
     })
   }
