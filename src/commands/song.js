@@ -12,6 +12,7 @@ module.exports = {
   desc: 'Make a song',
   permissions: '',
   usage: '<lang>-<LANG>_<male/female> <text>',
+  cooldown: -3,
   args: true,
   async execute(message, args) {
     let [ setting, ...arges ] = args
@@ -36,7 +37,7 @@ module.exports = {
     }
 
 // Õ¿◊¿ÀŒ —Œ«ƒ¿Õ»ﬂ ◊¿—“”ÿ »
-    const msg = await message.reply('Making a song...')
+    const msg = await message.reply('Making a song... <:shue:893362194689974283>')
 
     let code = randomText()
     let write = fs.createWriteStream('./musics/translate' + code + '.mp3')
@@ -55,20 +56,26 @@ module.exports = {
         },
         responseType: 'stream'
       }
-    )
+    ).catch(( er ) => {
+      msg.delete()
+      console.error(er)
+      return errorParse(er, message)
+    })
     res.data.pipe(write)
     write.on('finish', () => {
       try {
         new ffmpeg.Metadata('./musics/translate' + code + '.mp3', (dat, err) => {
           exec('ffmpeg -i ./musics/garmoshka1.mp3 -i ./musics/translate' + code + '.mp3 -i ./musics/garmoshka2.mp3 -filter_complex "[1]adelay=3300,volume=5[s1];[0]adelay=3300[s0];[2]adelay=' + (dat.durationsec * 1000 + 3600) + '[s2];[0][s0][s1][s2]amix=4[mixout]" -map [mixout] ./musics/msg' + code + '.mp3', async () => {
-            await msg.edit({ content: 'Done! <:nice_shit:895272991099867147>', files: ['./musics/msg' + code + '.mp3'] }).catch(() => {})
+            await msg.edit({ content: 'Here is your song <:sidor:812173881271386162>', files: ['./musics/msg' + code + '.mp3'] }).catch(() => {
+              msg.edit('Unable to attach the audio file <a:perms:842810795997265970>')
+            })
             fs.unlinkSync('./musics/translate' + code + '.mp3')
             fs.unlinkSync('./musics/msg' + code + '.mp3')
           })
         })
       } catch (e) {
         console.error(e)
-        msg.reply('Google does not want to sing that.')
+        errorParse('Google does not want to sing that', message ? message : msg)
       }
     })
   }

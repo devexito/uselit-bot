@@ -79,13 +79,13 @@ module.exports = {
       //  .setLabel('Stop')
         .setEmoji('✖️')
 
-      pages = [
+      const pages = [
 	       embed1,
 	       embed2,
         embed3
       ]
 
-      buttonList = [
+      const buttonList = [
         button1,
         button2,
         button3,
