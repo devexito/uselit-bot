@@ -1,24 +1,28 @@
 const { errorParse } = require('../../util/util')
 module.exports = {
   name: 'bk',
-  description: 'Not providing any argument will insert a default user\n\nUse `-off` postfix to turn this off for a specified user, or use it as a single argument to turn it off for everyone\n\nDoes not work for bots',
-  desc: 'bar',
-  usage: '[userID] [-off]',
-  owner: true,
+  description: 'Reacts with badklass emoji on every message of someone who really does some crap.\nNot providing any argument will insert a default user.\nUse `-off` postfix to turn this off for a specified user.\n\nDoes not work for bots.',
+  desc: 'React with crap on users',
+  usage: '<user mention/id> [-off]',
   async execute(message, args) {
+    let owner = (message.author.id == message.client.config.ownerID) ? true : false
     let off
 
     async function mentionCheck(input, message) {
       
       if (isNaN(input)) {
         var regEx = /<@\!?([0-9]{17,21})>/g
-        input = regEx.exec(input)[1]
+        if (regEx.test(input)) {
+          input = regEx.exec(input)[1]
+        } else {
+          errorParse('Please provide a user mention or id', message)
+          return {}
+        }
         console.log('blya ', input)
       }
 
       if (!isNaN(input)) {
         let usr = await message.client.users.fetch(input).catch((e) => { return false })
-        console.log('id ', usr.id)
         if (usr.bot) {
           errorParse('Bots are not supported', message)
           return {}
@@ -39,15 +43,21 @@ module.exports = {
       args.splice(-1, 1)
       off = true
       if (args.length == 0 || args[0] == '') {
-        bk = []
-        console.log('bk now empty')
-        return message.reply('ok, turned off for everyone').catch(() => {})
+        if (owner) {
+          bk = []
+          console.log('bk now empty')
+          return message.reply('ok, turned off for everyone').catch(() => {})
+        } else {
+          return errorParse('Please specify a user', message, this.usage)
+        }
       }
     }
     let user
+    let defaultUser = false
 
     if (!args || !args.length || args[0] == '') {
       user = '342247854875738113' //privet misha
+      defaultUser = true
     } else {
       user = await mentionCheck(args[0], message)
     }
@@ -57,15 +67,15 @@ module.exports = {
     if (bk.indexOf(user) === -1) { // checking if specified user is not in bk array...
       if (!off) {
         bk.push(user)
-        console.log('bk now:', bk)
         return message.react('👍🏿').catch(() => {})
       } else {
-        return errorParse('This user is already not included in the list', message)
+        return errorParse('This user is already not in the list', message)
       }
     } else if (off) {
       bk.splice(bk.indexOf(user), 1)
-      console.log('bk now:', bk)
       return message.reply('ok, removed user ' + user).catch(() => {})
+    } else if (defaultUser) {
+      return errorParse('Uhh.. Invalid Arguments\nPlease specify a user', message, this.usage)
     } else {
       return errorParse('This user is already included in the list', message)
     }
