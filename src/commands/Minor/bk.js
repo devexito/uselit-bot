@@ -11,13 +11,10 @@ module.exports = {
     async function mentionCheck(input, message) {
       
       if (isNaN(input)) {
-        var regEx = /<@\!?([0-9]{17,21})>/g
-        if (regEx.test(input)) {
-          input = regEx.exec(input)[1]
-        } else {
-          errorParse('Please provide a user mention or id', message)
-          return {}
-        }
+        var regEx = /<@\!?([0-9]{17,21})>/
+        input = regEx.exec(input)[1]
+        //  errorParse('Please provide a user mention or id', message)
+        //  return {}
         console.log('blya ', input)
       }
 
