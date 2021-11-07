@@ -20,9 +20,9 @@ const load = (dir = './src/commands/') => {
 
     for (const file of commandFiles) {
       const command = require(`./commands/${dirs}/${file}`)
-      process.stdout.clearLine()
-      process.stdout.cursorTo(0)
-      process.stdout.write(`Loading command ${command.name}...`)
+      //process.stdout.clearLine()
+      //process.stdout.cursorTo(0)
+      //process.stdout.write(`Loading command ${command.name}...`)
       client.commands.set(command.name, command)
     }
   })
@@ -31,7 +31,7 @@ const load = (dir = './src/commands/') => {
 load()
 
 client.on('ready', () => {
-  process.stdout.write('\n')
+  //process.stdout.write('\n')
   console.log(`[READY] Logged in as ${client.user.tag}`)
 
   setInterval(() => {
