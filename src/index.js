@@ -1,23 +1,40 @@
-const { Client, Collection, Intents } = require("discord.js")
+const { Client, Collection, Intents, MessageEmbed } = require('discord.js')
 const myintents = new Intents(32767)
 myintents.remove(['DIRECT_MESSAGES'])
 const client = new Client({ intents: myintents, allowedMentions: { repliedUser: false, parse: ['users'] }})
 
-const fs = require('fs')
-
-const Embed = require('./services/embedConstructor.js')
 const { shorten, errorParse, argsError } = require('./util/util.js')
 const config = require('./config.js')
+prefix = config.defaultPrefix
+client.config = config
+
+const { readdirSync } = require('fs')
+const { sep } = require('path')
 client.cooldowns = new Collection()
 client.commands = new Collection()
-const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'))
+const { cooldowns } = client
 
-const prefix = config.defaultPrefix
+const load = (dir = './src/commands/') => {
+  readdirSync(dir).forEach(dirs => {
+    const commandFiles = readdirSync(`${dir}${sep}${dirs}${sep}`).filter(files => files.endsWith('.js'))
+
+    for (const file of commandFiles) {
+      const command = require(`./commands/${dirs}/${file}`)
+      process.stdout.clearLine()
+      process.stdout.cursorTo(0)
+      process.stdout.write(`Loading command ${command.name}...`)
+      client.commands.set(command.name, command)
+    }
+  })
+}
+
+load()
 
 client.on('ready', () => {
+  process.stdout.write('\n')
   console.log(`[READY] Logged in as ${client.user.tag}`)
 
-  setTimeout(() => {
+  setInterval(() => {
     client.user.setPresence({
       activities: [{
         name: 'the largest amount of undefined', 
@@ -26,40 +43,38 @@ client.on('ready', () => {
       status: 'online'
     })
   }, 60000) // каждую минуту
+
+  bk = []
 })
-
-for (const file of commandFiles) {
-  const command = require(`./commands/${file}`)
-  client.commands.set(command.name, command)
-}
-
-const { cooldowns } = client
 
 client.on('messageCreate', async message => {
   // костыль для статуса печатания
   if (message.author.id === client.user.id) {
     return
   } else if (message.content == 'undefined') {
-    message.channel.send('undefined')
+    message.channel.send('undefined.')
     return message.react('<a:dieass:869488306314936370>').catch(() => {})
   } else if (message.content == 'null') {
-    return message.channel.send('null')
+    return message.channel.send('null.')
   } else if (message.content == 'NaN') {
-    return message.channel.send('NaN')
+    return message.channel.send('NaN.')
   }
 
   // ограничения
-  if (message.author.bot) return
-  if (!message.guild) return
+  if (message.author.bot || !message.guild) return
+
+  if (bk.length > 0 && bk.includes(message.author.id)) {
+    message.react('<:badklass:493361730160820234>').catch(() => {})
+  }
 
   if (message.content.startsWith(`<@${client.user.id}>`) || message.content.startsWith(`<@!${client.user.id}>`) ) {
-    let embed = new Embed()
-      .color('#3131BB')
-      .title(client.user.username)
-      .description(`My prefix is \`${prefix}\``)
-      .build()
+    const embed = new MessageEmbed()
+      .setColor('#3131BB')
+      .setTitle(client.user.username)
+      .setDescription(`My prefix is \`${prefix}\``)
     return message.reply({ embeds: [embed] })
   }
+  if (!message.content.startsWith(prefix)) return
 
   const commandBody = message.content.slice(prefix.length)
   const args = commandBody.trim().replace(/ +(?= )/g,'').split(' ')
@@ -68,9 +83,7 @@ client.on('messageCreate', async message => {
   const command = client.commands.get(commandName) 
     || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName))
 
-  if (!message.content.startsWith(prefix)) return
-
-  if (!command || !prefix) return
+  if (!command) return
 
   if (command.args && !args.length) {
     return argsError(command, message, prefix)
@@ -98,7 +111,7 @@ client.on('messageCreate', async message => {
   setTimeout(() => timestamps.delete(message.author.id), cooldownAmount)
 
   // EXECUTION
-  await command.execute(message, args, client)
+  await command.execute(message, args)
   .catch((e) => {
     errorParse('Critical Command Error: ' + e.message, message)
     console.error(e)

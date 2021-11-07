@@ -1,8 +1,8 @@
-﻿const paginationEmbed = require('../services/embedPagination')
+﻿const paginationEmbed = require('../../services/embedPagination')
 const { MessageEmbed, MessageButton } = require('discord.js')
-const { errorParse } = require('../util/util')
-const { repliedMessage } = require('../util/message')
-const gen = require('../services/generateText')
+const { errorParse } = require('../../util/util')
+const { repliedMessage } = require('../../util/message')
+const gen = require('../../services/generateText')
 
 module.exports = {
   name: 'generate',

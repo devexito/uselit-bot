@@ -9,6 +9,7 @@
     "fluent-ffmpeg-extended": "^1.5.2",
     "fs": "0.0.1-security",
     "git": "^0.1.5",
+    "path": "^0.12.7",
     "unirest": "^0.6.0",
     "xregexp": "^5.1.0"
   },

@@ -1,5 +1,5 @@
 const axios = require('axios')
-const { errorParse } = require('../util/util')
+const { errorParse } = require('../../util/util')
 
 module.exports = {
   name: 'g2',

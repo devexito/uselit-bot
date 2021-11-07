@@ -1,4 +1,4 @@
-﻿const Embed = require('../services/embedConstructor.js')
+﻿const { MessageEmbed } = require('discord.js')
 
 module.exports = class Util {
   static shorten(text, maxLen = 4000) {
@@ -40,17 +40,15 @@ module.exports = class Util {
   }
 
   static errorParse(error, message, usage = false) {
-    let embed = new Embed()
-      .color('#A00000')
-      .title('⚠️ Command Error')
-      .description(error)
-      .author(message.author.tag, message.author.displayAvatarURL())
+    const embed = new MessageEmbed()
+      .setColor('#A00000')
+      .setTitle('⚠️ Command Error')
+      .setDescription(error)
+      .setAuthor(message.author.tag, message.author.displayAvatarURL())
     if (usage) {
-      embed = embed
-        .field('Usage', usage)
-    }
-    embed = embed
-      .build()
+      embed
+        .addField('Usage', usage)
+    }
     message.reply({ embeds: [embed] })
   }
 

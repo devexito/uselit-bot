@@ -1,5 +1,5 @@
-const { errorParse } = require('../util/util')
-const { repliedMessage } = require('../util/message')
+const { errorParse } = require('../../util/util')
+const { repliedMessage } = require('../../util/message')
 const fs = require('fs')
 const axios = require('axios')
 const ffmpeg = require('fluent-ffmpeg-extended')
@@ -12,7 +12,6 @@ module.exports = {
   desc: 'Make a song',
   permissions: '',
   usage: '<lang>-<LANG>_<male/female> <text>',
-  cooldown: -3,
   args: true,
   async execute(message, args) {
     let [ setting, ...arges ] = args

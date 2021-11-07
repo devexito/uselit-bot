@@ -1,9 +1,9 @@
 const bingkey = '9e3ceaef5emsh58cb033407ace61p16ab76jsn5510af64ae15'
 const unirest = require('unirest')
-const Embed = require('../services/embedConstructor.js')
-const { errorParse, shorten } = require('../util/util')
-const { repliedMessage } = require('../util/message')
-langList = [ 'af', 'am', 'ar', 'as', 'az', 'bg', 'bn', 'bs', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'es', 'et', 'fa', 'fi', 'fil', 'fj', 'fr', 'fr-ca', 'ga', 'gu', 'he', 'hi', 'hr', 'ht', 'hu', 'hy', 'id', 'is', 'it', 'iu', 'ja', 'kk', 'km', 'kmr', 'kn', 'ko', 'ku', 'lo', 'lt', 'lv', 'lzh', 'mg', 'mi', 'ml', 'mr', 'ms', 'mt', 'mww', 'my', 'nb', 'ne', 'nl', 'or', 'otq', 'pa', 'pl', 'prs', 'ps', 'pt', 'pt-pt', 'ro', 'ru', 'sk', 'sl', 'sm', 'sq', 'sr-cyrl', 'sr-latn', 'sv', 'sw', 'ta', 'te', 'th', 'ti', 'tlh-latn', 'tlh-piqd', 'to', 'tr', 'ty', 'uk', 'ur', 'vi', 'yua', 'yue', 'zh-hans', 'zh-hant' ]
+const { MessageEmbed } = require('discord.js')
+const { errorParse, shorten } = require('../../util/util')
+const { repliedMessage } = require('../../util/message')
+const langList = [ 'af', 'am', 'ar', 'as', 'az', 'bg', 'bn', 'bs', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'es', 'et', 'fa', 'fi', 'fil', 'fj', 'fr', 'fr-ca', 'ga', 'gu', 'he', 'hi', 'hr', 'ht', 'hu', 'hy', 'id', 'is', 'it', 'iu', 'ja', 'kk', 'km', 'kmr', 'kn', 'ko', 'ku', 'lo', 'lt', 'lv', 'lzh', 'mg', 'mi', 'ml', 'mr', 'ms', 'mt', 'mww', 'my', 'nb', 'ne', 'nl', 'or', 'otq', 'pa', 'pl', 'prs', 'ps', 'pt', 'pt-pt', 'ro', 'ru', 'sk', 'sl', 'sm', 'sq', 'sr-cyrl', 'sr-latn', 'sv', 'sw', 'ta', 'te', 'th', 'ti', 'tlh-latn', 'tlh-piqd', 'to', 'tr', 'ty', 'uk', 'ur', 'vi', 'yua', 'yue', 'zh-hans', 'zh-hant' ]
 
 module.exports = {
   name: 'translate',
@@ -25,16 +25,18 @@ module.exports = {
     
     const reqTr = unirest('POST', 'https://microsoft-translator-text.p.rapidapi.com/translate')
 
-    /*
-    const fromRegExp = new RegExp('-from (\w{2,4}(-\w{2,4})?)$', 'g')
-    if (!args.includes(fromRegExp)) {
+/*
+    const regex = /-from (\w{2,4}(-\w{2,4})?)/g
+    if (!regex.test(args)) {
       inputFrom = ''
-    } else if (!fromRegExp[1].includes(inputFrom)) {
+    } else if (!regex.test(args)) {
       return errorParse('❗*Unsupported language* :( *Needs to be one of the following:* `' + langList.join('`, `') + '`', message)
     } else {
-      inputFrom = fromRegExp[1]
-    }*/
-
+      regex.exec(args)[1]
+      console.log(
+      const inputFrom = [1]
+    }
+*/
     //start of bing translate code
     reqTr.query({
       'to': args[0],
@@ -72,12 +74,12 @@ module.exports = {
         outFrom = res.body.map(a => a.detectedLanguage['language'])
       } catch (e) {
         console.error(e)
-        return message.channel.send('error')
+        return message.reply('error')
       }
       let output = res.body.map(a => a.translations.map(b => b.text)[0])
 
-      let embed = new Embed()
-        .color('#3131BB')
+      const embed = new MessageEmbed()
+        .setColor('#3131BB')
       
       let parsedOutText = ''
 
@@ -85,9 +87,8 @@ module.exports = {
         errorParse('API returned empty output', message)
       } else {
         parsedOutText = shorten(output[0])
-        embed = embed.title('`' + outFrom[0] + '` → `' + langInput + '`')
-          .description(parsedOutText)
-          .build()
+        embed.setTitle('`' + outFrom[0] + '` → `' + langInput + '`')
+          .setDescription(parsedOutText)
         message.reply({ embeds: [embed] }).catch(e => errorParse(e.toString(), message))
       }
     })

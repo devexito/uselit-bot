@@ -1,6 +1,4 @@
 
-//const { argsError } = require('../util/util')
-
 module.exports = {
   name: 'ytc',
   aliases: ['youtubecomment', 'ytcomment', 'ytp', 'ytс'],

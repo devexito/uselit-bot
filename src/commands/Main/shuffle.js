@@ -1,5 +1,5 @@
-const { shorten, errorParse } = require('../util/util')
-const { repliedMessage } = require('../util/message')
+const { shorten, errorParse } = require('../../util/util')
+const { repliedMessage } = require('../../util/message')
 
 module.exports = {
   name: 'shuffle',

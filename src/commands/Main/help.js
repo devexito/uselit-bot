@@ -1,7 +1,5 @@
-const config = require('../config.js')
-const Embed = require('../services/embedConstructor.js')
-const prefix = config.defaultPrefix
-const { errorParse } = require('../util/util')
+const { MessageEmbed } = require('discord.js')
+const { errorParse } = require('../../util/util')
 
 module.exports = {
   name: 'help',
@@ -15,18 +13,17 @@ module.exports = {
     let allcommands = commands
     commands = commands.filter(b => !b.owner)
 
-    let embed = new Embed()
-    //  .color('#2f3136')
-      .color('#3131BB')
+    const embed = new MessageEmbed()
+      .setColor('#3131BB')
 
     if (!args.length) {
       let spaces = '         ' // 9 spaces
       let commandList = commands.map(command => command.name + spaces.substring(command.name.length) + ' - ' + command.desc)
 
-      embed = embed
-        .title('Command List')
-        .description('```\n' + commandList.join('\n') + '```')
-        .footer('Type ' + prefix + 'help [command name] to show more info about a specific command.\nHint: Commands with any text input support message references. Try replying to a message while executing a ">generate", ">shuffle" or ">talk" command without arguments!')
+      embed
+        .setTitle('Command List')
+        .setDescription('```\n' + commandList.join('\n') + '```')
+        .setFooter('Type ' + prefix + 'help [command name] to show more info about a specific command.\nHint: Commands with any text input support message references. Try replying to a message while executing a ">generate", ">shuffle" or ">talk" command without arguments!')
     } else {
       const name = args[0].toLowerCase()
       const command = allcommands.get(name)
@@ -37,17 +34,16 @@ module.exports = {
       }
 
       try {
-        embed = embed.title(command.name)
+        embed.setTitle(command.name)
       } catch (e) {
         return errorParse('Invalid Command', message)
       }
 
-      if (command.description) embed = embed.description(command.description)
-      if (command.aliases) embed = embed.field('Aliases', command.aliases.join('\n'))
-      if (command.usage) embed = embed.field('Usage', '`' + command.usage + '`')
+      if (command.description) embed.setDescription(command.description)
+      if (command.aliases) embed.addField('Aliases', command.aliases.join('\n'))
+      if (command.usage) embed.addlField('Usage', '`' + command.usage + '`')
     }
 
-    embed = embed.build()
     message.reply({ embeds: [embed] })
   },
 }

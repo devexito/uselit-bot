@@ -19,7 +19,7 @@ const gen = require('../services/generateText');
  * @param {boolean} replied
  * @returns
  */
-const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message, args, replied = false) => {
+const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message, args) => {
   if (!msg && !msg.channel) throw new Error('Channel is inaccessible.');
   if (!pages) throw new Error('Pages are not given.');
   if (!buttonList) throw new Error('Buttons are not given.');
@@ -31,7 +31,6 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
 
   let page = 0;
 
-  // if (replied) buttonList[2].setDisabled(true);
   if (pages[0].description.length > 2999) buttonList[3].setDisabled(true);
 
   const row = new MessageActionRow().addComponents(buttonList);
@@ -70,10 +69,9 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
     return console.error(e);
   }
 
-  let isPaging = false;
-  let msgIsDeleted = false;
-
   collector.on('collect', async (i) => {
+    let isPaging = false;
+    let msgIsDeleted = false;
     let output;
 
     if (curPage.deleted) return;

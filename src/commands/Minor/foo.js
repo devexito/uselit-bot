@@ -3,7 +3,6 @@ module.exports = {
   description: 'foo bar',
   desc: 'bar',
   permissions: '',
-  cooldown: -1,
   owner: true,
   async execute(message) {
     message.react('🇧')

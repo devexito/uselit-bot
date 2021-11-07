@@ -1,5 +1,4 @@
-﻿const config = require('../config.js')
-const { errorParse } = require('../util/util')
+﻿const { errorParse } = require('../../util/util')
 
 module.exports = {
   name: 'prune',
@@ -10,7 +9,7 @@ module.exports = {
   aliases: ['p', 'purge', 'clear'],
   permissions: 'administrator',
   async execute(message, args) {
-    if (message.author.id !== config.ownerID) return
+    if (message.author.id !== message.client.config.ownerID) return
     const amount = parseInt(args[0]) + 1
 
     if (isNaN(amount)) {
@@ -20,7 +19,7 @@ module.exports = {
     }
     message.channel.bulkDelete(amount, true).catch(err => {
       console.error(err)
-      errorParse('❗an error has occurred while trying to evaluate the command', message)
+      errorParse('Couldn\'t bulk delete the messages: ' + err.message, message)
     })
   },
 }

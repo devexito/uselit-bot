@@ -1,5 +1,5 @@
-const { getRandomInt } = require('../util/util')
-const Embed = require('../services/embedConstructor.js')
+const { getRandomInt } = require('../../util/util')
+const { MessageEmbed } = require('discord.js')
 
 module.exports = {
   name: 'sex',
@@ -13,8 +13,8 @@ module.exports = {
     const virgin = 101 - getRandomInt(101)
     let sexState = 'sexing'
     let user = args
-    let embed = new Embed()
-      .color('#3131BB')
+    const embed = new MessageEmbed()
+      .setColor('#3131BB')
     
     async function mentionCheck(input, message) {
       input.join('')
@@ -45,11 +45,10 @@ module.exports = {
       }
     }
 
-    embed = embed.title('You are ' + sexState + ' ' + user)
-      .description('<:nice_shit:771145344322371595>')
-      .field('Sex level', randomNumber.toString(), true)
-      .field('Virgin', virgin.toString() + '%', true)
-      .build()
+    embed.setTitle('You are ' + sexState + ' ' + user)
+      .setDescription('<:nice_shit:771145344322371595>')
+      .addField('Sex level', randomNumber.toString(), true)
+      .addField('Virgin', virgin.toString() + '%', true)
     message.reply({ embeds: [embed] })
   }
 }

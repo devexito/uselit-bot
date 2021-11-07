@@ -3,10 +3,37 @@ const req = unirest('POST', 'https://pelevin.gpt.dobro.ai/generate/')
 const { MessageEmbed } = require('discord.js')
 const { errorParse } = require('../util/util')
 
-  async function fetchText(message, args, msg = false) {
+async function fetchText(message, args, msg = false) {
 
-    if (!args) return errorParse('No args?', message)
+  if (!args || !args.length) return errorParse('No args?', message)
+
+/* axios => socket hang up error :(
+
+  const headers = {
+    'content-type': 'application/json',
+   // 'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Connection': 'keep-alive'
+  }
     
+  const req = await axios.post('https://pelevin.gpt.dobro.ai/generate/', {
+    prompt: args.join(' ').trim(),
+    length: 60
+  }, {
+    headers: headers,
+    responseType: 'json',
+    transformResponse: [v => v]
+  })
+  .then((res) => {
+    console.log('Body: ', res.body)
+  })
+  .catch((er) => {
+    if (msg) msg.delete()
+    console.error(er)
+    return errorParse(er, message)
+  })
+*/
+
     req.query({
       'Accept-Encoding': 'gzip, deflate, br',
       'content-type': 'text/plain;charset=UTF-8'
@@ -20,7 +47,7 @@ const { errorParse } = require('../util/util')
     req.type('json')
     req.send({
       prompt: '' + args.join(' ').trim() + '',
-      length: 60
+      length: 100
     })
 
     return new Promise(function(resolve, reject) {
@@ -33,9 +60,10 @@ const { errorParse } = require('../util/util')
           }
           return console.error(res.error)
         } else {
+          console.log(req.options.body.prompt)
           resolve({
             res: res.body.replies,
-            input: req.options.body.prompt
+            input: args.join(' ').trim()
           })
         }
       })
@@ -43,15 +71,15 @@ const { errorParse } = require('../util/util')
       errorParse(e, message)
       console.error(e)
     })
-  }
+}
 
-  async function embedBase(output, page) {
-    if (!output) return console.error('no output for embedding pages')
-    return new MessageEmbed()
-      .setColor('#3131BB')
-      .setTitle('Result')
-      .setDescription(output.input + output.res.splice(output.res[page - 1], 1))
-  }
+async function embedBase(output, page) {
+  if (!output) return console.error('no output for embedding pages')
+  return new MessageEmbed()
+    .setColor('#3131BB')
+    .setTitle('Result')
+    .setDescription(output.input + output.res.splice(output.res[page - 1], 1))
+}
 
 module.exports = {
   fetchText,

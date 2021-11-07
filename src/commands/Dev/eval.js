@@ -1,7 +1,5 @@
-
-const config = require('../config.js')
 const { inspect } = require('util')
-const { errorParse } = require('../util/util')
+const { errorParse } = require('../../util/util')
 
 module.exports = {
   name: 'eval',
@@ -10,7 +8,7 @@ module.exports = {
   permissions: 'owner',
   owner: true,
   async execute (message, args, client) {
-    if (message.author.id !== config.ownerID) {
+    if (message.author.id !== message.client.config.ownerID) {
       return errorParse('⛔ Missing Access', message)
     }
 
@@ -32,8 +30,8 @@ module.exports = {
 
     // output
     console.log(inspect(evaled))
-    if (inspect(evaled).length > 1999) return message.react('🏳️')
     if (inspect(evaled) == 'undefined') return message.react('♿')
+    if (inspect(evaled).length > 1999 || noOutput) return message.react('🏳️')
 
     if (!noOutput) {
       message.reply(inspect(evaled))
