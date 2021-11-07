@@ -27,8 +27,12 @@ module.exports = {
       } else return false
     }
 
-    if (message.author.id == message.client.config.ownerID && args[0] == 'list') {
-      return message.reply(bk.join(', '))
+    if (args[0] == 'list') {
+      if (message.author.id == message.client.config.ownerID) {
+        return (bk.length > 0) ?message.reply(bk.join(', ')) : message.reply('bk is empty')
+      } else {
+        message.react('🚽')
+      }
     }
 
     if (args[args.length - 1] === '-off') {

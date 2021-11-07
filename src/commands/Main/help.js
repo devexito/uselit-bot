@@ -41,7 +41,7 @@ module.exports = {
 
       if (command.description) embed.setDescription(command.description)
       if (command.aliases) embed.addField('Aliases', command.aliases.join('\n'))
-      if (command.usage) embed.addlField('Usage', '`' + command.usage + '`')
+      if (command.usage) embed.addField('Usage', '`' + command.usage + '`')
     }
 
     message.reply({ embeds: [embed] })
