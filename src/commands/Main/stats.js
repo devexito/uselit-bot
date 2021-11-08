@@ -11,17 +11,16 @@ module.exports = {
     commands = commands.filter(b => !b.owner)
 
     const used = process.memoryUsage()
-    async function mem(key) {
+    function mem(key) {
       return Math.round(used[key] / 1024 / 1024 * 100) / 100
     } 
     const memUsed = await mem('heapUsed').toString()
     const memAllocate = await mem('heapTotal').toString()
 
-    async function uptime() {
+    function uptime() {
       let a = message.client.readyAt - 1
       a = a.toString()
       a = a.slice(0, a.length - 3)
-     // let b = Math.floor(process.uptime())
       return `<t:${a}:R>`
     }
 
@@ -32,7 +31,7 @@ module.exports = {
       .addField('Commands', `${commands.size.toString()} (${allcommands.size.toString()})`, true)
 
       .addField('Used/Allocated memory', `${memUsed} MB/${memAllocate} MB`, true)
-      .addField('Running since', await uptime(), true)
+      .addField('Running since', uptime(), true)
 
       .setTitle('Bot statistics')
      // .setAuthor(message.author.tag, message.author.displayAvatarURL())

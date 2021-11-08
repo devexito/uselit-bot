@@ -12,7 +12,7 @@ module.exports = {
   permissions: '',
   cooldown: 3,
   usage: '<text>',
-  async execute(message, args, client) {
+  async execute(message, args) {
     let reply = await repliedMessage(message).catch((e) => console.error(e))
     if (undefined != args && args.length) {
     } else if (undefined != reply && reply[0] !== '' && reply.length) {
@@ -88,7 +88,7 @@ module.exports = {
     }
 
     // chatbot api
-    const req = unirest('GET', `https://api.affiliateplus.xyz/api/chatbot?message=${text}&botname=${client.user.username}&language=${detectedLang}&gender=male&user=1`)
+    const req = unirest('GET', `https://api.affiliateplus.xyz/api/chatbot?message=${text}&botname=${message.client.user.username}&language=${detectedLang}&gender=male&user=1`)
 
     req.headers({
       'content-type': 'application/json'
