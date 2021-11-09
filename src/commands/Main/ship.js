@@ -14,6 +14,23 @@ module.exports = {
     let sexLvl = getRandomInt(256)
     const virgin = 101 - getRandomInt(101)
     let rate = 100 - getRandomInt(100)
+    let [ hot, hotString ] = getTemp(sexLvl)
+
+    function getTemp(sexLvl) {
+      let a = Math.ceil(sexLvl / 3) - getRandomInt(10) + getRandomInt(20)
+      if (a > 100) a = 100 - getRandomInt(5)
+
+      let str = '???'
+      if (a < 1) str = 'Freezing love :ice_cube: 💙'
+      if (a > 0 && a < 15) str = 'Cold 🥶'
+      if (a > 14 && a < 36) str = '🧐'
+      if (a > 35 && a < 50) str = 'Hot 🤒'
+      if (a > 49 && a < 65) str = 'Hotdamn it <:fluid:831795650219343912>'
+      if (a > 64 && a < 80) str = 'Very damn hot 🥵🥵🥵'
+      if (a > 79 && a < 98) str = 'What the hell! 🔥🔥🔥 That is so hot 😍'
+      if (a > 97 && a < 101) str = 'Boiled alive. I\'d not be proud of this.'
+      return [ a, str ]
+    }
     const emoteList = ['<a:pregnant:886071002067529770>', '<:heroin:870323994958651424>', '<:losyash:870324026218790913>', '<:gay_sex_minet_anal:893360848058318848>', '<a:ball:858301009309466634>']
     let emote = 0
     let randomised = 0
@@ -45,7 +62,7 @@ module.exports = {
     let user = args[0]
     let user2 = args[1]
 
-    let embed = new MessageEmbed()
+    const embed = new MessageEmbed()
       .setColor('#3131BB')
 
     async function randUser(message, isServNick) {
@@ -137,6 +154,7 @@ module.exports = {
       embed
       .addField('Sex level', sexLvl.toString() + newEmote, true)
       .addField('Virgin', virgin.toString() + '%', true)
+      .addField('Temperature', `${hot.toString()}°C. ${hotString}`, true)
     } else {
       embed
       .addField('Professional ratings', rate.toString() + '/100' + newEmote)
