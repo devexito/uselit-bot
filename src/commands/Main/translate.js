@@ -16,30 +16,18 @@ module.exports = {
   typing: true,
   async execute(message, args) {
     const usage = this.usage
-    if (!args[1] && args[0]) return errorParse('Invalid Arguments', message, usage)
+    let [ langInput, ...untranslated ] = args
+    langInput = langInput.toLowerCase()
 
-    const langInput = args[0].toLowerCase()
     if (!langList.includes(langInput)) {
       return errorParse('Unsupported language. Language List: `' + langList.join('`, `') + '`', message, usage)
     }
     
     const reqTr = unirest('POST', 'https://microsoft-translator-text.p.rapidapi.com/translate')
-
-/*
-    const regex = /-from (\w{2,4}(-\w{2,4})?)/g
-    if (!regex.test(args)) {
-      inputFrom = ''
-    } else if (!regex.test(args)) {
-      return errorParse('❗*Unsupported language* :( *Needs to be one of the following:* `' + langList.join('`, `') + '`', message)
-    } else {
-      regex.exec(args)[1]
-      console.log(
-      const inputFrom = [1]
-    }
-*/
+
     //start of bing translate code
     reqTr.query({
-      'to': args[0],
+      'to': langInput,
       'api-version': '3.0',
       'profanityAction': 'NoAction',
       'textType': 'plain'
@@ -51,15 +39,23 @@ module.exports = {
       'x-rapidapi-host': 'microsoft-translator-text.p.rapidapi.com',
       'useQueryString': true
     })
-
+/*
     let textToTranslate = args
     textToTranslate.splice(0, 1)
-    textToTranslate = textToTranslate.join(' ')
+*/
+    let reply = await repliedMessage(message).catch((e) => console.error(e))
+    if (undefined != untranslated && untranslated.length) {
+    } else if (undefined != reply && reply[0] !== '' && reply.length) {
+      untranslated = reply
+    } else {
+      return errorParse('No text provided', message, usage)
+    }
+    untranslated = untranslated.join(' ')
     
     reqTr.type('json')
     reqTr.send([
       {
-        'Text': '' + textToTranslate.trim() + ''
+        'Text': '' + untranslated.trim() + ''
       }
     ])
 

@@ -8,14 +8,21 @@ const { getPackedSettings } = require('http2')
 
 module.exports = {
   name: 'song',
-  description: 'Makes a very funny song!!!!\n\nSupports message replies.\nExample usage: `>song ru-RU_female your text here`',
+  description: 'Makes a very funny song!!!!\nNow outputs video instead of audio for mobile Discord compatibility.\nSupports message replies.\nExample usage: `>song ru-RU_female your text here`\nUse `-audio` to force output mp3 audio file.',
   desc: 'Make a song',
   permissions: '',
-  usage: '<lang>-<LANG>_<male/female> <text>',
+  usage: '<lang>-<LANG>_<male/female> <text> [-audio]',
   args: true,
   async execute(message, args) {
     let [ setting, ...arges ] = args
+    let outFormat = '.mp4'
+    let noVideo = false
 
+    if (arges && arges[arges.length - 1] === '-audio') {
+      outFormat = '.mp3'
+      noVideo = true
+      arges.splice(-1, 6)
+    }
     if (arges) arges = arges.join(' ').trim().split(' ')
 
     let reply = await repliedMessage(message).catch((e) => console.error(e))
@@ -38,8 +45,12 @@ module.exports = {
 // Õ¿◊¿ÀŒ —Œ«ƒ¿Õ»ﬂ ◊¿—“”ÿ »
     const msg = await message.reply('Making a song... <:shue:893362194689974283>')
 
+    let imgPath = ''
+   // img${getRandomInt(1, 4) || 0}.png
+    if (!noVideo) imgPath = ` -loop 1 -i ./musics/img0.png`
+
     let code = randomText()
-    let write = fs.createWriteStream('./musics/translate' + code + '.mp3')
+    let write = fs.createWriteStream('./tempmusic/translate' + code + '.mp3')
     
     const res = await axios.get(
       'https://texttospeech.responsivevoice.org/v1/text:synthesize?text=' + encodeURI(arges.join(' ')) + '&lang=' + setting.split('_')[0] + '&engine=g3&name=&pitch=0.5&rate=0.5&volume=1&key=0POmS5Y2&gender=' + setting.split('_')[1],
@@ -58,23 +69,29 @@ module.exports = {
     ).catch(( er ) => {
       msg.delete()
       console.error(er)
+      fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
       return errorParse(er, message)
     })
     res.data.pipe(write)
     write.on('finish', () => {
       try {
-        new ffmpeg.Metadata('./musics/translate' + code + '.mp3', (dat, err) => {
-          exec('ffmpeg -i ./musics/garmoshka1.mp3 -i ./musics/translate' + code + '.mp3 -i ./musics/garmoshka2.mp3 -filter_complex "[1]adelay=3300,volume=5[s1];[0]adelay=3300[s0];[2]adelay=' + (dat.durationsec * 1000 + 3600) + '[s2];[0][s0][s1][s2]amix=4[mixout]" -map [mixout] ./musics/msg' + code + '.mp3', async () => {
-            await msg.edit({ content: 'Here is your song <:sidor:812173881271386162>', files: ['./musics/msg' + code + '.mp3'] }).catch(() => {
+        new ffmpeg.Metadata('./tempmusic/translate' + code + '.mp3', (dat, err) => {
+          exec(`ffmpeg -i ./musics/garmoshka1.mp3 -i ./tempmusic/translate${code}.mp3 -i ./musics/garmoshka2.mp3${imgPath} -filter_complex "[1]adelay=3300,volume=5[s1];[0]adelay=3300[s0];[2]adelay=${(dat.durationsec * 1000 + 3600)}[s2];[0][s0][s1][s2]amix=4[mixout]" -map [mixout] ${noVideo ? '' : '-map 3:v -c:v libx264 -pix_fmt yuv420p -shortest '}./tempmusic/msg${code}${outFormat}`, async () => {
+            await msg.edit({ content: 'Here is your song <:sidor:812173881271386162>', files: ['./tempmusic/msg' + code + outFormat] }).catch((e) => {
+              console.error(e)
               msg.edit('Unable to attach the audio file <a:perms:842810795997265970>')
+              fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
+              fs.unlinkSync('./tempmusic/msg' + code + outFormat)
             })
-            fs.unlinkSync('./musics/translate' + code + '.mp3')
-            fs.unlinkSync('./musics/msg' + code + '.mp3')
+            fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
+            fs.unlinkSync('./tempmusic/msg' + code + outFormat)
           })
         })
       } catch (e) {
         console.error(e)
-        errorParse('Google does not want to sing that', message ? message : msg)
+        fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
+        fs.unlinkSync('./tempmusic/msg' + code + outFormat)
+        errorParse('Google did not want to sing that', message ? message : msg)
       }
     })
   }

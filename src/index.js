@@ -14,15 +14,14 @@ client.cooldowns = new Collection()
 client.commands = new Collection()
 const { cooldowns } = client
 
+const NickChanger = require('./services/nickChanger')
+
 const load = (dir = './src/commands/') => {
   readdirSync(dir).forEach(dirs => {
     const commandFiles = readdirSync(`${dir}${sep}${dirs}${sep}`).filter(files => files.endsWith('.js'))
 
     for (const file of commandFiles) {
       const command = require(`./commands/${dirs}/${file}`)
-      //process.stdout.clearLine()
-      //process.stdout.cursorTo(0)
-      //process.stdout.write(`Loading command ${command.name}...`)
       client.commands.set(command.name, command)
     }
   })
@@ -31,8 +30,9 @@ const load = (dir = './src/commands/') => {
 load()
 
 client.on('ready', () => {
-  //process.stdout.write('\n')
   console.log(`[READY] Logged in as ${client.user.tag}`)
+
+  new NickChanger(client)
 
   setInterval(() => {
     client.user.setPresence({
@@ -71,7 +71,7 @@ client.on('messageCreate', async message => {
     const embed = new MessageEmbed()
       .setColor('#3131BB')
       .setTitle(client.user.username)
-      .setDescription(`My prefix is \`${prefix}\``)
+      .setDescription(`My prefix is \`${prefix}\`\nType \`${prefix}help\` for a list of available commands.`)
     return message.reply({ embeds: [embed] })
   }
   if (!message.content.startsWith(prefix)) return
@@ -122,28 +122,8 @@ client.on('messageCreate', async message => {
 })
 
 
-client.on('guildMemberUpdate', async (oldMember, newMember) => {
-  if (oldMember.nickname === newMember.nickname) return
-  let guild = 467759978716069888
-  let m = [350177157550571521, 761943058924830740, 567411443276840984]
-  let n = ['❤Nikitock Fanta❤', '❤femboy debil❤', '❤serafemboy❤']
-
-  if (oldMember.guild.id != guild) return console.log('escaped guild')
-  if (newMember.user.id == m[0]) {
-    if (newMember.nickname != n[0]) {
-      newMember.setNickname(n[0])
-    }
-  } else if (newMember.user.id == m[1]) {
-    if (newMember.nickname != n[1]) {
-      newMember.setNickname(n[1])
-    }
-  } else if (newMember.user.id == m[2]) {
-    if (newMember.nickname != n[2]) {
-      newMember.setNickname(n[2])
-    }
-  } else return console.log('escaped member')
-  console.log(newMember.user.username + ' has changed from ' + oldMember.nickname + ' to ' + newMember.nickname + '! Changing back to their defaults')
-})
-
-
 client.login(config.token)
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.log('Unhandled Rejection at:', reason.stack || reason)
+})

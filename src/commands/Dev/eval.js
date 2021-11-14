@@ -1,5 +1,6 @@
 const { inspect } = require('util')
 const { errorParse } = require('../../util/util')
+const { MessageEmbed } = require('discord.js')
 
 module.exports = {
   name: 'eval',
@@ -25,16 +26,18 @@ module.exports = {
     } catch (e) {
       if (e.message == 'Cannot send an empty message') return message.react('🏴')
       console.error(e)
-      return message.react('❌')
+      return errorParse('```\n' + e.toString() + '\n```', message)
     }
 
     // output
     console.log(inspect(evaled))
     if (inspect(evaled) == 'undefined') return message.react('♿')
-    if (inspect(evaled).length > 1999 || noOutput) return message.react('🏳️')
+    if (inspect(evaled).length > 4000 || noOutput) return message.react('🏳️')
 
     if (!noOutput) {
-      message.reply(inspect(evaled))
+      const embed = new MessageEmbed()
+        .setDescription('```js\n' + inspect(evaled) + '\n```')
+      message.reply({embeds: [embed]})
     }
   },
 }

@@ -1,4 +1,6 @@
-﻿const { errorParse } = require('../util/util')
+﻿const { URL } = require('url')
+
+const { errorParse } = require('../util/util')
 const TRUSTED_URLS = Object.freeze([
   'cdn.discordapp.com',
   'images-ext-1.discordapp.net',
@@ -42,8 +44,8 @@ async function repliedMessage(message) {
 
 
 // taken from notsobot.ts
-function findImageUrlInAttachment(attachment) {
-  if (attachment.proxyUrl && (attachment.height || attachment.width)) {
+async function findImageUrlInAttachment(attachment) {
+  if (attachment.proxyURL && (attachment.height || attachment.width)) {
     if (attachment.isImage) {
       if (attachment.url) {
         const url = new URL(attachment.url)
@@ -51,78 +53,101 @@ function findImageUrlInAttachment(attachment) {
           return attachment.url
         }
       }
-      return attachment.proxyUrl
+      return attachment.proxyURL
     } else if (attachment.isVideo) {
-      return attachment.proxyUrl + '?format=png'
+      return attachment.proxyURL + '?format=png'
+    } else {
+      console.log('not image nor video')
     }
   }
+  console.log('attachment check fail')
   return null
 }
 
 
 
-function findImageUrlInEmbed(embed, ignoreGIFV = false) {
-  if (!ignoreGIFV && embed.type === MessageEmbedTypes.GIFV) {
+async function findImageUrlInEmbed(embed, ignoreGIFV = false) {
+  if (!ignoreGIFV && embed.type === 'gifv') {
     // try to use our own unfurler for the url since it'll use the thumbnail
     // imgur returns the .gif image in thumbnail, so check if that ends with .gif
-    const url = findImageUrlInEmbed(embed, true);
+    const url = await findImageUrlInEmbed(embed, true)
     if (url && url.endsWith('.gif')) {
       return url
     }
     if (embed.url) {
       return embed.url
     }
+    console.log('gifv check fail')
     return null
   }
   const { image } = embed
-  if (image && image.proxyUrl && (image.height || image.width)) {
+  if (image && image.proxyURL && (image.height || image.width)) {
     if (image.url) {
       const url = new URL(image.url)
       if (TRUSTED_URLS.includes(url.host)) {
         return image.url
+      } else {
+        console.log('url image untrusted')
       }
+    } else {
+      console.log('no image.url')
     }
-    return image.proxyUrl
+    return image.proxyURL
   }
   const { thumbnail } = embed
-  if (thumbnail && thumbnail.proxyUrl && (thumbnail.height || thumbnail.width)) {
+  if (thumbnail && thumbnail.proxyURL && (thumbnail.height || thumbnail.width)) {
     if (thumbnail.url) {
       const url = new URL(thumbnail.url)
       if (TRUSTED_URLS.includes(url.host)) {
         return thumbnail.url
+      } else {
+        console.log('url thumbnail untrusted')
       }
+    } else {
+      console.log('no thumbnail.url')
     }
-    return thumbnail.proxyUrl
+    return thumbnail.proxyURL
+  } else {
+    console.log('no thumbnail')
   }
   const { video } = embed
-  if (video && video.proxyUrl && (video.height || video.width)) {
-    return video.proxyUrl + '?format=png'
+  if (video && video.proxyURL && (video.height || video.width)) {
+    return video.proxyURL + '?format=png'
   }
+  console.log('embed check fail')
   return null
 }
 
 
 
-function findImageUrlInMessage(message, url = null) {
+async function findImageUrlInMessage(message, url = null) {
   if (url) {
-    for (let [embedId, embed] of message.embeds) {
+    for (let [embedId, embed] of Object.entries(message.embeds)) {
       if (embed.url === url) {
-        return findImageUrlInEmbed(embed)
+        return await findImageUrlInEmbed(embed)
+      } else {
+        console.log('no embed.url')
       }
     }
   }
-  for (let [attachmentId, attachment] of message.attachments) {
-    const url = findImageUrlInAttachment(attachment)
+  for (let [attachmentId, attachment] of Object.entries(message.attachments)) {
+    const url = await findImageUrlInAttachment(attachment)
     if (url) {
       return url
+    } else {
+      console.log('no attach url')
     }
   }
-  for (let [embedId, embed] of message.embeds) {
-    const url = findImageUrlInEmbed(embed)
+  for (let [embedId, embed] of Object.entries(message.embeds)) {
+    const url = await findImageUrlInEmbed(embed)
     if (url) {
       return url
+    } else {
+      console.log('no embed url')
     }
   }
+  console.log('message check fail')
+  console.log(message)
   return null
 }
 

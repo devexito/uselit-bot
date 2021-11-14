@@ -4,6 +4,7 @@ module.exports = {
   description: 'Reacts with badklass emoji on every message of someone who really does some crap.\nNot providing any argument will insert a default user.\nUse `-off` postfix to turn this off for a specified user.\n\nDoes not work for bots.',
   desc: 'React with crap on users',
   usage: '<user mention/id> [-off]',
+  args: true,
   async execute(message, args) {
     let owner = (message.author.id == message.client.config.ownerID) ? true : false
     let off
@@ -14,7 +15,7 @@ module.exports = {
         var regEx = /<@\!?([0-9]{17,21})>/
         input = regEx.exec(input)[1]
         //  errorParse('Please provide a user mention or id', message)
-        //  return {}
+        //  return false
         console.log('blya ', input)
       }
 
@@ -22,9 +23,9 @@ module.exports = {
         let usr = await message.client.users.fetch(input).catch((e) => { return false })
         if (usr.bot) {
           errorParse('Bots are not supported', message)
-          return {}
+          return false
         }
-        return usr.id
+        return usr
       } else return false
     }
 
@@ -32,7 +33,7 @@ module.exports = {
       if (message.author.id == message.client.config.ownerID) {
         return (bk.length > 0) ?message.reply(bk.join(', ')) : message.reply('bk is empty')
       } else {
-        message.react('🚽')
+        return message.react('🚽')
       }
     }
 
@@ -49,28 +50,28 @@ module.exports = {
         }
       }
     }
-    let user
+    let user = {}
     let defaultUser = false
 
     if (!args || !args.length || args[0] == '') {
-      user = '342247854875738113' //privet misha
+      user.id = '342247854875738113' //poka misha :(
       defaultUser = true
     } else {
       user = await mentionCheck(args[0], message)
     }
-    if (typeof user === 'object') return
+    if (typeof user !== 'object') return
     if (!user) return errorParse('User not found', message)
 
-    if (bk.indexOf(user) === -1) { // checking if specified user is not in bk array...
+    if (bk.indexOf(user.id) === -1) { // checking if specified user is not in bk array...
       if (!off) {
-        bk.push(user)
+        bk.push(user.id)
         return message.react('👍🏿').catch(() => {})
       } else {
         return errorParse('This user is already not in the list', message)
       }
     } else if (off) {
-      bk.splice(bk.indexOf(user), 1)
-      return message.reply('ok, removed user ' + user).catch(() => {})
+      bk.splice(bk.indexOf(user.id), 1)
+      return message.reply('ok, removed user ' + user.username).catch(() => {})
     } else if (defaultUser) {
       return errorParse('Uhh.. Invalid Arguments\nPlease specify a user', message, this.usage)
     } else {
