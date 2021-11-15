@@ -8,7 +8,7 @@ module.exports = {
   name: 'nick',
   args: true,
   owner: true,
-  description: 'a',
+  description: 'Chan',
   desc: '.',
   aliases: ['nick'],
   usage: '<add/remove/list> <user id> <guild id> <nickname>',
@@ -16,7 +16,11 @@ module.exports = {
   async execute(message, args) {
     if (message.author.id !== message.client.config.ownerID) return message.react('⛔')
     let [setting, usrId, guildId, ...nicknm] = args
-    nicknm = nicknm.join(' ')
+    if (nicknm[nicknm.length - 1] === '-now') {
+      var now = true
+      nicknm.splice(-1, 4)
+    }
+    nicknm = nicknm.join(' ').trim()
     let isDeleting = false
     var out = ''
 
@@ -28,29 +32,32 @@ module.exports = {
       return errorParse('setting is neither add nor remove', message)
     }
 
-    if (!usrId) return errorParse('no user', message)
+    if (!usrId || !guildId) return errorParse('invalid arguments', message)
+
+    try {
+      var memCache = message.client.guilds.cache.get(guildId).members.cache.get(usrId)
+    } catch (e) {
+      return errorParse('couldnt cache smth', message)
+    }
 
     if (isDeleting) {
-      if (!list[usrId]) return errorParse('this user does not exist', message)
-      delete list[usrId]
-      msg = 'ok, removed user ' + usrId
-    } else if (guildId && nicknm) {
-      list[usrId] = {
-        "nick": nicknm,
-        "guild": guildId
-      }
-      msg = 'ok, added user ' + usrId
-    } else return errorParse('Invalid arguments', message)
+      if (!list[guildId][usrId]) return errorParse('this user does not exist', message)
+      delete list[guildId][usrId]
+      msg = `ok, removed user ${memCache.user.username}`
+    } else if (nicknm) {
+      list[guildId][usrId] = nicknm
+      msg = 'ok, added user ' + memCache.user.username
+    } else return errorParse('provide a nickname', message)
 
-    let er = false
     console.log(list)
-    fs.writeFileSync(name, JSON.stringify(list), function (err) {
-      if (err) {
-        console.error(err)
-        errorParse('File writing error', message)
-        er = true
-      }
-    })
-    if (!er) message.reply(msg)
+
+    try {
+      fs.writeFileSync(name, JSON.stringify(list), 'utf8')
+      if (now) memCache.setNickname(nicknm)
+      message.reply(msg)
+    } catch (err) {
+      console.error(err)
+      errorParse('File writing error: ' + err.toString(), message)
+    }
   },
 }
