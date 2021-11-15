@@ -9,6 +9,8 @@ module.exports = {
     let owner = (message.author.id == message.client.config.ownerID) ? true : false
     let off
 
+    if (message.author.id == '227054810673840128') return message.reply('idi nahui dolbaeb lol')
+
     async function mentionCheck(input, message) {
       
       if (isNaN(input)) {
