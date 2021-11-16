@@ -32,19 +32,31 @@ module.exports = {
       return errorParse('setting is neither add nor remove', message)
     }
 
+    let allUsers = false
     if (!usrId || !guildId) return errorParse('invalid arguments', message)
+    if (isDeleting && (usrId === 'all' || usrId === 'guild')) allUsers = true
 
-    try {
-      var memCache = message.client.guilds.cache.get(guildId).members.cache.get(usrId)
-    } catch (e) {
-      return errorParse('couldnt cache smth', message)
+    if (!allUsers) {
+      try {
+        var memCache = message.client.guilds.cache.get(guildId).members.cache.get(usrId)
+      } catch (e) {
+        return errorParse('couldnt cache smth', message)
+      }
     }
 
     if (isDeleting) {
-      if (!list[guildId][usrId]) return errorParse('this user does not exist', message)
-      delete list[guildId][usrId]
-      msg = `ok, removed user ${memCache.user.username}`
+      if (!list[guildId]) return errorParse('this guild does not exist in the list', message)
+      if (!allUsers) {
+        if (!list[guildId][usrId]) return errorParse('this user does not exist in the list', message)
+        delete list[guildId][usrId]
+        if (list[guildId] == {}) delete list[guildId]
+        msg = 'ok, removed user ' + memCache.user.username
+      } else {
+        delete list[guildId]
+        msg = 'ok, removed guild ' + guildId + ' and every its member'
+      }
     } else if (nicknm) {
+      if (!list[guildId]) list[guildId] = {}
       list[guildId][usrId] = nicknm
       msg = 'ok, added user ' + memCache.user.username
     } else return errorParse('provide a nickname', message)
