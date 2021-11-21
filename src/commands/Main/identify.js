@@ -1,4 +1,4 @@
-const axios = require('axios').default
+﻿const axios = require('axios').default
 const { errorParse, validateUrl } = require('../../util/util')
 const { repliedMessageObject, findImageUrlInMessage, findImageUrlInAttachment, findImageUrlInMessageHistory, findImageUrlInEmbed } = require('../../util/message')
 
@@ -64,8 +64,8 @@ module.exports = {
 
     const res = await axios.request(options).catch((er) => {
       let erCode = '\n\n'
-      console.error(er)
       if (er.response.data) {
+        console.error(er.response.data)
         if (er.response.data.code) {
           erCode += `${er.response.data.code}: ${er.response.data.message}`
         } else if (er.response.data.messages) {
@@ -76,8 +76,17 @@ module.exports = {
     })
     if (res && res.data) {
       let anal = res.data.description.captions[0]
-      if (!anal || !anal.text) return errorParse('No output received from API', msg, false, true)
-      msg.edit(`\`I think it is ${anal.text}, ${anal.confidence < 0.5 ? 'although I am only' : 'I am'} ${Math.ceil(anal.confidence * 100).toString()}% sure\``).catch(() => {})
+      let tags = res.data.description.tags
+      if (!anal || !anal.text) {
+        if (tags.length) {
+          if (tags.length > 3) tags.splice(2, tags.length - 3)
+          msg.edit(`\`"I can't really describe the image but I do see ${tags.join(', ')}"\``)
+        } else {
+          msg.edit(`\`"I really can't describe the image 😳"\``)
+        }
+      } else {
+        msg.edit(`\`"I think it is ${anal.text}, ${anal.confidence < 0.4 ? 'although I am only' : 'I am'} ${Math.ceil(anal.confidence * 100).toString()}% sure"\``).catch(() => {})
+      }
     }
   },
 }
