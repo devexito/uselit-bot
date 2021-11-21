@@ -22,7 +22,6 @@ module.exports = {
         errorParse('Error searching for an image in referenced message', message)
         return console.error(e)
       })
-      console.log(url)
     } else if (args.length && message.mentions.users.size) {
       let mentioned = message.mentions.users.first()
       if (mentioned) url = mentioned.avatarURL({ format: 'png' }) || mentioned.displayAvatarURL({ format: 'png' })
@@ -37,9 +36,6 @@ module.exports = {
       url = args[0]
     } else return errorParse('Please provide an attachment, image URL or a user mention', message)
 
-//https://cdn.discordapp.com/attachments/834155990571810826/906941048394227712/b64c642588d1c4469ad9f55c85dfe823.png
-
-   // return message.reply(args)
     let msg 
     if (mess) {
       msg = await mess.reply(':thinking:')
@@ -80,7 +76,6 @@ module.exports = {
     })
     if (res && res.data) {
       let anal = res.data.description.captions[0]
-      console.log(res)
       if (!anal || !anal.text) return errorParse('No output received from API', msg, false, true)
       msg.edit(`\`I think it is ${anal.text}, ${anal.confidence < 0.5 ? 'although I am only' : 'I am'} ${Math.ceil(anal.confidence * 100).toString()}% sure\``).catch(() => {})
     }
