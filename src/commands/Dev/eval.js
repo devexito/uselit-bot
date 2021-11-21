@@ -6,9 +6,9 @@ module.exports = {
   name: 'eval',
   description: 'Can be used only by bot\'s owner',
   desc: '.',
-  permissions: 'owner',
+  permissions: ['ADMINISTRATOR'],
   owner: true,
-  async execute (message, args, client) {
+  async execute (message, args) {
     if (message.author.id !== message.client.config.ownerID) {
       return errorParse('⛔ Missing Access', message)
     }
@@ -22,7 +22,7 @@ module.exports = {
 
     let evaled
     try {
-      evaled = await eval(args.join(' ').trim()) 
+      evaled = await eval(args.join(' ').trim())
     } catch (e) {
       if (e.message == 'Cannot send an empty message') return message.react('🏴')
       console.error(e)

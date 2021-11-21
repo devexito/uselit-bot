@@ -3,6 +3,7 @@ module.exports = {
   name: 'bk',
   description: 'Reacts with badklass emoji on every message of someone who really does some crap.\nNot providing any argument will insert a default user.\nUse `-off` postfix to turn this off for a specified user.\n\nDoes not work for bots.',
   desc: 'React with crap on users',
+  cooldown: 5,
   usage: '<user mention/id> [-off]',
   args: true,
   async execute(message, args) {

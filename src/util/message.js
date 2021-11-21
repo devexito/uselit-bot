@@ -1,6 +1,6 @@
 ﻿const { URL } = require('url')
 
-const { errorParse } = require('../util/util')
+const { shorten, errorParse } = require('../util/util')
 const TRUSTED_URLS = Object.freeze([
   'cdn.discordapp.com',
   'images-ext-1.discordapp.net',
@@ -46,15 +46,17 @@ async function repliedMessage(message) {
 // taken from notsobot.ts
 async function findImageUrlInAttachment(attachment) {
   if (attachment.proxyURL && (attachment.height || attachment.width)) {
-    if (attachment.isImage) {
+    if (/^image/.test(attachment.contentType)) {
       if (attachment.url) {
         const url = new URL(attachment.url)
         if (TRUSTED_URLS.includes(url.host)) {
           return attachment.url
+        } else {
+          console.log('untrusted attachment url')
         }
       }
       return attachment.proxyURL
-    } else if (attachment.isVideo) {
+    } else if (/^video/.test(attachment.contentType)) {
       return attachment.proxyURL + '?format=png'
     } else {
       console.log('not image nor video')
@@ -130,16 +132,16 @@ async function findImageUrlInMessage(message, url = null) {
       }
     }
   }
-  for (let [attachmentId, attachment] of Object.entries(message.attachments)) {
-    const url = await findImageUrlInAttachment(attachment)
+  if (message.attachments.size) {
+    const url = await findImageUrlInAttachment(message.attachments.first())
     if (url) {
       return url
     } else {
-      console.log('no attach url')
+      console.log('no attachment')
     }
   }
   for (let [embedId, embed] of Object.entries(message.embeds)) {
-    const url = await findImageUrlInEmbed(embed)
+    const url = await findImageUrlInEmbed(embed, true)
     if (url) {
       return url
     } else {
@@ -147,10 +149,38 @@ async function findImageUrlInMessage(message, url = null) {
     }
   }
   console.log('message check fail')
-  console.log(message)
   return null
 }
 
+
+
+async function findImageUrlInMessageHistory(message, retObj = false) {
+  let kostil = false
+  return new Promise(function(resolve, reject) {
+    message.channel.messages.fetch({ limit: 50 }).then(async arr => { arr.map(async m => {
+      if (m.attachments.size) {
+        const url = await findImageUrlInAttachment(m.attachments.first())
+        if (url && !kostil) {
+          kostil = true
+          if (retObj) {
+            resolve([ url, m ])
+          } else resolve(url)
+        }
+      } else if (m.embeds.length) {
+        const url = await findImageUrlInEmbed(m.embeds[0], true)
+        if (url && !kostil) {
+          kostil = true
+          if (retObj) {
+            resolve([ url, m ])
+          } else resolve(url)
+        }
+      }
+    })
+     // if (!kostil) reject( null )
+    })
+    
+  })
+}
 
 
 module.exports = {
@@ -158,5 +188,6 @@ module.exports = {
   repliedMessage,
   findImageUrlInAttachment,
   findImageUrlInEmbed,
-  findImageUrlInMessage
+  findImageUrlInMessage,
+  findImageUrlInMessageHistory
 }

@@ -65,7 +65,7 @@ module.exports = {
 
     try {
       fs.writeFileSync(name, JSON.stringify(list), 'utf8')
-      if (now) memCache.setNickname(nicknm)
+      if (now) await memCache.setNickname(nicknm)
       message.reply(msg)
     } catch (err) {
       console.error(err)

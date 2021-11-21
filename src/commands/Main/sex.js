@@ -1,4 +1,4 @@
-const { getRandomInt } = require('../../util/util')
+const { emote, getRandomInt } = require('../../util/util')
 const { MessageEmbed } = require('discord.js')
 
 module.exports = {
@@ -28,7 +28,7 @@ module.exports = {
     }
 
     if (message.content.includes(message.author.id)) {
-      sexState = 'masturbating'
+      sexState = 'making fun of'
       user = 'yourself'
     } else {
 // 1st etap
@@ -46,7 +46,7 @@ module.exports = {
     }
 
     embed.setTitle('You are ' + sexState + ' ' + user)
-      .setDescription('<:nice_shit:771145344322371595>')
+      .setDescription(emote('nice_shit'))
       .addField('Sex level', randomNumber.toString(), true)
       .addField('Virgin', virgin.toString() + '%', true)
     message.reply({ embeds: [embed] })

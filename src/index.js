@@ -1,9 +1,9 @@
-const { Client, Collection, Intents, MessageEmbed } = require('discord.js')
+const { Client, Collection, Intents, MessageEmbed, Permissions } = require('discord.js')
 const myintents = new Intents(32767)
 myintents.remove(['DIRECT_MESSAGES'])
 const client = new Client({ intents: myintents, allowedMentions: { repliedUser: false, parse: ['users'] }})
 
-const { shorten, errorParse, argsError } = require('./util/util.js')
+const { emote, shorten, errorParse, argsError } = require('./util/util.js')
 const config = require('./config.js')
 prefix = config.defaultPrefix
 client.config = config
@@ -53,7 +53,7 @@ client.on('messageCreate', async message => {
     return
   } else if (message.content == 'undefined') {
     message.channel.send('undefined.')
-    return message.react('<a:dieass:869488306314936370>').catch(() => {})
+    return message.react(emote('dieass')).catch(() => {})
   } else if (message.content == 'null') {
     return message.channel.send('null.')
   } else if (message.content == 'NaN') {
@@ -64,7 +64,7 @@ client.on('messageCreate', async message => {
   if (message.author.bot || !message.guild) return
 
   if (bk.length > 0 && bk.includes(message.author.id)) {
-    message.react('<:badklass:493361730160820234>').catch(() => {})
+    message.react(emote('badklass')).catch(() => {})
   }
 
   if (message.content.startsWith(`<@${client.user.id}>`) || message.content.startsWith(`<@!${client.user.id}>`) ) {
@@ -88,7 +88,11 @@ client.on('messageCreate', async message => {
   if (command.args && !args.length) {
     return argsError(command, message, prefix)
   }
-
+/*
+  if (command.permissions && command.permissions.length && !message.author.permissions.has(Permissions.FLAGS[command.permissions])) {
+    return errorParse(`This command requires ${command.permissions.join(', ')} permissions.`)
+  }
+*/
     // COOLDOWNS
   if (!cooldowns.has(command.name)) {
     cooldowns.set(command.name, new Collection())
@@ -103,7 +107,7 @@ client.on('messageCreate', async message => {
 
     if (now < expirationTime) {
       const timeLeft = (expirationTime - now) / 1000
-      return message.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`)
+      return message.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`).then(m => setTimeout(() => m.delete(), timeLeft * 1000)).catch(() => {})
     }
   }
 
@@ -113,7 +117,7 @@ client.on('messageCreate', async message => {
   // EXECUTION
   await command.execute(message, args)
   .catch((e) => {
-    errorParse('Critical Command Error: ' + e.message, message)
+    errorParse('**Critical:** ' + e.message, message)
     console.error(e)
   })
         //   logs   //

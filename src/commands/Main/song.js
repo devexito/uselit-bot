@@ -1,4 +1,4 @@
-const { errorParse } = require('../../util/util')
+const { emote, errorParse } = require('../../util/util')
 const { repliedMessage } = require('../../util/message')
 const fs = require('fs')
 const axios = require('axios')
@@ -43,7 +43,7 @@ module.exports = {
     }
 
 // ÍÀ×ÀËÎ ÑÎÇÄÀÍÈß ×ÀÑÒÓØÊÈ
-    const msg = await message.reply('Making a song... <:shue:893362194689974283>')
+    const msg = await message.reply('Making a song... ' + emote('shue'))
 
     let imgPath = ''
    // img${getRandomInt(1, 4) || 0}.png
@@ -77,9 +77,9 @@ module.exports = {
       try {
         new ffmpeg.Metadata('./tempmusic/translate' + code + '.mp3', (dat, err) => {
           exec(`ffmpeg -i ./musics/garmoshka1.mp3 -i ./tempmusic/translate${code}.mp3 -i ./musics/garmoshka2.mp3${imgPath} -filter_complex "[1]adelay=3300,volume=5[s1];[0]adelay=3300[s0];[2]adelay=${(dat.durationsec * 1000 + 3600)}[s2];[0][s0][s1][s2]amix=4[mixout]" -map [mixout] ${noVideo ? '' : '-map 3:v -c:v libx264 -pix_fmt yuv420p -shortest '}./tempmusic/msg${code}${outFormat}`, async () => {
-            await msg.edit({ content: 'Here is your song <:sidor:812173881271386162>', files: ['./tempmusic/msg' + code + outFormat] }).catch((e) => {
+            await msg.edit({ content: 'Here is your song ' + emote('sidor'), files: ['./tempmusic/msg' + code + outFormat] }).catch((e) => {
               console.error(e)
-              msg.edit('Unable to attach the audio file <a:perms:842810795997265970>')
+              msg.edit('Unable to attach the audio file ' + emote('perms'))
               fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
               fs.unlinkSync('./tempmusic/msg' + code + outFormat)
             })

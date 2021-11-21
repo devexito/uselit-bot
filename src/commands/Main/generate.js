@@ -1,6 +1,6 @@
 ﻿const paginationEmbed = require('../../services/embedPagination')
 const { MessageEmbed, MessageButton } = require('discord.js')
-const { errorParse } = require('../../util/util')
+const { emote, errorParse } = require('../../util/util')
 const { repliedMessage } = require('../../util/message')
 const gen = require('../../services/generateText')
 
@@ -24,7 +24,7 @@ module.exports = {
     const embed = new MessageEmbed()
       .setColor('#3131BB')
       .setTitle('Generating text...')
-      .setDescription('<:clueless:896283754652381214>')
+      .setDescription(emote('clueless'))
     const msg = await message.reply({ embeds: [embed] }).catch(e => errorParse(e.toString(), message))
     if (!msg) return
     const out = await gen.fetchText(message, args, msg)

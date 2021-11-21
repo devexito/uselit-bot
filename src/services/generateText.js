@@ -54,7 +54,7 @@ async function fetchText(message, args, msg = false) {
       req.end(async function (res) {
         if (res.error) {
           if (msg) {
-            reject('API error! Please try again later')
+            reject('API error: ' + res.error.toString() + '\nPlease try again later!')
           } else {
             reject('Couldn\'t generate text')
           }

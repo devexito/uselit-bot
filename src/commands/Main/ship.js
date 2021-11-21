@@ -1,4 +1,4 @@
-﻿const { getRandomInt } = require('../../util/util')
+﻿const { emote, getRandomInt } = require('../../util/util')
 const { MessageEmbed } = require('discord.js')
 const { errorParse } = require('../../util/util')
 
@@ -25,14 +25,20 @@ module.exports = {
       if (a > 0 && a < 15) str = 'Cold 🥶'
       if (a > 14 && a < 36) str = '🧐'
       if (a > 35 && a < 50) str = 'Hot 🤒'
-      if (a > 49 && a < 65) str = 'Hotdamn it <:fluid:831795650219343912>'
+      if (a > 49 && a < 65) str = 'Hotdamn it ' + emote('fluid')
       if (a > 64 && a < 80) str = 'Very damn hot 🥵🥵🥵'
       if (a > 79 && a < 98) str = 'What the hell! 🔥🔥🔥 That is so hot 😍'
       if (a > 97 && a < 101) str = 'Boiled alive. I\'d not be proud of this.'
       return [ a, str ]
     }
-    const emoteList = ['<a:pregnant:886071002067529770>', '<:heroin:870323994958651424>', '<:losyash:870324026218790913>', '<:gay_sex_minet_anal:893360848058318848>', '<a:ball:858301009309466634>']
-    let emote = 0
+    const emoteList = [
+      emote('pregnant'),
+      emote('heroin'),
+      emote('losyash'),
+      emote('suhariki'),
+      emote('ball')
+    ]
+    let emotenum = 0
     let randomised = 0
     
     let isServNick = false
@@ -54,7 +60,7 @@ module.exports = {
     args = args.join(' ')
     if (args.includes('|')) {
       args = args.split('|')
-      emote = 1
+      emotenum = 1
     } else {
       args = args.split(' ')
     }
@@ -116,7 +122,7 @@ module.exports = {
         randomised += 1
       } else {
         user = args[0]
-        emote = 1
+        emotenum = 1
       }
     }
     if (!user2) {
@@ -125,7 +131,7 @@ module.exports = {
         randomised += 1
       } else {
         user2 = args[1]
-        emote = 1
+        emotenum = 1
       }
     }
 
@@ -141,16 +147,16 @@ module.exports = {
     let newEmote = ''
     const regSex = new RegExp('sex')
     if (regSex.test(final)) {
-      (emote === 0) ? newEmote = ' ' + emoteList[3] : newEmote = ' ' + emoteList[2]
-      emote = 4
+      (emotenum === 0) ? newEmote = ' ' + emoteList[3] : newEmote = ' ' + emoteList[2]
+      emotenum = 4
       rate = 69
       sexLvl = 69
     }
 
     embed
       .setTitle('`' + user + '` + `' + user2 + '`')
-      .setDescription('**' + final + '** ' + emoteList[emote])
-    if (emote === 0) {
+      .setDescription('**' + final + '** ' + emoteList[emotenum])
+    if (emotenum === 0) {
       embed
       .addField('Sex level', sexLvl.toString() + newEmote, true)
       .addField('Virgin', virgin.toString() + '%', true)
