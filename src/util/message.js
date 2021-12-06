@@ -51,8 +51,6 @@ async function findImageUrlInAttachment(attachment) {
         const url = new URL(attachment.url)
         if (TRUSTED_URLS.includes(url.host)) {
           return attachment.url
-        } else {
-          console.log('untrusted attachment url')
         }
       }
       return attachment.proxyURL
@@ -88,11 +86,7 @@ async function findImageUrlInEmbed(embed, ignoreGIFV = false) {
       const url = new URL(image.url)
       if (TRUSTED_URLS.includes(url.host)) {
         return image.url
-      } else {
-        console.log('url image untrusted')
       }
-    } else {
-      console.log('no image.url')
     }
     return image.proxyURL
   }
@@ -102,11 +96,7 @@ async function findImageUrlInEmbed(embed, ignoreGIFV = false) {
       const url = new URL(thumbnail.url)
       if (TRUSTED_URLS.includes(url.host)) {
         return thumbnail.url
-      } else {
-        console.log('url thumbnail untrusted')
       }
-    } else {
-      console.log('no thumbnail.url')
     }
     return thumbnail.proxyURL
   } else {
@@ -155,28 +145,29 @@ async function findImageUrlInMessage(message, url = null) {
 
 
 async function findImageUrlInMessageHistory(message, retObj = false) {
-  let kostil = false
+  let found = false
   return new Promise(function(resolve, reject) {
     message.channel.messages.fetch({ limit: 50 }).then(async arr => { arr.map(async m => {
       if (m.attachments.size) {
         const url = await findImageUrlInAttachment(m.attachments.first())
-        if (url && !kostil) {
-          kostil = true
+        if (url && !found) {
+          found = true
           if (retObj) {
             resolve([ url, m ])
           } else resolve(url)
         }
       } else if (m.embeds.length) {
         const url = await findImageUrlInEmbed(m.embeds[0], true)
-        if (url && !kostil) {
-          kostil = true
+        if (url && !found) {
+          found = true
           if (retObj) {
             resolve([ url, m ])
           } else resolve(url)
         }
       }
     })
-     // if (!kostil) reject( null )
+    }).then(() => {
+      if (!found) reject( 'No images found in last 50 messages' )
     })
     
   })

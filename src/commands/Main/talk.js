@@ -1,6 +1,6 @@
 const unirest = require('unirest')
 // const ctkey = '00IGfYo3R5USlx45tAVLoAAid'
-const { errorParse } = require('../../util/util')
+const { errorParse, argsError } = require('../../util/util')
 const { repliedMessage } = require('../../util/message')
 const XRegExp = require('xregexp')
 
@@ -18,7 +18,7 @@ module.exports = {
     } else if (undefined != reply && reply[0] !== '' && reply.length) {
       args = reply
     } else {
-      return errorParse('No text provided', message)
+      return argsError(this, message)
     }
 
     args = args.join(' ')

@@ -7,31 +7,14 @@ const {
   MessageButton,
 } = require('discord.js');
 const { shorten } = require('../util/util');
-const gen = require('../services/generateText');
+const gen = require('../services/searchGoogle');
 
-/**
- * Creates a pagination embed
- * @param {Message} msg (of bot)
- * @param {MessageEmbed[]} pages
- * @param {MessageButton[]} buttonList
- * @param {number} timeout
- * @param {Message} message (of user)
- * @param {boolean} replied
- * @returns
- */
+
 const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message, args) => {
   if (!msg && !msg.channel) throw new Error('Channel is inaccessible.');
   if (!pages) throw new Error('Pages are not given.');
-  if (!buttonList) throw new Error('Buttons are not given.');
-  if (buttonList[0].style === 'LINK' || buttonList[1].style === 'LINK')
-    throw new Error(
-      'Link buttons are not supported with discordjs-button-pagination'
-    );
-  if (buttonList.length < 5) throw new Error('Need five buttons.');
 
   let page = 0;
-
-  if (pages[0].description && pages[0].description.length > 2999) buttonList[3].setDisabled(true);
 
   const row = new MessageActionRow().addComponents(buttonList);
   let curPage;

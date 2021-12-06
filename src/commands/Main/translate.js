@@ -1,7 +1,7 @@
 const bingkey = '9e3ceaef5emsh58cb033407ace61p16ab76jsn5510af64ae15'
 const unirest = require('unirest')
 const { MessageEmbed } = require('discord.js')
-const { errorParse, shorten } = require('../../util/util')
+const { errorParse, shorten, argsError } = require('../../util/util')
 const { repliedMessage } = require('../../util/message')
 const langList = [ 'af', 'am', 'ar', 'as', 'az', 'bg', 'bn', 'bs', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'es', 'et', 'fa', 'fi', 'fil', 'fj', 'fr', 'fr-ca', 'ga', 'gu', 'he', 'hi', 'hr', 'ht', 'hu', 'hy', 'id', 'is', 'it', 'iu', 'ja', 'kk', 'km', 'kmr', 'kn', 'ko', 'ku', 'lo', 'lt', 'lv', 'lzh', 'mg', 'mi', 'ml', 'mr', 'ms', 'mt', 'mww', 'my', 'nb', 'ne', 'nl', 'or', 'otq', 'pa', 'pl', 'prs', 'ps', 'pt', 'pt-pt', 'ro', 'ru', 'sk', 'sl', 'sm', 'sq', 'sr-cyrl', 'sr-latn', 'sv', 'sw', 'ta', 'te', 'th', 'ti', 'tlh-latn', 'tlh-piqd', 'to', 'tr', 'ty', 'uk', 'ur', 'vi', 'yua', 'yue', 'zh-hans', 'zh-hant' ]
 
@@ -12,10 +12,10 @@ module.exports = {
   desc: 'Translate text with Bing',
   permissions: '',
   args: true,
-  usage: '<lang in short> <text>',
+  usage: '<lang in ISO format> <text>',
   typing: true,
   async execute(message, args) {
-    const usage = this.usage
+    const usage = '`' + this.usage + '`'
     let [ langInput, ...untranslated ] = args
     langInput = langInput.toLowerCase()
 
@@ -48,7 +48,7 @@ module.exports = {
     } else if (undefined != reply && reply[0] !== '' && reply.length) {
       untranslated = reply
     } else {
-      return errorParse('No text provided', message, usage)
+      return argsError(this, message)
     }
     untranslated = untranslated.join(' ')
     

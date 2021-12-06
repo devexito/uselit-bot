@@ -1,4 +1,4 @@
-const { shorten, errorParse } = require('../../util/util')
+const { shorten, errorParse, argsError } = require('../../util/util')
 const { repliedMessage } = require('../../util/message')
 
 module.exports = {
@@ -35,7 +35,7 @@ module.exports = {
       shuffle(reply)
       message.reply(shorten(reply.join(' ').trim(), 2000)).catch(e => errorParse(e.toString(), message))
     } else {
-      errorParse('No text provided', message)
+      argsError(this, message)
     }
   },
 }

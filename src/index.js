@@ -86,7 +86,7 @@ client.on('messageCreate', async message => {
   if (!command) return
 
   if (command.args && !args.length) {
-    return argsError(command, message, prefix)
+    return argsError(command, message)
   }
 /*
   if (command.permissions && command.permissions.length && !message.author.permissions.has(Permissions.FLAGS[command.permissions])) {

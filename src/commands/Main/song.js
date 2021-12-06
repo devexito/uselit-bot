@@ -32,7 +32,7 @@ module.exports = {
     } else if (reply && reply[0] == '') {
       return errorParse('No text provided in reply', message)
     } else if (arges[0] === '') {
-      return errorParse('No text provided', message)
+      return argsError(this, message)
     }
 
     var regEx = /[a-z]{2,7}(-[A-Z]{2,7})?_(female|male)/g
@@ -83,15 +83,14 @@ module.exports = {
               fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
               fs.unlinkSync('./tempmusic/msg' + code + outFormat)
             })
-            fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
-            fs.unlinkSync('./tempmusic/msg' + code + outFormat)
           })
         })
       } catch (e) {
         console.error(e)
+        errorParse('Google did not want to sing that', message ? message : msg)
+      } finally {
         fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
         fs.unlinkSync('./tempmusic/msg' + code + outFormat)
-        errorParse('Google did not want to sing that', message ? message : msg)
       }
     })
   }

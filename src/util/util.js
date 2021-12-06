@@ -80,10 +80,14 @@ module.exports = class Util {
     }
   }
 
-  static argsError(command, message, prefix) {
-    let usage
-    if (command.usage) usage = `\`${prefix}${command.name} ${command.usage}\``
-    return Util.errorParse('Invalid Arguments', message, usage)
+  static argsError(command, message) {
+    const embed = new MessageEmbed()
+      .setColor('#3131BB')
+      .setTitle(command.name)
+    if (command.description) embed.setDescription(command.description)
+    if (command.aliases && command.aliases.length) embed.addField('Aliases', command.aliases.join('\n'))
+    if (command.usage) embed.addField('Usage', '`' + command.usage + '`')
+    return message.reply({ embeds: [embed] })
   }
 
   static validateUrl(value) {
