@@ -7,7 +7,7 @@ module.exports = {
   usage: '<user mention/id> [-off]',
   args: true,
   async execute(message, args) {
-    let owner = (message.author.id == message.client.config.ownerID) ? true : false
+    let owner = (!message.client.config.owners.includes(message.author.id)) ? true : false
     let off
 
     if (message.author.id == '227054810673840128') return message.reply('idi nahui dolbaeb lol')

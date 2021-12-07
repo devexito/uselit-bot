@@ -9,7 +9,7 @@ module.exports = {
   aliases: ['p', 'purge', 'clear'],
   permissions: 'administrator',
   async execute(message, args) {
-    if (message.author.id !== message.client.config.ownerID) return
+    if (!message.client.config.owners.includes(message.author.id)) return
     const amount = parseInt(args[0]) + 1
 
     if (isNaN(amount)) {

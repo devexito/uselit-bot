@@ -26,12 +26,11 @@ module.exports = {
 
     let output = await emoteCheck(strIn).catch((e) => {
       errorParse('Emote Check Fail', message)
-      console.error(e)
+      return console.error(e)
     })
 
     if (output) {
       message.reply('https://cdn.discordapp.com/emojis/' + output)
-   //   console.log(output)
     } else {
       errorParse('i cannot do this :(', message)
     }

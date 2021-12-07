@@ -9,7 +9,7 @@ module.exports = {
   permissions: ['ADMINISTRATOR'],
   owner: true,
   async execute (message, args) {
-    if (message.author.id !== message.client.config.ownerID) {
+    if (!message.client.config.owners.includes(message.author.id)) {
       return errorParse('⛔ Missing Access', message)
     }
 

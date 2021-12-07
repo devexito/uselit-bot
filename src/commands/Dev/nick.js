@@ -14,7 +14,7 @@ module.exports = {
   usage: '<add/remove/list> <user id> <guild id> <nickname>',
   permissions: 'owner',
   async execute(message, args) {
-    if (message.author.id !== message.client.config.ownerID) return message.react('⛔')
+    if (!message.client.config.owners.includes(message.author.id)) return message.react('⛔')
     let [setting, usrId, guildId, ...nicknm] = args
     if (nicknm[nicknm.length - 1] === '-now') {
       var now = true

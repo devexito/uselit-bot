@@ -71,7 +71,6 @@ module.exports = {
     url = await findUrl(args, message)
 
     if (url) {
-      if (typeof url === 'object') console.log('объект', url)
       if (Array.isArray(url)) {
         [messUrl, mess] = url
         url = messUrl.toString()

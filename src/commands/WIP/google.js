@@ -2,7 +2,7 @@
 const { MessageEmbed, MessageButton } = require('discord.js')
 const { shorten, emote, errorParse, argsError } = require('../../util/util')
 const { repliedMessage } = require('../../util/message')
-const gen = require('../../services/searchGoogle')
+//const gen = require('../../services/searchGoogle')
 
 module.exports = {
   name: 'google',

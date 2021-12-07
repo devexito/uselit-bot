@@ -83,12 +83,13 @@ module.exports = {
               fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
               fs.unlinkSync('./tempmusic/msg' + code + outFormat)
             })
+            fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
+            fs.unlinkSync('./tempmusic/msg' + code + outFormat)
           })
         })
       } catch (e) {
         console.error(e)
         errorParse('Google did not want to sing that', message ? message : msg)
-      } finally {
         fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
         fs.unlinkSync('./tempmusic/msg' + code + outFormat)
       }
