@@ -6,7 +6,6 @@ module.exports = {
   name: 'eval',
   description: 'Can be used only by bot\'s owner',
   desc: '.',
-  permissions: ['ADMINISTRATOR'],
   owner: true,
   async execute (message, args) {
     if (!message.client.config.owners.includes(message.author.id)) {
@@ -32,9 +31,10 @@ module.exports = {
     // output
     console.log(inspect(evaled))
     if (inspect(evaled) == 'undefined') return message.react('♿')
-    if (inspect(evaled).length > 4000 || noOutput) return message.react('🏳️')
-
-    if (!noOutput) {
+    if (inspect(evaled).length > 4000) return message.react('🏳️')
+    if (noOutput) {
+      return message.react('🆙')
+    } else {
       const embed = new MessageEmbed()
         .setDescription('```js\n' + inspect(evaled) + '\n```')
       message.reply({embeds: [embed]})

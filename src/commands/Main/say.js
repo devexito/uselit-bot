@@ -8,11 +8,8 @@
   async execute(message, args) {
     let text = args.join(' ').trim()
     
-    try {
-      message.delete()
-    } catch (e) {
-      console.log(e)
-    }
+    message.delete().catch((e) => console.log(e))
+    
     message.channel.send(text).catch(() => message.react('🚽'))
   },
 }

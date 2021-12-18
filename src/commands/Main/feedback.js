@@ -4,7 +4,7 @@ const { MessageEmbed } = require('discord.js')
 
 module.exports = {
   name: 'feedback',
-  aliases: ['fb'],
+  aliases: ['fb', 'report'],
   description: 'Sends a message to bot\'s owner, plus some little info like username and guild ID.',
   desc: 'Contact bot\'s owner',
   permissions: '',

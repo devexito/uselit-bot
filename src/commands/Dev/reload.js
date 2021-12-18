@@ -21,18 +21,17 @@ module.exports = {
     if (!command) return errorParse(`Cannot find command \`${commandName}\``, message)
     readdirSync(join(__dirname, '..')).forEach(f => {
       const files = readdirSync(join(__dirname, '..', f))
-      if (files.includes(`${commandName}.js`)) {
-        const file = `../${f}/${commandName}.js`
+      if (files.includes(`${command.name}.js`)) {
+        const file = `../${f}/${command.name}.js`
         try {
           delete require.cache[require.resolve(file)]
           const newCommand = require(file)
           message.client.commands.set(newCommand.name, newCommand)
-      
-          console.log(`Обновляю ${command.name}`)
+      
           message.reply(`✅ Command \`${command.name}\` successfully reloaded`)
         } catch (err) {
           console.error(err.stack || err)
-          return errorParse(`Reload Fail:\n\`${err.message}\``, message)
+          return errorParse(`Reload Failure:\n\`${err.message}\``, message)
         }
       }
     })

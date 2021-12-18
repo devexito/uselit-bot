@@ -7,7 +7,7 @@ module.exports = {
   usage: '<user mention/id> [-off]',
   args: true,
   async execute(message, args) {
-    let owner = (!message.client.config.owners.includes(message.author.id)) ? true : false
+    let owner = (message.client.config.owners.includes(message.author.id)) ? true : false
     let off
 
     if (message.author.id == '227054810673840128') return message.reply('idi nahui dolbaeb lol')
@@ -15,10 +15,13 @@ module.exports = {
     async function mentionCheck(input, message) {
       
       if (isNaN(input)) {
-        var regEx = /<@\!?([0-9]{17,21})>/
-        input = regEx.exec(input)[1]
-        //  errorParse('Please provide a user mention or id', message)
-        //  return false
+        try {
+          var regEx = /<@\!?([0-9]{17,21})>/
+          input = regEx.exec(input)[1]
+        } catch (e) {
+          errorParse('Please provide a user mention or id', message)
+          return false
+        }
         console.log('blya ', input)
       }
 
@@ -33,7 +36,7 @@ module.exports = {
     }
 
     if (args[0] == 'list') {
-      if (message.author.id == message.client.config.ownerID) {
+      if (owner) {
         return (bk.length > 0) ?message.reply(bk.join(', ')) : message.reply('bk is empty')
       } else {
         return message.react('🚽')
