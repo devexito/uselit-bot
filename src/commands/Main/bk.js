@@ -1,7 +1,9 @@
+const ignoreList = ['227054810673840128', '567411443276840984']
+
 const { errorParse } = require('../../util/util')
 module.exports = {
   name: 'bk',
-  description: 'Reacts with badklass emoji on every message of someone who really does some crap.\nNot providing any argument will insert a default user.\nUse `-off` postfix to turn this off for a specified user.\n\nDoes not work for bots.',
+  description: 'Reacts with badklass emoji on every message of someone who really does some crap.\nUse `-off` postfix to turn this off for a specified user.\n\nDoes not work for bots.',
   desc: 'React with crap on users',
   cooldown: 5,
   usage: '<user mention/id> [-off]',
@@ -10,7 +12,7 @@ module.exports = {
     let owner = (message.client.config.owners.includes(message.author.id)) ? true : false
     let off
 
-    if (message.author.id == '227054810673840128') return message.reply('idi nahui dolbaeb lol')
+    if (ignoreList.includes(message.author.id)) return message.reply('idi nahui dolbaeb lol')
 
     async function mentionCheck(input, message) {
       
@@ -22,11 +24,13 @@ module.exports = {
           errorParse('Please provide a user mention or id', message)
           return false
         }
-        console.log('blya ', input)
       }
 
       if (!isNaN(input)) {
-        let usr = await message.client.users.fetch(input).catch((e) => { return false })
+        let usr = await message.client.users.fetch(input).catch((e) => { 
+          errorParse('User not found')
+          return false
+        })
         if (usr.bot) {
           errorParse('Bots are not supported', message)
           return false
@@ -39,7 +43,7 @@ module.exports = {
       if (owner) {
         return (bk.length > 0) ?message.reply(bk.join(', ')) : message.reply('bk is empty')
       } else {
-        return message.react('🚽')
+        return message.react('🚽').catch(() => { console.log('Toilet reaction blocked') })
       }
     }
 
@@ -50,7 +54,7 @@ module.exports = {
         if (owner) {
           bk = []
           console.log('bk now empty')
-          return message.reply('ok, turned off for everyone').catch(() => {})
+          return message.reply('ok, turned off for everyone')
         } else {
           return errorParse('Please specify a user', message, this.usage)
         }
@@ -77,7 +81,7 @@ module.exports = {
       }
     } else if (off) {
       bk.splice(bk.indexOf(user.id), 1)
-      return message.reply('ok, removed user ' + user.username).catch(() => {})
+      return message.reply('ok, removed user ' + user.username)
     } else if (defaultUser) {
       return errorParse('Uhh.. Invalid Arguments\nPlease specify a user', message, this.usage)
     } else {

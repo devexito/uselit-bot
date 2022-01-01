@@ -36,11 +36,11 @@ module.exports = {
     if (!usrId || !guildId) return errorParse('invalid arguments', message)
     if (isDeleting && (usrId === 'all' || usrId === 'guild')) allUsers = true
 
-    if (!allUsers) {
+    if (!allUsers && !isDeleting) {
       try {
         var memCache = message.client.guilds.cache.get(guildId).members.cache.get(usrId)
       } catch (e) {
-        return errorParse('couldnt cache smth', message)
+        return errorParse('couldnt cache something', message)
       }
     }
 
@@ -50,7 +50,7 @@ module.exports = {
         if (!list[guildId][usrId]) return errorParse('this user does not exist in the list', message)
         delete list[guildId][usrId]
         if (list[guildId] == {}) delete list[guildId]
-        msg = 'ok, removed user ' + memCache.user.username
+        msg = 'ok, removed user ' + usrId
       } else {
         delete list[guildId]
         msg = 'ok, removed guild ' + guildId + ' and every its member'
@@ -61,7 +61,6 @@ module.exports = {
       msg = 'ok, added user ' + memCache.user.username
     } else return errorParse('provide a nickname', message)
 
-    console.log(list)
 
     try {
       fs.writeFileSync(name, JSON.stringify(list), 'utf8')
