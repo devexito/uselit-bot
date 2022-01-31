@@ -1,10 +1,11 @@
 const ignoreList = ['227054810673840128', '567411443276840984']
 
-const { errorParse } = require('../../util/util')
+const { emote, errorParse } = require('../../util/util')
 module.exports = {
-  name: 'bk',
-  description: 'Reacts with badklass emoji on every message of someone who really does some crap.\nUse `-off` postfix to turn this off for a specified user.\n\nDoes not work for bots.',
-  desc: 'React with crap on users',
+  name: 'dn',
+  aliases: ['deeznuts'],
+  description: 'Reacts with deeznuts emoji on every message of someone who really does some crap.\nUse `-off` postfix to turn this off for a specified user.\n\nDoes not work for bots.',
+  desc: 'React with DN on users',
   cooldown: 5,
   usage: '<user mention/id> [-off]',
   args: true,
@@ -12,7 +13,7 @@ module.exports = {
     let owner = (message.client.config.owners.includes(message.author.id)) ? true : false
     let off
 
-    if (ignoreList.includes(message.author.id)) return message.reply('idi nahui dolbaeb lol')
+    if (ignoreList.includes(message.author.id)) return message.reply('https://youtu.be/4v8ek9TEeOU')
 
     async function mentionCheck(input, message) {
       
@@ -43,7 +44,7 @@ module.exports = {
       if (owner) {
         return (bk.length > 0) ?message.reply(bk.join(', ')) : message.reply('bk is empty')
       } else {
-        return message.react('🚽').catch(() => { console.log('Toilet reaction blocked') })
+        return message.react('🚽').catch(() => { console.log('Toilet reaction blocked MAN') })
       }
     }
 
@@ -75,17 +76,15 @@ module.exports = {
     if (bk.indexOf(user.id) === -1) { // checking if specified user is not in bk array...
       if (!off) {
         bk.push(user.id)
-        return message.react('👍🏿').catch(() => {})
+        return message.reply('i know whats DN.').catch(() => {})
       } else {
-        return errorParse('This user is already not in the list', message)
+        return errorParse('This user is already not affected by DN', message)
       }
     } else if (off) {
       bk.splice(bk.indexOf(user.id), 1)
       return message.reply('ok, removed user ' + user.username)
-    } else if (defaultUser) {
-      return errorParse('Uhh.. Invalid Arguments\nPlease specify a user', message, this.usage)
     } else {
-      return errorParse('This user is already included in the list', message)
+      return errorParse('This user is already affected by DN', message)
     }
   },
 }

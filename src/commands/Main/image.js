@@ -5,7 +5,7 @@ const { repliedMessageObject, findImageUrlInMessage, findImageUrlInAttachment, f
 module.exports = {
   name: 'image',
   aliases: ['img', 'toimg', 'toimage'],
-  description: 'Converts found image into static image for identify command',
+  description: 'Adapts found image into static image for identify command.',
   desc: 'Utility function',
   permissions: '',
   usage: '<image url/attachment/user mention>',
