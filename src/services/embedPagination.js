@@ -75,7 +75,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
     let msgIsDeleted = false;
     let output;
 
-    msgIsDeleted = await isInvalid(curPage)
+    msgIsDeleted = await isInvalid(curPage);
 
     switch (i.customId) {
       case buttonList[0].customId: // PREVIOUS
@@ -117,7 +117,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
       case buttonList[4].customId: // CLOSE BUTTONS
         isPaging = false;
         await i.deferUpdate();
-        if ((i.user.id == message.author.id) || !message || !args) collector.stop();
+        if ((i.user.id == message.author.id) || msgIsDeleted || !args) collector.stop();
         break;
       default:
         break;
@@ -150,7 +150,9 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
         embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
         components: [],
       }).catch(() => {});
-    };
+    } else {
+      console.log('the curPage message is invalid. huh.')
+    }
   });
 
   return curPage;

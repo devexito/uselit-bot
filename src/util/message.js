@@ -23,7 +23,7 @@ async function repliedMessageObject(message) {
     console.error(e)
     return null
   })
-  if (!msg || isInvalid(message)) return null
+  if (!msg || await isInvalid(message)) return null
 
   return msg
 }
@@ -36,7 +36,7 @@ async function repliedMessage(message) {
     console.error(e)
     return null
   })
-  if (!msg || isInvalid(message)) return null
+  if (!msg || await isInvalid(message)) return null
   let content = msg.content.replace(/ +(?= )/g,'').split(' ')
 
   if (msg.embeds.length > 0) {
