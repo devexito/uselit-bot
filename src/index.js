@@ -32,6 +32,10 @@ load()
 client.on('ready', () => {
   console.log(`[READY] Logged in as ${client.user.tag}`)
 
+  if (!client.feedbackChannel) {
+    console.error('No feedbackChannel set in config!')
+  }
+
   new NickChanger(client)
 
   setInterval(() => {
@@ -62,6 +66,12 @@ client.on('messageCreate', async message => {
 
   // ограничения
   if (message.author.bot || !message.guild) return
+
+
+
+
+//  ТУТ ПИЗДЕЦ
+//  if (message.author.id == '350177157550571521') return message.reply({ content: 'токсик', allowedMentions: { repliedUser: true } })
 
   if (bk.length > 0 && bk.includes(message.author.id)) {
     message.react(emote('badklass')).catch(() => {})

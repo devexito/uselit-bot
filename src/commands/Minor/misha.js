@@ -1,6 +1,6 @@
 module.exports = {
   name: 'misha',
-  description: 'ref',
+  description: 'reference',
   desc: '.',
   owner: true,
   async execute(message) {

@@ -6,7 +6,7 @@ const {
   MessageEmbed,
   MessageButton,
 } = require('discord.js');
-const { shorten } = require('../util/util');
+const { isInvalid, shorten } = require('../util/util');
 const gen = require('../services/generateText');
 
 /**
@@ -74,7 +74,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
     let msgIsDeleted = false;
     let output;
 
-    if (curPage.deleted) return;
+    msgIsDeleted = await isInvalid(curPage)
 
     switch (i.customId) {
       case buttonList[0].customId: // PREVIOUS
@@ -116,7 +116,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
       case buttonList[4].customId: // CLOSE BUTTONS
         isPaging = false;
         await i.deferUpdate();
-        if ((i.user.id == message.author.id) || message.deleted || !args) collector.stop();
+        if ((i.user.id == message.author.id) || !message || !args) collector.stop();
         break;
       default:
         break;
@@ -143,7 +143,8 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
   });
 
   collector.on('end', () => {
-    if (!curPage.deleted) {
+    let thebestboolean = await isInvalid(curPage)
+    if (!thebestboolean) {
       curPage.edit({
         embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
         components: [],

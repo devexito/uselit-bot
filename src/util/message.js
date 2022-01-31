@@ -9,13 +9,21 @@ const TRUSTED_URLS = Object.freeze([
 ])
 
 
+async function isInvalid(message, messageId = message.id) {
+  let out = false
+  await message.channel.messages.fetch(messageId).catch(e => out = true)
+  return out
+}
+
+
+
 async function repliedMessageObject(message) {
   if (!message.reference) return
   const msg = await message.channel.messages.fetch(message.reference.messageId).catch((e) => {
     console.error(e)
     return null
   })
-  if (!msg || message.deleted) return null
+  if (!msg || this.isInvalid(message)) return null
 
   return msg
 }
@@ -28,7 +36,7 @@ async function repliedMessage(message) {
     console.error(e)
     return null
   })
-  if (!msg || message.deleted) return null
+  if (!msg || this.isInvalid(message)) return null
   let content = msg.content.replace(/ +(?= )/g,'').split(' ')
 
   if (msg.embeds.length > 0) {
@@ -173,12 +181,12 @@ async function findImageUrlInMessageHistory(message, retObj = false) {
   })
 }
 
-
 module.exports = {
   repliedMessageObject,
   repliedMessage,
   findImageUrlInAttachment,
   findImageUrlInEmbed,
   findImageUrlInMessage,
-  findImageUrlInMessageHistory
+  findImageUrlInMessageHistory,
+  isInvalid
 }

@@ -3,7 +3,7 @@ const { repliedMessage } = require('../../util/message')
 
 module.exports = {
   name: 'replace',
-  description: 'Replaces text in one of the last 50 messages or in the reply with your text.',
+  description: 'Replaces text in one of the last 50 messages (search is literal!) or in the reply with your text.',
 //nWrap an argument in `"` to escape trimming.
   desc: 'Replace text in message',
   aliases: ['sed', 'rep'],
@@ -39,7 +39,10 @@ module.exports = {
       await findTextInMessageHistory(message, args[0]).then((out) => {
         if (!out) return argsError(this, message)
         let outReplaced = replace(out, args, trim)
-        if (!outReplaced) return console.error('outReplaced is empty')
+        if (!outReplaced) {
+          console.error('outReplaced is empty')
+          return errorParse('I received nothing', message)
+        }
         if (outReplaced === out) return errorParse('Output is the same as input', message)
         return message.reply(shorten(outReplaced, 2000)).catch(() => {})
       }).catch((e) => { errorParse(e, message) })
@@ -72,7 +75,7 @@ async function findTextInMessageHistory(message, text) {
         }
       })
     }).then(() => {
-      if (!found) reject( 'No matching text found in last 50 messages' )
+      if (!found) reject( 'No literal matching text found in last 50 messages' )
     }).catch((e) => {
       reject(e)
     })

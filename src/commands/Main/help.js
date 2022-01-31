@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js')
-const { errorParse } = require('../../util/util')
+const { emote, errorParse } = require('../../util/util')
 
 module.exports = {
   name: 'help',
@@ -30,7 +30,7 @@ module.exports = {
           || allcommands.find(c => c.aliases && c.aliases.includes(name))
       
       if (args[0] == 'me') {
-        return errorParse('sorry but i don\'t know how to help you, wish i had more than just stupid useless commands code with a lot of crutches', message)
+        return errorParse('no help for you, sorry not sorry ' + emote('losyash'), message)
       }
 
       try {

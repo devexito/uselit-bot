@@ -159,8 +159,8 @@ module.exports = {
     if (emotenum === 0) {
       embed
       .addField('Sex level', sexLvl.toString() + newEmote, true)
-      .addField('Virgin', virgin.toString() + '%', true)
-      .addField('Temperature', `${hot.toString()}°C. ${hotString}`, true)
+      .addField('Virgin probability', virgin.toString() + '%', true)
+      .addField('Love in temperature', `${hot.toString()}°C. ${hotString}`, true)
     } else {
       embed
       .addField('Professional ratings', rate.toString() + '/100' + newEmote)

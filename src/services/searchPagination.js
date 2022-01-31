@@ -57,7 +57,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
     let msgIsDeleted = false;
     let output;
 
-    if (curPage.deleted) return;
+    //if (curPage.deleted) return;
 
     switch (i.customId) {
       case buttonList[0].customId: // PREVIOUS

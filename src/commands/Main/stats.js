@@ -28,7 +28,7 @@ module.exports = {
       .setColor('#3131BB')
       .addField('Guilds', message.client.guilds.cache.size.toString(), true)
       .addField('Users', message.client.users.cache.size.toString(), true)
-      .addField('Commands', `${commands.size.toString()} (${allcommands.size.toString()})`, true)
+      .addField('Commands', `${commands.size.toString()} available (${allcommands.size.toString()} total)`, true)
 
       .addField('Used/Allocated memory', `${memUsed} MB/${memAllocate} MB`, true)
       .addField('Running since', uptime(), true)

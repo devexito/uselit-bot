@@ -9,17 +9,18 @@ module.exports = class Util {
       perms: '<a:perms:842810795997265970>',
       man: '<:man:886071033621254204>',
       dieass: '<a:dieass:869488306314936370>',
-      shue: '<:shue:893362194689974283>',
-      sidor: '<:sidor:812173881271386162>',
+      shue: '<a:oatmeal:908025294298972230>',
+      sidor: '<:shue:893362194689974283>',
       fluid: '<:fluid:831795650219343912>',
-      // BADKLASS MANIA
-      badklass: '<:badklass:493361730160820234>',
+      hmmm: '<:hmmm:814451433087827990>',
+      heroin: '<:heroin:937532321148567604>',
+      suhariki: '<:gay_sex_minet_anal:937532440799502356>',
+      clueless: '<:clueless:937532045364695142>',
+      nice_shit: '<:nice_shit:937532782228406342>',
+    //badklass: '<:badklass:493361730160820234>',
+      badklass: '<a:deeznuts:874607834061484082>',
       // EMOJI EPTA
-      losyash: '<:losyash:870324026218790913>',
-      heroin: '<:heroin:870323994958651424>',
-      suhariki: '<:gay_sex_minet_anal:893360848058318848>',
-      clueless: '<:clueless:896283754652381214>',
-      nice_shit: '<:nice_shit:895272991099867147>',
+      losyash: '<:sillytime:854287027888979988>',
     }
     if (!emoteList[which]) throw new TypeError(`${which} is not a valid emote in emote list.`)
     return emoteList[which]

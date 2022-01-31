@@ -24,7 +24,7 @@ module.exports = {
     const embed = new MessageEmbed()
       .setColor('#3131BB')
       .setTitle('Generating text...')
-      .setDescription(emote('clueless'))
+      .setDescription(emote('shue'))
     const msg = await message.reply({ embeds: [embed] }).catch(e => errorParse(e.toString(), message))
     if (!msg) return
     const out = await gen.fetchText(message, args, msg)
@@ -80,8 +80,8 @@ module.exports = {
         .setEmoji('✖️')
 
       const pages = [
-	       embed1,
-	       embed2,
+        embed1,
+        embed2,
         embed3
       ]
 
