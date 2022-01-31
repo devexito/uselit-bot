@@ -1,5 +1,5 @@
 ﻿const axios = require('axios').default
-const { errorParse, validateUrl } = require('../../util/util')
+const { emote, errorParse, validateUrl } = require('../../util/util')
 const { repliedMessageObject, findImageUrlInMessage, findImageUrlInAttachment, findImageUrlInMessageHistory, findImageUrlInEmbed } = require('../../util/message')
 
 module.exports = {
@@ -84,9 +84,9 @@ module.exports = {
 
     let msg 
     if (mess) {
-      msg = await mess.reply(':thinking:')
+      msg = await mess.reply(emote('hmmm'))
     } else {
-      msg = await message.reply(':thinking:')
+      msg = await message.reply(emote('hmmm'))
     }
 
     const options = {
@@ -135,7 +135,7 @@ module.exports = {
       } else {
         return msg.edit(`${anal.confidence < 0.4 ? 'I am not really confident, but ' : ''}I think it is ${anal.text} (${Math.ceil(anal.confidence * 100).toString()}% confidence)`).catch(() => {})
       }
-      msg.edit(`I really can't describe the image 😳`)
+      msg.edit(`I really can't describe the image ` + emote('fluid'))
     }
   },
 }

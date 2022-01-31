@@ -32,7 +32,7 @@ load()
 client.on('ready', () => {
   console.log(`[READY] Logged in as ${client.user.tag}`)
 
-  if (!client.feedbackChannel) {
+  if (!config.feedbackChannel) {
     console.error('No feedbackChannel set in config!')
   }
 

@@ -142,7 +142,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
     collector.resetTimer();
   });
 
-  collector.on('end', () => {
+  collector.on('end', async () => {
     let thebestboolean = await isInvalid(curPage)
     if (!thebestboolean) {
       curPage.edit({
