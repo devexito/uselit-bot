@@ -6,7 +6,8 @@ const {
   MessageEmbed,
   MessageButton,
 } = require('discord.js');
-const { isInvalid, shorten } = require('../util/util');
+const { isInvalid } = require('../util/message');
+const { shorten } = require('../util/util');
 const gen = require('../services/generateText');
 
 /**
