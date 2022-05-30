@@ -26,32 +26,28 @@ module.exports = {
       return isNaN(output) ? null : await message.guild.channels.cache.get(output)
     }
 
-    let url
-    let mess = ''
-    let messUrl = ''
-
-    async function findUrl(args, message) {
+    async function findId(args, message) {
       let mentioned
-      if (args.length) mentioned = await channelCheck(args, message)
-      if (mentioned) return mentioned
+      if (args.length)
+        mentioned = await channelCheck(args, message)
+      if (mentioned)
+        return mentioned
 
-      if (!args || !args.length || args == '') {
+      if (!args || !args.length || args == '')
         return await message.channel
-      }
+      
       return null
     }
-    url = await findUrl(args, message)
-
-    if (url) {
-      if (Array.isArray(url)) {
-        [messUrl, mess] = url
-        url = messUrl.toString()
-      }
-    } else if (validateUrl(args)) {
-      url = args[0]
-    } else return errorParse('Please provide an attachment, image URL, user id or mention', message)
-
-    return await message.reply()
+    
+    let channel = await findId(args, message)
+    if (!channel || !channel.messages)
+      return errorParse('Invalid channel.', message)
+    await channel.messages.fetchPinned().then(m => {
+      let pinCount = m.size.toString()
+      message.reply(`There ${pinCount == 1 ? `is 1 pin` : `are ${pinCount} pins`} in <#${channel.id}>`)
+    }).catch(() => {
+      return errorParse('Could not fetch channel.', message)
+    })
   },
 }
 
