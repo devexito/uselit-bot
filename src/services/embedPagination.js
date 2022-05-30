@@ -21,45 +21,22 @@ const gen = require('../services/generateText');
  * @returns
  */
 const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message, args) => {
-  if (!msg && !msg.channel) throw new Error('Channel is inaccessible.');
-  if (!pages) throw new Error('Pages are not given.');
-  if (!buttonList) throw new Error('Buttons are not given.');
-  if (buttonList[0].style === 'LINK' || buttonList[1].style === 'LINK')
-    throw new Error(
-      'Link buttons are not supported with discordjs-button-pagination'
-    );
-  if (buttonList.length < 5) throw new Error('Need five buttons.');
-
+  if (!msg || !msg.channel)
+    throw new Error('Channel is inaccessible.');
+  
   let page = 0;
+  
+  if (pages[0].description && pages[0].description.length > 2999)
+    buttonList[3].setDisabled(true);
+  
+  const row = new MessageActionRow().addComponents(buttonList).toJSON();
+  let curPage = await msg.edit({
+    embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
+    components: [row],
+  }).catch(() => {});
+  
+  const filter = i => buttonList.filter(button => button.customId === i.customId).length
 
-  if (pages[0].description && pages[0].description.length > 2999) buttonList[3].setDisabled(true);
-
-  const row = new MessageActionRow().addComponents(buttonList);
-  let curPage;
-  if (msg) {
-    curPage = await msg.edit({
-      embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
-      components: [row],
-    }).catch(() => {});
-  } else {
-    console.log('no message? skipping');
-    return null;
-  };
-
-  const disabledRow = new MessageActionRow().addComponents(
-    buttonList[0].setDisabled(true),
-    buttonList[1].setDisabled(true),
-    buttonList[2].setDisabled(true),
-    buttonList[3].setDisabled(true),
-    buttonList[4].setDisabled(true)
-  );
-
-  const filter = (i) =>
-    i.customId === buttonList[0].customId ||
-    i.customId === buttonList[1].customId ||
-    i.customId === buttonList[2].customId ||
-    i.customId === buttonList[3].customId ||
-    i.customId === buttonList[4].customId;
   let collector;
   try {
     collector = await curPage.createMessageComponentCollector({
@@ -69,14 +46,17 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
   } catch (e) {
     return console.error(e);
   }
+  
+  const disabledRow = new MessageActionRow().setComponents(
+    buttonList.map(button => button.setDisabled(true))
+  ).toJSON();
 
   collector.on('collect', async (i) => {
     let isPaging = false;
-    let msgIsDeleted = false;
     let output;
 
-    msgIsDeleted = await isInvalid(curPage);
-
+    let msgIsDeleted = await isInvalid(curPage);
+  
     switch (i.customId) {
       case buttonList[0].customId: // PREVIOUS
         page = page > 0 ? --page : pages.length - 1;
@@ -111,24 +91,29 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
         }).catch(() => {});
         let embedText = pages[page].description.split(' ');
         output = await gen.fetchText(msg, embedText);
-        if (output) args = output.input.split(' ');
+        if (output)
+          args = output.input.split(' ');
         page = 0;
         break;
       case buttonList[4].customId: // CLOSE BUTTONS
         isPaging = false;
         await i.deferUpdate();
-        if ((i.user.id == message.author.id) || msgIsDeleted || !args) collector.stop();
+        if ((i.user.id == message.author.id) || msgIsDeleted || !args)
+          collector.stop();
         break;
       default:
         break;
     }
+
     if (output) {
-      pages[0] = pages[0].setDescription(shorten(output.input + output.res[0]));
-      pages[1] = pages[1].setDescription(shorten(output.input + output.res[1]));
-      pages[2] = pages[2].setDescription(shorten(output.input + output.res[2]));
+      for (let i = 0; i < pages.length; i++) {
+        pages[i] = pages[i].setDescription(shorten(output.input + output.res[i]));
+      }
+
       if (pages[page].description.length > 2999) {
         row.spliceComponents(3, 1, buttonList[3].setDisabled(true))
       }
+      
       await i.editReply({
         embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
         components: [row],
@@ -140,12 +125,13 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
         components: [row],
       }).catch(() => {});
     };
+    
     collector.resetTimer();
   });
-
+  
   collector.on('end', async () => {
-    let thebestboolean = await isInvalid(curPage)
-    if (!thebestboolean) {
+    let isMessageInvalid = await isInvalid(curPage)
+    if (!isMessageInvalid) {
       curPage.edit({
         embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
         components: [],
@@ -154,7 +140,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
       console.log('the curPage message is invalid. huh.')
     }
   });
-
+  
   return curPage;
 };
-module.exports = paginationEmbed;
+module.exports = paginationEmbed;
