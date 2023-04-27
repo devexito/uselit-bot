@@ -13,7 +13,7 @@ module.exports = {
   permissions: '',
   usage: '<lang>-<LANG>_<male/female> <text> [-audio]',
   args: true,
-  async execute(message, args) {
+  async execute(message, args) {
     let [ setting, ...arges ] = args
     let outFormat = '.mp4'
     let noVideo = false
@@ -53,7 +53,7 @@ module.exports = {
     let write = fs.createWriteStream('./tempmusic/translate' + code + '.mp3')
     
     const res = await axios.get(
-      'https://texttospeech.responsivevoice.org/v1/text:synthesize?text=' + encodeURI(arges.join(' ')) + '&lang=' + setting.split('_')[0] + '&engine=g3&name=&pitch=0.5&rate=0.5&volume=1&key=0POmS5Y2&gender=' + setting.split('_')[1],
+      'https://texttospeech.responsivevoice.org/v1/text:synthesize?text=' + encodeURI(arges.join(' ')) + '&lang=' + setting.split('_')[0] + '&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=kvfbSITh&gender=' + setting.split('_')[1],
       {
         headers: {
           'accept': '*/*',
