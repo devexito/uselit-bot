@@ -8,7 +8,7 @@ module.exports = {
   name: 'talk',
   aliases: ['t', 'talk', 'chat'],
   description: 'Chatbot. Supported by api.affiliateplus.xyz\n\nSupports message replies.',
-  desc: 'Chatbot that works?..',
+  desc: 'Chatbot that does no longer work',
   permissions: '',
   cooldown: 3,
   usage: '<text>',

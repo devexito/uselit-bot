@@ -4,9 +4,8 @@ myintents.remove(['DIRECT_MESSAGES'])
 const client = new Client({ intents: myintents, allowedMentions: { repliedUser: false, parse: ['users'] }})
 
 const { emote, shorten, errorParse, argsError } = require('./util/util.js')
-const config = require('./config.js')
-prefix = config.defaultPrefix
-client.config = config
+client.config = require('./config.js')
+prefix = client.config.defaultPrefix
 
 const { readdirSync } = require('fs')
 const { sep } = require('path')
@@ -14,7 +13,7 @@ client.cooldowns = new Collection()
 client.commands = new Collection()
 const { cooldowns } = client
 
-const NickChanger = require('./services/nickChanger')
+//const NickChanger = require('./services/nickChanger')
 
 const load = (dir = './src/commands/') => {
   readdirSync(dir).forEach(dirs => {
@@ -32,11 +31,11 @@ load()
 client.on('ready', () => {
   console.log(`[READY] Logged in as ${client.user.tag}`)
 
-  if (!config.feedbackChannel) {
+  if (!client.config.feedbackChannel) {
     console.error('No feedbackChannel set in config!')
   }
 
-  new NickChanger(client)
+  //new NickChanger(client)
 
   setInterval(() => {
     client.user.setPresence({
@@ -51,7 +50,11 @@ client.on('ready', () => {
   bk = []
 })
 
-client.on('messageCreate', async message => {
+client.on('messageCreate', onMessage)
+//client.on('messageUpdate', (old, _new) => old.content !== _new.content && onMessage(_new, true))
+
+async function onMessage(message, edit = false) {
+
   // костыль для статуса печатания
   if (message.author.id === client.user.id) {
     return
@@ -73,9 +76,9 @@ client.on('messageCreate', async message => {
 //  ТУТ ПИЗДЕЦ
 //  if (message.author.id == '350177157550571521') return message.reply({ content: 'токсик', allowedMentions: { repliedUser: true } })
 
-  if (bk.length > 0 && bk.includes(message.author.id)) {
-    message.react(emote('badklass')).catch(() => {})
-  }
+  //if (bk.length > 0 && bk.includes(message.author.id)) {
+  //  message.react(emote('badklass')).catch(() => {})
+  //}
 
   if (message.content.startsWith(`<@${client.user.id}>`) || message.content.startsWith(`<@!${client.user.id}>`) ) {
     const embed = new MessageEmbed()
@@ -130,13 +133,15 @@ client.on('messageCreate', async message => {
     errorParse('**Critical:** ' + e.message, message)
     console.error(e)
   })
+  
+  if (!edit) {
         //   logs   //
-  return !command || !prefix ? null : console.log(`${command.name}  ${shorten(args.join(' '), 1000)} in: ${message.guild.name}`)
+    return !command || !prefix ? null : console.log(`${command.name}  ${shorten(args.join(' '), 1000)} in: ${message.guild.name}`)
+  }
+}
 
-})
 
-
-client.login(config.token)
+client.login(client.config.token)
 
 process.on('unhandledRejection', (reason, promise) => {
   console.log('Unhandled Rejection at:', reason.stack || reason)

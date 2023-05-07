@@ -46,30 +46,16 @@ module.exports = {
     }) {
       
       const embed1 = await gen.embedBase(output, 1)
-      const embed2 = await gen.embedBase(output, 2)
-      const embed3 = await gen.embedBase(output, 3)
-
-      let button1 = new MessageButton()
-        .setCustomId('previousbtn')
-        .setStyle('PRIMARY')
-        .setEmoji('⬅️')
-       // .setLabel('Prev')
-
-      let button2 = new MessageButton()
-        .setCustomId('nextbtn')
-        .setStyle('PRIMARY')
-        .setEmoji('➡️')
-      //  .setLabel('Next')
 
       let button3 = new MessageButton()
         .setCustomId('regenbtn')
-        .setStyle('SECONDARY')
+        .setStyle('PRIMARY')
        // .setLabel('Regen')
         .setEmoji('🔄')
 
       let button4 = new MessageButton()
         .setCustomId('genmorebtn')
-        .setStyle('SECONDARY')
+        .setStyle('PRIMARY')
        // .setLabel('More')
         .setEmoji('⏩')
 
@@ -80,14 +66,10 @@ module.exports = {
         .setEmoji('✖️')
 
       const pages = [
-        embed1,
-        embed2,
-        embed3
+        embed1
       ]
 
       const buttonList = [
-        button1,
-        button2,
         button3,
         button4,
         button5

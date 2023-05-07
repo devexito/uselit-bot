@@ -27,11 +27,11 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
   let page = 0;
   
   if (pages[0].description && pages[0].description.length > 2999)
-    buttonList[3].setDisabled(true);
+    buttonList[1].setDisabled(true);
   
   const row = new MessageActionRow().addComponents(buttonList).toJSON();
   let curPage = await msg.edit({
-    embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
+    embeds: [pages[page].setFooter("")],
     components: [row],
   }).catch(() => {});
   
@@ -58,15 +58,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
     let msgIsDeleted = await isInvalid(curPage);
   
     switch (i.customId) {
-      case buttonList[0].customId: // PREVIOUS
-        page = page > 0 ? --page : pages.length - 1;
-        isPaging = true;
-        break;
-      case buttonList[1].customId: // NEXT
-        page = page + 1 < pages.length ? ++page : 0
-        isPaging = true;
-        break;
-      case buttonList[2].customId: // REGENERATE TEXT
+      case buttonList[0].customId: // REGENERATE TEXT
         isPaging = false;
         if (!args) {
           console.log(msgIsDeleted + ' ' + args)
@@ -82,7 +74,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
         output = await gen.fetchText(msg, args);
         page = 0;
         break;
-      case buttonList[3].customId: // GENERATE MORE TEXT
+      case buttonList[1].customId: // GENERATE MORE TEXT
         isPaging = false;
         await i.deferUpdate();
         await i.editReply({
@@ -95,7 +87,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
           args = output.input.split(' ');
         page = 0;
         break;
-      case buttonList[4].customId: // CLOSE BUTTONS
+      case buttonList[2].customId: // CLOSE BUTTONS
         isPaging = false;
         await i.deferUpdate();
         if ((i.user.id == message.author.id) || msgIsDeleted || !args)
@@ -111,17 +103,17 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
       }
 
       if (pages[page].description.length > 2999) {
-        row.spliceComponents(3, 1, buttonList[3].setDisabled(true))
+        row.spliceComponents(1, 1, buttonList[1].setDisabled(true))
       }
       
       await i.editReply({
-        embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
+        embeds: [pages[page].setFooter("")],
         components: [row],
       }).catch(() => {});
     } else if (isPaging) {
       await i.deferUpdate();
       await i.editReply({
-        embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
+        embeds: [pages[page].setFooter("")],
         components: [row],
       }).catch(() => {});
     };
@@ -133,7 +125,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
     let isMessageInvalid = await isInvalid(curPage)
     if (!isMessageInvalid) {
       curPage.edit({
-        embeds: [pages[page].setFooter(`Page ${page + 1} / ${pages.length}`)],
+        embeds: [pages[page].setFooter("")],
         components: [],
       }).catch(() => {});
     } else {
