@@ -18,6 +18,7 @@ module.exports = class Util {
       suhariki: '<:gay_sex_minet_anal:937532440799502356>',
       clueless: '<:clueless:937532045364695142>',
       nice_shit: '<:nice_shit:937532782228406342>',
+      hungary: '<a:hungary:843514096027959367>',
     //badklass: '<:badklass:493361730160820234>',
       badklass: '<a:deeznuts:874607834061484082>',
       // EMOJI EPTA

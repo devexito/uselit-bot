@@ -13,7 +13,8 @@ module.exports = {
   permissions: '',
   usage: '<lang>-<LANG>_<male/female> <text> [-audio]',
   args: true,
-  async execute(message, args) {
+  async execute(message, args) {
+
     let [ setting, ...arges ] = args
     let outFormat = '.mp4'
     let noVideo = false
@@ -42,7 +43,7 @@ module.exports = {
       return errorParse('Invalid format of the parameter!', message, '`' + this.usage + '`')
     }
 
-// ÍÀ×ÀËÎ ÑÎÇÄÀÍÈß ×ÀÑÒÓØÊÈ
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     const msg = await message.reply('Making a song... ' + emote('shue'))
 
     let imgPath = ''
@@ -79,9 +80,9 @@ module.exports = {
           exec(`ffmpeg -i ./musics/garmoshka1.mp3 -i ./tempmusic/translate${code}.mp3 -i ./musics/garmoshka2.mp3${imgPath} -filter_complex "[1]adelay=3300,volume=5[s1];[0]adelay=3300[s0];[2]adelay=${(dat.durationsec * 1000 + 3600)}[s2];[0][s0][s1][s2]amix=4[mixout]" -map [mixout] ${noVideo ? '' : '-map 3:v -c:v libx264 -pix_fmt yuv420p -shortest '}./tempmusic/msg${code}${outFormat}`, async () => {
             await msg.edit({ content: 'Here is your song ' + emote('sidor'), files: ['./tempmusic/msg' + code + outFormat] }).catch((e) => {
               console.error(e)
-              msg.edit('Unable to attach the audio file ' + emote('perms'))
               fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
               fs.unlinkSync('./tempmusic/msg' + code + outFormat)
+              msg.edit('Unable to attach the audio file ' + emote('perms'))
             })
             fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
             fs.unlinkSync('./tempmusic/msg' + code + outFormat)
@@ -89,9 +90,9 @@ module.exports = {
         })
       } catch (e) {
         console.error(e)
-        errorParse('Google did not want to sing that', message ? message : msg)
         fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
         fs.unlinkSync('./tempmusic/msg' + code + outFormat)
+        errorParse('Google did not want to sing that', message ? message : msg)
       }
     })
   }
