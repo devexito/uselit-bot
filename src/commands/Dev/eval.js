@@ -1,6 +1,6 @@
 const { inspect } = require('util')
 const { errorParse } = require('../../util/util')
-const { MessageEmbed } = require('discord.js')
+const Discord = require('discord.js')
 
 module.exports = {
   name: 'eval',
@@ -8,7 +8,7 @@ module.exports = {
   desc: '.',
   owner: true,
   async execute (message, args) {
-    if (!message.client.config.owners.includes(message.author.id)) {
+    if (!owners.includes(message.author.id)) {
       return errorParse('⛔ Missing Access', message)
     }
 
@@ -35,7 +35,7 @@ module.exports = {
     if (noOutput) {
       return message.react('🆙')
     } else {
-      const embed = new MessageEmbed()
+      const embed = new Discord.EmbedBuilder()
         .setDescription('```js\n' + inspect(evaled) + '\n```')
       message.reply({embeds: [embed]})
     }

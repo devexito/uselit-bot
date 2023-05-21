@@ -1,4 +1,4 @@
-const { emote, errorParse } = require('../../util/util')
+const { emote, errorParse, argsError } = require('../../util/util')
 const { repliedMessage } = require('../../util/message')
 const fs = require('fs')
 const axios = require('axios')

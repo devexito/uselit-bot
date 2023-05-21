@@ -1,5 +1,5 @@
 ﻿const paginationEmbed = require('../../services/embedPagination')
-const { MessageEmbed, MessageButton } = require('discord.js')
+const Discord = require('discord.js')
 const { emote, errorParse, argsError } = require('../../util/util')
 const { repliedMessage } = require('../../util/message')
 const gen = require('../../services/generateText')
@@ -21,60 +21,65 @@ module.exports = {
     } else {
       return argsError(this, message)
     }
-    const embed = new MessageEmbed()
-      .setColor('#3131BB')
+    
+    const embed = new Discord.EmbedBuilder()
+      .setColor(0x3131BB)
       .setTitle('Generating text...')
       .setDescription(emote('shue'))
+    
     const msg = await message.reply({ embeds: [embed] }).catch(e => errorParse(e.toString(), message))
     if (!msg) return
-    const out = await gen.fetchText(message, args, msg)
-    .then(async (output) => {
-      if (!output) return msg.delete()
-      await createPages({
-        message,
-        output,
-        msg,
-        args
-      })
-    }).catch((e) => console.log(e))
     
-    async function createPages({
+    const out = await gen.fetchText(message, args, msg)
+      .then(async (output) => {
+        if (!output) return msg.delete()
+        await createButtons({
+          message,
+          output,
+          msg,
+          args
+        })
+      }).catch((e) => console.log(e))
+    
+    async function createButtons({
       message,
       output,
       msg = false,
       args
     }) {
       
-      const embed1 = await gen.embedBase(output, 1)
+      const resultEmbed = new Discord.EmbedBuilder()
+        .setColor(0x3131BB)
+        .setTitle('Result')
+        .setDescription(output.input + output.res.splice(output.res[0], 1))
 
-      let button3 = new MessageButton()
-        .setCustomId('regenbtn')
-        .setStyle('PRIMARY')
-       // .setLabel('Regen')
+      let button1 = new Discord.ButtonBuilder()
+        .setCustomId('regenerate')
+        .setStyle('Primary')
         .setEmoji('🔄')
 
-      let button4 = new MessageButton()
-        .setCustomId('genmorebtn')
-        .setStyle('PRIMARY')
-       // .setLabel('More')
+      let button2 = new Discord.ButtonBuilder()
+        .setCustomId('generateMore')
+        .setStyle('Primary')
         .setEmoji('⏩')
 
-      let button5 = new MessageButton()
-        .setCustomId('stopbtn')
-        .setStyle('DANGER')
-      //  .setLabel('Stop')
+      let button3 = new Discord.ButtonBuilder()
+        .setCustomId('close')
+        .setStyle('Danger')
         .setEmoji('✖️')
 
-      const pages = [
-        embed1
-      ]
+      let button4 = new Discord.ButtonBuilder()
+        .setCustomId('song')
+        .setStyle('Secondary')
+        .setEmoji('📢')
 
       const buttonList = [
+        button1,
+        button2,
         button3,
-        button4,
-        button5
+        button4
       ]
-      msg ? paginationEmbed(msg, pages, buttonList, timeout = 120000, message, args) : errorParse('Unexpected error occurred!', message)
+      msg ? paginationEmbed(msg, resultEmbed, buttonList, timeout = 120000, message, args) : errorParse('Unexpected error occurred!', message)
     }
   },
 }

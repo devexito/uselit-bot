@@ -1,10 +1,9 @@
-const { emote, errorParse } = require('../../util/util')
+const { emote, errorParse, argsError } = require('../../util/util')
 const { repliedMessage } = require('../../util/message')
 const fs = require('fs')
 const axios = require('axios')
 const ffmpeg = require('fluent-ffmpeg-extended')
 const exec = require('child_process').exec
-const { getPackedSettings } = require('http2')
 
 module.exports = {
   name: 'song',
@@ -26,7 +25,7 @@ module.exports = {
     }
     if (arges) arges = arges.join(' ').trim().split(' ')
 
-    let reply = await repliedMessage(message).catch((e) => console.error(e))
+    let reply = await repliedMessage(message).catch(console.error)
     if (arges && arges[0] !== '' && arges.length) {
     } else if (reply && reply[0] !== '' && reply.length) {
       arges = reply
@@ -43,7 +42,7 @@ module.exports = {
       return errorParse('Invalid format of the parameter!', message, '`' + this.usage + '`')
     }
 
-// ������ �������� ��������
+// афвыща выщза ыощзвашофызвщшапофкщп кщ
     const msg = await message.reply('Making a song... ' + emote('shue'))
 
     let imgPath = ''
@@ -77,12 +76,10 @@ module.exports = {
     write.on('finish', () => {
       try {
         new ffmpeg.Metadata('./tempmusic/translate' + code + '.mp3', (dat, err) => {
-          exec(`ffmpeg -i ./musics/garmoshka1.mp3 -i ./tempmusic/translate${code}.mp3 -i ./musics/garmoshka2.mp3${imgPath} -filter_complex "[1]adelay=3300,volume=5[s1];[0]adelay=3300[s0];[2]adelay=${(dat.durationsec * 1000 + 3600)}[s2];[0][s0][s1][s2]amix=4[mixout]" -map [mixout] ${noVideo ? '' : '-map 3:v -c:v libx264 -pix_fmt yuv420p -shortest '}./tempmusic/msg${code}${outFormat}`, async () => {
+          exec(`ffmpeg -i ./musics/garmoshka1.mp3 -i ./tempmusic/translate${code}.mp3 -i ./musics/garmoshka2.mp3${imgPath} -filter_complex "[1]adelay=3300,volume=5[s1];[0]adelay=3300[s0];[2]adelay=${(dat.durationsec * 1000 + 3600)}[s2];[0][s0][s1][s2]amix=inputs=4:normalize=0,volume=0.8[mixout]" -map [mixout] ${noVideo ? '' : '-map 3:v -c:v libx264 -pix_fmt yuv420p -shortest '}./tempmusic/msg${code}${outFormat}`, async () => {
             await msg.edit({ content: 'Here is your song ' + emote('sidor'), files: ['./tempmusic/msg' + code + outFormat] }).catch((e) => {
               console.error(e)
-              fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
-              fs.unlinkSync('./tempmusic/msg' + code + outFormat)
-              msg.edit('Unable to attach the audio file ' + emote('perms'))
+              return msg.edit('Unable to attach the audio file ' + emote('perms'))
             })
             fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
             fs.unlinkSync('./tempmusic/msg' + code + outFormat)
@@ -90,9 +87,8 @@ module.exports = {
         })
       } catch (e) {
         console.error(e)
-        fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
-        fs.unlinkSync('./tempmusic/msg' + code + outFormat)
         errorParse('Google did not want to sing that', message ? message : msg)
+        fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
       }
     })
   }
@@ -102,11 +98,11 @@ function randomText() {
   arr = ['a', 'b', 'c', 'd', 'e', '0', '1', '2', '3', '4']
   out = ''
   i = 0
-  while(i < 50) {
+  while(i < 30) {
     out = out + arr[getRandomInt(0, 9)]
     i++
   }
-  if(i == 50) {
+  if(i == 30) {
     return out
   }
 }

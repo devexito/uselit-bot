@@ -1,5 +1,4 @@
-﻿
-const { MessageEmbed } = require('discord.js')
+﻿const Discord = require('discord.js')
 
 module.exports = class Util {
   static emote(which) {
@@ -67,14 +66,14 @@ module.exports = class Util {
   }
 
   static errorParse(error, message, usage = false, edit = false) {
-    const embed = new MessageEmbed()
-      .setColor('#A00000')
+    const embed = new Discord.EmbedBuilder()
+      .setColor(0xA00000)
       .setTitle('⚠️ Command Error')
       .setDescription(error?.toString() || 'unknown error')
-      .setAuthor(message.author.tag, message.author.displayAvatarURL())
+      .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
     if (usage) {
       embed
-        .addField('Usage', usage)
+        .addFields({ name: 'Usage', value: usage })
     }
 
     if (!edit) {
@@ -85,12 +84,12 @@ module.exports = class Util {
   }
 
   static argsError(command, message) {
-    const embed = new MessageEmbed()
-      .setColor('#3131BB')
+    const embed = new Discord.EmbedBuilder()
+      .setColor(0x3131BB)
       .setTitle(command.name)
     if (command.description) embed.setDescription(command.description)
-    if (command.aliases && command.aliases.length) embed.addField('Aliases', command.aliases.join('\n'))
-    if (command.usage) embed.addField('Usage', '`' + command.usage + '`')
+    if (command.aliases && command.aliases.length) embed.addFields({ name: 'Aliases', value: command.aliases.join('\n') })
+    if (command.usage) embed.addFields({ name: 'Usage', value: '`' + command.usage + '`' })
     return message.reply({ embeds: [embed] })
   }
 

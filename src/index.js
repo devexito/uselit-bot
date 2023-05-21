@@ -1,23 +1,32 @@
-const { Client, Collection, Intents, MessageEmbed, Permissions } = require('discord.js')
-const myintents = new Intents(32767)
-myintents.remove(['DIRECT_MESSAGES'])
-const client = new Client({ intents: myintents, allowedMentions: { repliedUser: false, parse: ['users'] }})
+const Discord = require('discord.js')
+const intents = new Discord.IntentsBitField(
+  Discord.IntentsBitField.Flags.Guilds |
+  Discord.IntentsBitField.Flags.GuildMessages |
+  Discord.IntentsBitField.Flags.GuildMembers |
+  Discord.IntentsBitField.Flags.MessageContent
+)
+const client = new Discord.Client({ 
+  intents: intents, allowedMentions: {
+    repliedUser: false, parse: ['users']
+  }
+})
 
 const { emote, shorten, errorParse, argsError } = require('./util/util.js')
-client.config = require('./config.js')
-prefix = client.config.defaultPrefix
+const config = require('./config.js')
+prefix = config.defaultPrefix
+feedbackChannel = ''
+owners = config.owners
 
 const { readdirSync } = require('fs')
 const { sep } = require('path')
-client.cooldowns = new Collection()
-client.commands = new Collection()
+client.cooldowns = new Discord.Collection()
+client.commands = new Discord.Collection()
 const { cooldowns } = client
-
-//const NickChanger = require('./services/nickChanger')
 
 const load = (dir = './src/commands/') => {
   readdirSync(dir).forEach(dirs => {
-    const commandFiles = readdirSync(`${dir}${sep}${dirs}${sep}`).filter(files => files.endsWith('.js'))
+    const commandFiles = readdirSync(`${dir}${sep}${dirs}${sep}`)
+      .filter(files => files.endsWith('.js'))
 
     for (const file of commandFiles) {
       const command = require(`./commands/${dirs}/${file}`)
@@ -31,11 +40,11 @@ load()
 client.on('ready', () => {
   console.log(`[READY] Logged in as ${client.user.tag}`)
 
-  if (!client.config.feedbackChannel) {
+  if (!config.feedbackChannel) {
     console.error('No feedbackChannel set in config!')
+  } else {
+    feedbackChannel = config.feedbackChannel
   }
-
-  //new NickChanger(client)
 
   setInterval(() => {
     client.user.setPresence({
@@ -67,24 +76,19 @@ async function onMessage(message, edit = false) {
     return message.channel.send('NaN.')
   }
 
-  // ограничения
   if (message.author.bot || !message.guild) return
 
 
-
-
-//  ТУТ ПИЗДЕЦ
-//  if (message.author.id == '350177157550571521') return message.reply({ content: 'токсик', allowedMentions: { repliedUser: true } })
-
-  //if (bk.length > 0 && bk.includes(message.author.id)) {
-  //  message.react(emote('badklass')).catch(() => {})
-  //}
-
-  if (message.content.startsWith(`<@${client.user.id}>`) || message.content.startsWith(`<@!${client.user.id}>`) ) {
-    const embed = new MessageEmbed()
-      .setColor('#3131BB')
+  if (
+    message.content.startsWith(`<@${client.user.id}>`) ||
+    message.content.startsWith(`<@!${client.user.id}>`)
+    ) {
+    const embed = new Discord.EmbedBuilder()
+      .setColor(0x3131BB)
       .setTitle(client.user.username)
-      .setDescription(`My prefix is \`${prefix}\`\nType \`${prefix}help\` for a list of available commands.`)
+      .setDescription(
+        `My prefix is \`${prefix}\`\nType \`${prefix}help\` for a list of available commands.`
+      )
     return message.reply({ embeds: [embed] })
   }
   if (!message.content.startsWith(prefix)) return
@@ -101,14 +105,10 @@ async function onMessage(message, edit = false) {
   if (command.args && !args.length) {
     return argsError(command, message)
   }
-/*
-  if (command.permissions && command.permissions.length && !message.author.permissions.has(Permissions.FLAGS[command.permissions])) {
-    return errorParse(`This command requires ${command.permissions.join(', ')} permissions.`)
-  }
-*/
+
     // COOLDOWNS
   if (!cooldowns.has(command.name)) {
-    cooldowns.set(command.name, new Collection())
+    cooldowns.set(command.name, new Discord.Collection())
   }
 
   const now = Date.now()
@@ -120,7 +120,9 @@ async function onMessage(message, edit = false) {
 
     if (now < expirationTime) {
       const timeLeft = (expirationTime - now) / 1000
-      return message.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`).then(m => setTimeout(() => m.delete(), timeLeft * 1000)).catch(() => {})
+      return message.reply(
+        `Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`
+      ).then(m => setTimeout(() => m.delete(), timeLeft * 1000)).catch(() => {})
     }
   }
 
@@ -133,15 +135,17 @@ async function onMessage(message, edit = false) {
     errorParse('**Critical:** ' + e.message, message)
     console.error(e)
   })
-  
-  if (!edit) {
+
+  /*if (!edit) {
         //   logs   //
-    return !command || !prefix ? null : console.log(`${command.name}  ${shorten(args.join(' '), 1000)} in: ${message.guild.name}`)
-  }
+    return !command || !prefix ? null : console.log(
+      `${command.name}  ${shorten(args.join(' '), 1000)} in: ${message.guild.name}`
+    )
+  }*/
 }
 
 
-client.login(client.config.token)
+client.login(config.token)
 
 process.on('unhandledRejection', (reason, promise) => {
   console.log('Unhandled Rejection at:', reason.stack || reason)

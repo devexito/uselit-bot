@@ -1,5 +1,5 @@
 const unirest = require('unirest')
-const { MessageEmbed } = require('discord.js')
+const Discord = require('discord.js')
 const { errorParse, shorten, argsError } = require('../../util/util')
 const { repliedMessage } = require('../../util/message')
 const clm = require('../../util/clm')
@@ -73,8 +73,8 @@ module.exports = {
       }
 
       if (res.ok) {
-        const embed = new MessageEmbed()
-          .setColor('#3131BB')
+        const embed = new Discord.EmbedBuilder()
+          .setColor(0x3131BB)
           .setTitle('YouTube Video Restrictions')
         
         let embed_size = 0
@@ -99,15 +99,15 @@ module.exports = {
             })
             
             let finalout = shorten(allowedCountries.join(', '), 980)
-            embed.addField(`${video.title}\n(https://youtu.be/${video.id})`, `Blocked everywhere **except**: ${finalout}`, true)
+            embed.addFields({ name: `${video.title}\n(https://youtu.be/${video.id})`, value: `Blocked everywhere **except**: ${finalout}`, inline: true })
             
           } else {
             if (blockedCountries.length == 0) {
-              embed.addField(`${video.title}\n(https://youtu.be/${video.id})`, 'Video is not blocked in any country', true)
+              embed.addFields({ name: `${video.title}\n(https://youtu.be/${video.id})`, value: 'Video is not blocked in any country', inline: true })
             }
             else if (embed_size < 4000) {
               let finalout = shorten(blockedCountries.join(', '), 1000)
-              embed.addField(`${video.title}\n(https://youtu.be/${video.id})`, `Blocked in: ${finalout}`, true)
+              embed.addFields({ name: `${video.title}\n(https://youtu.be/${video.id})`, value: `Blocked in: ${finalout}`, inline: true })
               embed_size = embed_size + finalout.length
             }
           }

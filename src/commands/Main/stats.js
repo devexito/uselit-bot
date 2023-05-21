@@ -1,4 +1,8 @@
-const { MessageEmbed } = require('discord.js')
+const Discord = require('discord.js')
+const { execSync } = require('child_process');
+
+const githubURL = 'https://github.com/jue131/uselit-bot'
+
 module.exports = {
   name: 'stats',
   aliases: ['info', 'bot', 'botinfo'],
@@ -23,15 +27,21 @@ module.exports = {
       a = a.slice(0, a.length - 3)
       return `<t:${a}:R>`
     }
+    
+    const gitHash = execSync('git rev-parse HEAD').toString().trim()
+    const gitHashShort = gitHash.slice(0, 7)
 
-    const embed = new MessageEmbed()
-      .setColor('#3131BB')
-      .addField('Guilds', message.client.guilds.cache.size.toString(), true)
-      .addField('Users', message.client.users.cache.size.toString(), true)
-      .addField('Commands', `${commands.size.toString()} available (${allcommands.size.toString()} total)`, true)
+    const embed = new Discord.EmbedBuilder()
+      .setColor(0x3131BB)
+      .addFields(
+        { name: 'Guilds', value: message.client.guilds.cache.size.toString(), inline: true },
+        { name: 'Users', value: message.client.users.cache.size.toString(), inline: true },
+        { name: 'Commands', value: `${commands.size.toString()} available (${allcommands.size.toString()} total)`, inline: true },
 
-      .addField('Used/Allocated memory', `${memUsed} MB/${memAllocate} MB`, true)
-      .addField('Running since', uptime(), true)
+        { name: 'Used/Allocated memory', value: `${memUsed} MB/${memAllocate} MB`, inline: true },
+        { name: 'Running since', value: uptime(), inline: true },
+        { name: 'Current commit', value: `[\`${gitHashShort}\`](${githubURL}/commit/${gitHash})`, inline: true }
+       )
 
       .setTitle('Bot statistics')
      // .setAuthor(message.author.tag, message.author.displayAvatarURL())

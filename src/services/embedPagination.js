@@ -1,11 +1,6 @@
 // stolen from npm library
 
-const {
-  MessageActionRow,
-  Message,
-  MessageEmbed,
-  MessageButton,
-} = require('discord.js');
+const Discord = require('discord.js');
 const { isInvalid } = require('../util/message');
 const { shorten } = require('../util/util');
 const gen = require('../services/generateText');
@@ -20,46 +15,44 @@ const gen = require('../services/generateText');
  * @param {boolean} replied
  * @returns
  */
-const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message, args) => {
+const paginationEmbed = async (msg, resultEmbed, buttonList, timeout = 120000, message, args) => {
   if (!msg || !msg.channel)
     throw new Error('Channel is inaccessible.');
-  
-  let page = 0;
-  
-  if (pages[0].description && pages[0].description.length > 2999)
+
+  if (resultEmbed.description && resultEmbed.description.length > 2999)
     buttonList[1].setDisabled(true);
   
-  const row = new MessageActionRow().addComponents(buttonList).toJSON();
+  const row = new Discord.ActionRowBuilder().addComponents(buttonList).toJSON();
   let curPage = await msg.edit({
-    embeds: [pages[page].setFooter("")],
+    embeds: [resultEmbed.setFooter({ text: ' ' })],
     components: [row],
   }).catch(() => {});
   
-  const filter = i => buttonList.filter(button => button.customId === i.customId).length
+  const colFilter = i => buttonList.filter(bu => bu.customId == i.customId).length;
 
   let collector;
   try {
     collector = await curPage.createMessageComponentCollector({
-      filter,
+      componentType: Discord.ComponentType.ActionRow,
+      filter: colFilter,
       time: timeout,
     });
+    console.log(collector);
   } catch (e) {
     return console.error(e);
   }
   
-  const disabledRow = new MessageActionRow().setComponents(
-    buttonList.map(button => button.setDisabled(true))
+  const disabledRow = new Discord.ActionRowBuilder().setComponents(
+    buttonList.map(bu => bu.setDisabled(true))
   ).toJSON();
 
   collector.on('collect', async (i) => {
-    let isPaging = false;
     let output;
 
     let msgIsDeleted = await isInvalid(curPage);
   
     switch (i.customId) {
-      case buttonList[0].customId: // REGENERATE TEXT
-        isPaging = false;
+      case 'regenerate': // REGENERATE TEXT
         if (!args) {
           console.log(msgIsDeleted + ' ' + args)
           await i.deferUpdate();
@@ -68,30 +61,30 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
         }
         await i.deferUpdate();
         await i.editReply({
-          embeds: [pages[page].setFooter('Regenerating text...')],
+          embeds: [resultEmbed.setFooter({ text: 'Regenerating text...' })],
           components: [disabledRow],
         }).catch(() => {});
         output = await gen.fetchText(msg, args);
-        page = 0;
         break;
-      case buttonList[1].customId: // GENERATE MORE TEXT
-        isPaging = false;
+      case 'generateMore': // GENERATE MORE TEXT
         await i.deferUpdate();
         await i.editReply({
-          embeds: [pages[page].setFooter('Generating more text...')],
+          embeds: [resultEmbed.setFooter({ text: 'Generating more text...' })],
           components: [disabledRow],
         }).catch(() => {});
-        let embedText = pages[page].description.split(' ');
+        let embedText = resultEmbed.description.split(' ');
         output = await gen.fetchText(msg, embedText);
         if (output)
           args = output.input.split(' ');
-        page = 0;
         break;
-      case buttonList[2].customId: // CLOSE BUTTONS
+      case 'close': // CLOSE BUTTONS
         isPaging = false;
         await i.deferUpdate();
         if ((i.user.id == message.author.id) || msgIsDeleted || !args)
           collector.stop();
+        break;
+      case 'song':
+        await i.deferUpdate();
         break;
       default:
         break;
@@ -102,18 +95,12 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
         pages[i] = pages[i].setDescription(shorten(output.input + output.res[i]));
       }
 
-      if (pages[page].description.length > 2999) {
+      if (resultEmbed.description.length > 2999) {
         row.spliceComponents(1, 1, buttonList[1].setDisabled(true))
       }
       
       await i.editReply({
-        embeds: [pages[page].setFooter("")],
-        components: [row],
-      }).catch(() => {});
-    } else if (isPaging) {
-      await i.deferUpdate();
-      await i.editReply({
-        embeds: [pages[page].setFooter("")],
+        embeds: [resultEmbed.setFooter({ text: ' ' })],
         components: [row],
       }).catch(() => {});
     };
@@ -125,7 +112,7 @@ const paginationEmbed = async (msg, pages, buttonList, timeout = 120000, message
     let isMessageInvalid = await isInvalid(curPage)
     if (!isMessageInvalid) {
       curPage.edit({
-        embeds: [pages[page].setFooter("")],
+        embeds: [resultEmbed.setFooter({ text: ' ' })],
         components: [],
       }).catch(() => {});
     } else {

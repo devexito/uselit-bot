@@ -1,5 +1,5 @@
 const { emote, getRandomInt } = require('../../util/util')
-const { MessageEmbed } = require('discord.js')
+const Discord = require('discord.js')
 
 module.exports = {
   name: 'sex',
@@ -13,8 +13,8 @@ module.exports = {
     const virgin = 101 - getRandomInt(101)
     let sexState = 'sexing'
     let user = args
-    const embed = new MessageEmbed()
-      .setColor('#3131BB')
+    const embed = new Discord.EmbedBuilder()
+      .setColor(0x3131BB)
     
     async function mentionCheck(input, message) {
       input.join('')
@@ -47,8 +47,10 @@ module.exports = {
 
     embed.setTitle('You are ' + sexState + ' ' + user)
       .setDescription(emote('nice_shit'))
-      .addField('Sex level', randomNumber.toString(), true)
-      .addField('Virgin', virgin.toString() + '%', true)
+      .addFields(
+        { name: 'Sex level', value: randomNumber.toString(), inline: true },
+        { name: 'Virgin', value: virgin.toString() + '%', inline: true }
+       )
     message.reply({ embeds: [embed] })
   }
 }

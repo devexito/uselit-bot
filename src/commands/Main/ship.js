@@ -1,5 +1,5 @@
 ﻿const { emote, getRandomInt } = require('../../util/util')
-const { MessageEmbed } = require('discord.js')
+const Discord = require('discord.js')
 const { errorParse } = require('../../util/util')
 
 module.exports = {
@@ -68,8 +68,8 @@ module.exports = {
     let user = args[0]
     let user2 = args[1]
 
-    const embed = new MessageEmbed()
-      .setColor('#3131BB')
+    const embed = new Discord.EmbedBuilder()
+      .setColor(0x3131BB)
 
     async function randUser(message, isServNick) {
       let random = message.guild.members.cache.random()
@@ -158,12 +158,14 @@ module.exports = {
       .setDescription('**' + final + '** ' + emoteList[emotenum])
     if (emotenum === 0) {
       embed
-      .addField('Sex level', sexLvl.toString() + newEmote, true)
-      .addField('Virgin probability', virgin.toString() + '%', true)
-      .addField('Love in temperature', `${hot.toString()}°C. ${hotString}`, true)
+      .addFields(
+        { name: 'Sex level', value: sexLvl.toString() + newEmote, inline: true },
+        { name: 'Virgin probability', value: virgin.toString() + '%', inline: true},
+        { name: 'Love in temperature', value: `${hot.toString()}°C. ${hotString}`, inline: true}
+      )
     } else {
       embed
-      .addField('Professional ratings', rate.toString() + '/100' + newEmote)
+      .addFields({ name: 'Professional ratings', value: rate.toString() + '/100' + newEmote })
     }
 
     message.reply({ embeds: [embed] })
