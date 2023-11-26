@@ -15,7 +15,7 @@ module.exports = {
     if (isNaN(amount)) {
       return errorParse('Invalid Amount', message)
     } else if (amount <= 1 || amount > 100) {
-      return errorParse('please input a number between 1 and 99', message)
+      return errorParse('Please input a number between 1 and 100', message)
     }
     message.channel.bulkDelete(amount, true).catch(err => {
       console.error(err)
