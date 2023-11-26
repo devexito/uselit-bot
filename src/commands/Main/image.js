@@ -1,6 +1,6 @@
 ﻿const Discord = require('discord.js')
 const { errorParse, validateUrl } = require('../../util/util')
-const { repliedMessageObject, findImageUrlInMessage, findImageUrlInAttachment, findImageUrlInMessageHistory, findImageUrlInEmbed } = require('../../util/message')
+const { repliedMessageObject, findImageUrlInMessage, findImageUrlInMessageHistory } = require('../../util/message')
 
 module.exports = {
   name: 'image',
@@ -37,6 +37,7 @@ module.exports = {
     let url
     let mess = ''
     let messUrl = ''
+    let errorText = 'Please provide an attachment, image URL, user ID or mention'
 
     async function findUrl(args, message) {
 
@@ -58,7 +59,11 @@ module.exports = {
       if (mentioned) return mentioned
 
       if (!args || !args.length || args == '') {
-        return await findImageUrlInMessageHistory(message, true).catch((e) => errorParse(e, message))
+        let result = await findImageUrlInMessageHistory(message, true).catch((e) => {
+          errorText = e
+          return null
+        })
+        return result
       }
       return null
     }
@@ -74,7 +79,7 @@ module.exports = {
       }
     } else if (validateUrl(args)) {
       url = args[0]
-    } else return errorParse('Please provide an attachment, image URL, user id or mention', message)
+    } else return errorParse(errorText, message)
 
     let msg
     const attachment = new Discord.MessageAttachment(url, 'attachment.png')

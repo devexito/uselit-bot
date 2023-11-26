@@ -7,6 +7,7 @@ module.exports = {
   desc: 'Purges messages in a channel',
   aliases: ['purge', 'clear'],
   permissions: 'MANAGE_MESSAGES',
+  usage: '<amount of messages between 1 and 100>',
   ignore_dms: true,
   async execute(message, args) {
     const amount = parseInt(args[0]) + 1

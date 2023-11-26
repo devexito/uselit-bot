@@ -12,7 +12,7 @@ module.exports = {
       ownersInfo.push(`<@${ownersArray[i]}> (@${message.client.users.cache.get(ownersArray[i]).username})`)
     }
     let prefix = message.guild ? await db.get(`prefix_${message.guild.id}`) : ''
-    if (prefix === null || prefix === undefined) prefix = message.client.config.DEFAULT_PREFIX
+    if (!prefix) prefix = message.client.config.DEFAULT_PREFIX
 
     const embed = new MessageEmbed()
       .setColor('#3131BB')
@@ -21,8 +21,6 @@ module.exports = {
       .addField('Discord.js Version', version.toString(), true)
       .addField('Support', 'Use the feedback command', true)
       .addField('Prefix', '@mention or ' + prefix)
-
-      //.addField('Running since', uptime(), true)
 
       .setTitle('About Uselit')
       
