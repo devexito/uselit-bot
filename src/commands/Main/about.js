@@ -12,7 +12,7 @@ module.exports = {
       ownersInfo.push(`<@${ownersArray[i]}> (@${message.client.users.cache.get(ownersArray[i]).username})`)
     }
     let prefix = message.guild ? await db.get(`prefix_${message.guild.id}`) : ''
-    if (prefix === null || prefix === undefined) prefix = client.config.DEFAULT_PREFIX
+    if (prefix === null || prefix === undefined) prefix = message.client.config.DEFAULT_PREFIX
 
     const embed = new MessageEmbed()
       .setColor('#3131BB')
