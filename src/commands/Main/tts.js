@@ -1,13 +1,14 @@
-const { emote, errorParse } = require('../../util/util')
+const { emote, errorParse, argsError } = require('../../util/util')
 const { repliedMessage } = require('../../util/message')
 const fs = require('fs')
 const axios = require('axios')
 
 module.exports = {
   name: 'tts',
-  description: 'Just speaks out loud a specified text in a selected language.\nSupports message replies.\nExample usage: `>tts en-US_female your text here`',
+  description: 'Just speaks out loud a specified text in a selected language.\nSupports message replies.\nExample usage: `tts en-US_female your text here`',
   desc: 'Text to speech',
   permissions: '',
+  aliases: ['texttospeech'],
   usage: '<lang>-<LANG>_<male/female> <text>',
   args: true,
   async execute(message, args) {

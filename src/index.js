@@ -1,11 +1,10 @@
 const { Client, Collection, Intents, MessageEmbed, Permissions } = require('discord.js')
 const myintents = new Intents(32767)
-myintents.remove(['DIRECT_MESSAGES'])
-const client = new Client({ intents: myintents, allowedMentions: { repliedUser: false, parse: ['users'] }})
+myintents.add('DIRECT_MESSAGES')
+const client = new Client({ intents: myintents, allowedMentions: { repliedUser: false, parse: ['users'] }, partials: ['CHANNEL']})
 
+client.config = require('dotenv').config().parsed
 const { emote, shorten, errorParse, argsError } = require('./util/util.js')
-client.config = require('./config.js')
-prefix = client.config.defaultPrefix
 
 const { readdirSync } = require('fs')
 const { sep } = require('path')
@@ -13,9 +12,12 @@ client.cooldowns = new Collection()
 client.commands = new Collection()
 const { cooldowns } = client
 
+const { QuickDB } = require('quick.db')
+db = new QuickDB({ filePath: '../db.sqlite' })
+
 //const NickChanger = require('./services/nickChanger')
 
-const load = (dir = './src/commands/') => {
+function load(dir = './src/commands/') {
   readdirSync(dir).forEach(dirs => {
     const commandFiles = readdirSync(`${dir}${sep}${dirs}${sep}`).filter(files => files.endsWith('.js'))
 
@@ -31,8 +33,8 @@ load()
 client.on('ready', () => {
   console.log(`[READY] Logged in as ${client.user.tag}`)
 
-  if (!client.config.feedbackChannel) {
-    console.error('No feedbackChannel set in config!')
+  if (!client.config.FEEDBACK_CHANNEL) {
+    console.error('*******\n******* NO FEEDBACK_CHANNEL SET IN ENV VARIABLES!\n*******')
   }
 
   //new NickChanger(client)
@@ -46,8 +48,6 @@ client.on('ready', () => {
       status: 'online'
     })
   }, 60000) // каждую минуту
-
-  bk = []
 })
 
 client.on('messageCreate', onMessage)
@@ -68,26 +68,32 @@ async function onMessage(message, edit = false) {
   }
 
   // ограничения
-  if (message.author.bot || !message.guild) return
+  if (message.author.bot) return
+  
+  let prefixes = [`<@${client.user.id}>`, `<@!${client.user.id}>`]
+  let prefix = message.guild ? await db.get(`prefix_${message.guild.id}`) : ''
+  if (prefix === null || prefix === undefined) prefix = client.config.DEFAULT_PREFIX
+  if (!message.guild) prefixes.push(client.config.DEFAULT_PREFIX)
+  prefixes.push(prefix)
 
-
-
-
-//  ТУТ ПИЗДЕЦ
-//  if (message.author.id == '350177157550571521') return message.reply({ content: 'токсик', allowedMentions: { repliedUser: true } })
-
-  //if (bk.length > 0 && bk.includes(message.author.id)) {
-  //  message.react(emote('badklass')).catch(() => {})
-  //}
-
-  if (message.content.startsWith(`<@${client.user.id}>`) || message.content.startsWith(`<@!${client.user.id}>`) ) {
+  if (message.content == `<@${client.user.id}>` || message.content == `<@!${client.user.id}>` ) {
+    let desc = 'In direct messages, you can use commands without providing a prefix.'
+    if (message.guild) desc = `My prefix is \`${prefix}\``
+    desc += `\nType \`${prefix}help\` for a list of available commands.`
     const embed = new MessageEmbed()
       .setColor('#3131BB')
       .setTitle(client.user.username)
-      .setDescription(`My prefix is \`${prefix}\`\nType \`${prefix}help\` for a list of available commands.`)
+      .setDescription(desc)
     return message.reply({ embeds: [embed] })
   }
-  if (!message.content.startsWith(prefix)) return
+
+  for (i in prefixes) {
+    if (message.content.startsWith(prefixes[i])) {
+      prefix = prefixes[i]
+      break
+    }
+  }
+  if (!message.content.startsWith(prefix) && message.guild) return
 
   const commandBody = message.content.slice(prefix.length)
   const args = commandBody.trim().replace(/ +(?= )/g,'').split(' ')
@@ -101,11 +107,20 @@ async function onMessage(message, edit = false) {
   if (command.args && !args.length) {
     return argsError(command, message)
   }
-/*
-  if (command.permissions && command.permissions.length && !message.author.permissions.has(Permissions.FLAGS[command.permissions])) {
-    return errorParse(`This command requires ${command.permissions.join(', ')} permissions.`)
+
+  if (command.ignore_dms && command.ignore_dms === true && message.guild == null) {
+    return errorParse(`This command cannot be used in private messages.`, message)
   }
-*/
+
+  if (command.permissions?.length && !message.member?.permissions?.has(Permissions.FLAGS[command.permissions])) {
+    return errorParse(`You have insufficient permissions on the server.\n\nThis command requires the following permissions: \`${command.permissions}\``, message)
+  }
+
+  let owners = client.config.OWNERS.split('\n')
+  if (command.owner && !owners.includes(message.author.id)) {
+    return errorParse('⛔ Owner Only', message)
+  }
+
     // COOLDOWNS
   if (!cooldowns.has(command.name)) {
     cooldowns.set(command.name, new Collection())
@@ -120,7 +135,8 @@ async function onMessage(message, edit = false) {
 
     if (now < expirationTime) {
       const timeLeft = (expirationTime - now) / 1000
-      return message.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`).then(m => setTimeout(() => m.delete(), timeLeft * 1000)).catch(() => {})
+      return message.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`)
+      .then(m => setTimeout(() => m.delete(), timeLeft * 1000)).catch(() => {})
     }
   }
 
@@ -136,12 +152,12 @@ async function onMessage(message, edit = false) {
   
   if (!edit) {
         //   logs   //
-    return !command || !prefix ? null : console.log(`${command.name}  ${shorten(args.join(' '), 1000)} in: ${message.guild.name}`)
+    return !command || !prefix ? null : console.log(`${command.name}  ${shorten(args.join(' '), 1000)} in: ${message.guild?.name}`)
   }
 }
 
 
-client.login(client.config.token)
+client.login(client.config.TOKEN)
 
 process.on('unhandledRejection', (reason, promise) => {
   console.log('Unhandled Rejection at:', reason.stack || reason)

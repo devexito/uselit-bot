@@ -1,4 +1,4 @@
-const { emote, getRandomInt } = require('../../util/util')
+const { emote, getRandomInt, errorParse } = require('../../util/util')
 const { MessageEmbed } = require('discord.js')
 
 module.exports = {
@@ -40,6 +40,9 @@ module.exports = {
 // 2nd etap
         user = '`' + args.join(' ').trim() + '`'
       } else {
+        if (!message.guild) {
+          return errorParse('No members to pick from in private messages. Put something in arguments.', message)
+        }
 // 3rd etap
         user = '`' + message.guild.members.cache.random().user.username + '`'
       }

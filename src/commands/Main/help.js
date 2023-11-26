@@ -15,6 +15,9 @@ module.exports = {
 
     const embed = new MessageEmbed()
       .setColor('#3131BB')
+    
+    let prefix = message.guild ? await db.get(`prefix_${message.guild.id}`) : ''
+    if (prefix === null || prefix === undefined) prefix = message.client.config.DEFAULT_PREFIX
 
     if (!args.length) {
       let spaces = '         ' // 9 spaces
@@ -23,7 +26,7 @@ module.exports = {
       embed
         .setTitle('Command List')
         .setDescription('```\n' + commandList.join('\n') + '```')
-        .setFooter('Type ' + prefix + 'help [command name] to show more info about a specific command.\nHint: Commands with any text input support message references. Try replying to a message while executing a ">generate", ">shuffle" or ">talk" command without arguments!')
+        .setFooter(`Type ${prefix}help [command name] to show more info about a specific command.\nHint: Commands with any text input support message references. Try replying to a message while executing a "${prefix}generate", "${prefix}shuffle" or "${prefix}talk" command without arguments!`)
     } else {
       const name = args[0].toLowerCase()
       const command = allcommands.get(name)
@@ -41,7 +44,7 @@ module.exports = {
 
       if (command.description) embed.setDescription(command.description)
       if (command.aliases) embed.addField('Aliases', command.aliases.join('\n'))
-      if (command.usage) embed.addField('Usage', '`' + command.usage + '`')
+      if (command.usage) embed.addField('Usage', '`' + prefix + command.name + ' ' + command.usage + '`')
     }
 
     message.reply({ embeds: [embed] })

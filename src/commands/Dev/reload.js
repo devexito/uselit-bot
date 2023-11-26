@@ -10,9 +10,6 @@ module.exports = {
   aliases: ['rel'],
   args: true,
   async execute(message, args) {
-    if (!message.client.config.owners.includes(message.author.id)) {
-      return errorParse('⛔ Missing Access', message)
-    }
 
     const commandName = args[0].toLowerCase()
     const command = message.client.commands.get(commandName)
@@ -27,7 +24,8 @@ module.exports = {
           delete require.cache[require.resolve(file)]
           const newCommand = require(file)
           message.client.commands.set(newCommand.name, newCommand)
-      
+      
+
           message.reply(`✅ Command \`${command.name}\` successfully reloaded`)
         } catch (err) {
           console.error(err.stack || err)

@@ -1,4 +1,4 @@
-﻿const { emote, errorParse } = require('../../util/util')
+﻿const { errorParse } = require('../../util/util')
 const { repliedMessageObject } = require('../../util/message')
 const { MessageEmbed } = require('discord.js')
 
@@ -13,7 +13,7 @@ module.exports = {
   cooldown: 10,
   async execute(message, args) {
     let replying = false
-    const { feedbackChannel } = message.client.config
+    const { FEEDBACK_CHANNEL } = message.client.config
 
     if (args[0] == 'reply') {
       args.shift()
@@ -22,7 +22,7 @@ module.exports = {
     args = args.join(' ').trim()
 
     if (replying) {
-      if (!message.client.config.owners.includes(message.author.id)) return
+      if (!message.client.config.OWNERS.split('\n').includes(message.author.id)) return
       let msg = await repliedMessageObject(message)
       if (!msg) return
       if (msg.embeds.length && 
@@ -64,11 +64,11 @@ msg.embeds[0].fields[0].value) {
       .setTitle('Uselit Feedback')
       .setDescription(`
 User: **${message.author.tag}**\n(||${message.author.id}||)
-Guild: \`${message.guild.name}\`\n(||${message.guild.id}||)
+Guild: \`${message.guild ? message.guild.name : 'Private message'}\`\n(||${message.guild?.id}||)
 Channel: \`${message.channel.name}\`\n(||${message.channel.id}||)
 \nMessage:\`\`\`\n${comment.join(' ')}\n\`\`\``)
       .addField('IDs', `${message.channel.id}, ${message.id}`)
-    message.client.channels.cache.get(feedbackChannel).send({ embeds: [embed] })
+    message.client.channels.cache.get(FEEDBACK_CHANNEL).send({ embeds: [embed] })
     message.reply('Feedback sent.')
   }
 }

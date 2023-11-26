@@ -2,7 +2,7 @@
   name: 'say',
   description: 'Sends a message with arguments as message content, and deletes author message',
   desc: 'Send a message as bot',
-  permissions: '',
+  permissions: 'MANAGE_MESSAGES',
   args: true,
   usage: '<text>',
   async execute(message, args) {

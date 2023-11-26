@@ -4,11 +4,11 @@ const fs = require('fs')
 const axios = require('axios')
 const ffmpeg = require('fluent-ffmpeg-extended')
 const exec = require('child_process').exec
-const { getPackedSettings } = require('http2')
+//const { getPackedSettings } = require('http2')
 
 module.exports = {
   name: 'song',
-  description: 'Makes a very funny song!!!!\nNow outputs video instead of audio for mobile Discord compatibility.\nSupports message replies.\nExample usage: `>song ru-RU_female your text here`\nUse `-audio` to force output mp3 audio file.',
+  description: 'Makes a very funny song!!!!\nNow outputs video instead of audio for mobile Discord compatibility.\nSupports message replies.\nExample usage: `song ru-RU_female your text here`\nUse `-audio` to force output mp3 audio file.',
   desc: 'Make a song',
   permissions: '',
   usage: '<lang>-<LANG>_<male/female> <text> [-audio]',

@@ -1,7 +1,7 @@
 const { MessageEmbed } = require('discord.js')
 module.exports = {
   name: 'stats',
-  aliases: ['info', 'bot', 'botinfo'],
+  aliases: ['statistics', 'uptime', 'botstats'],
   description: 'Shows a little information about bot',
   desc: 'Stats for nerds',
   permissions: '',
@@ -14,8 +14,8 @@ module.exports = {
     function mem(key) {
       return Math.round(used[key] / 1024 / 1024 * 100) / 100
     } 
-    const memUsed = await mem('heapUsed').toString()
-    const memAllocate = await mem('heapTotal').toString()
+    const memUsed = mem('heapUsed').toString()
+    const memAllocate = mem('heapTotal').toString()
 
     function uptime() {
       let a = message.client.readyAt - 1

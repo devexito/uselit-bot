@@ -43,11 +43,11 @@ module.exports = {
     
     let isServNick = false
     let isReversed = false
-    if (args[args.length - 1] === '-s') {
+    if (args[args.length - 1] === '-s' && message.guild) {
       isServNick = true
       args.splice(-1, 2)
     }
-    if (args[args.length - 1] === '-f' && args[args.length - 2] === '-s') {
+    if (args[args.length - 1] === '-f' && args[args.length - 2] === '-s' && message.guild) {
       isServNick = true
       isReversed = true
       args.splice(-2, 2)
@@ -72,7 +72,7 @@ module.exports = {
       .setColor('#3131BB')
 
     async function randUser(message, isServNick) {
-      let random = message.guild.members.cache.random()
+      let random = message.guild?.members.cache.random()
       if (isServNick && random.nickname) {
         return random.nickname
       } else {
@@ -88,7 +88,7 @@ module.exports = {
         //console.log('blya ' + input)
       }
 
-      if (!isNaN(input) && message.guild.members.cache.get(input)) {
+      if (!isNaN(input) && message.client.users.cache.get(input)) {
         if (isServNick && message.guild.members.cache.get(input).nickname) {
           return message.guild.members.cache.get(input).nickname
         } else {
@@ -118,7 +118,7 @@ module.exports = {
 
     if (!user) {
       if (!args[0]) {
-        user = await randUser(message, isServNick).catch((e) => {})
+        user = await randUser(message, message.guild ? isServNick : false).catch((e) => {})
         randomised += 1
       } else {
         user = args[0]
@@ -127,7 +127,7 @@ module.exports = {
     }
     if (!user2) {
       if (!args[1]) {
-        user2 = await randUser(message, isServNick).catch((e) => {})
+        user2 = await randUser(message, message.guild ? isServNick : false).catch((e) => {})
         randomised += 1
       } else {
         user2 = args[1]

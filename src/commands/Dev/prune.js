@@ -3,13 +3,12 @@
 module.exports = {
   name: 'prune',
   args: true,
-  owner: true,
   description: 'Purges messages in a current channel',
   desc: 'Purges messages in a channel',
-  aliases: ['p', 'purge', 'clear'],
-  permissions: 'administrator',
+  aliases: ['purge', 'clear'],
+  permissions: 'MANAGE_MESSAGES',
+  ignore_dms: true,
   async execute(message, args) {
-    if (!message.client.config.owners.includes(message.author.id)) return
     const amount = parseInt(args[0]) + 1
 
     if (isNaN(amount)) {

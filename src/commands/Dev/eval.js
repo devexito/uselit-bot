@@ -8,10 +8,6 @@ module.exports = {
   desc: '.',
   owner: true,
   async execute (message, args) {
-    if (!message.client.config.owners.includes(message.author.id)) {
-      return errorParse('⛔ Missing Access', message)
-    }
-
     // argument
     let noOutput = false
     if (args[args.length - 1] === '-off') {

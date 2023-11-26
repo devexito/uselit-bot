@@ -9,6 +9,7 @@ module.exports = {
   permissions: '',
   usage: '[channel]',
   cooldown: 2,
+  ignore_dms: true,
   async execute(message, args) {
     async function channelCheck(input, message) {
       var output = input.join('')
