@@ -1,4 +1,4 @@
-﻿const { emote, getRandomInt } = require('../../util/util')
+﻿const { emote, getRandomInt, argsError } = require('../../util/util')
 const { MessageEmbed } = require('discord.js')
 const { errorParse } = require('../../util/util')
 
@@ -8,7 +8,7 @@ module.exports = {
   aliases: ['c', 'child'],
   description: `Ships two user names (or thing names?)\nSkip arguments for random users. You can either enter two mentions, id or words separated by spaces, or use a \`|\` as a separator for words.\n\nUse \`-s\` for server nicknames.\nUse \`-f\` to floor odd amount of characters instead of ceiling it.`,
   desc: 'Lovely shipping...',
-  usage: '[first mention or id] [second mention or id] [-s] [-f]\` **OR**\n\`[text] | [another text]',
+  usage: '[first mention or id] [second mention or id] [-s] [-f]\`\n**OR**\n\`[text] | [another text]',
   typing: true,
   async execute(message, args) {
     let sexLvl = getRandomInt(256)
@@ -118,8 +118,12 @@ module.exports = {
 
     if (!user) {
       if (!args[0]) {
-        user = await randUser(message, message.guild ? isServNick : false).catch((e) => {})
-        randomised += 1
+        if (message.guild) {
+          user = await randUser(message, isServNick).catch((e) => {})
+          randomised += 1
+        } else {
+          return argsError(this, message)
+        }
       } else {
         user = args[0]
         emotenum = 1
@@ -127,8 +131,12 @@ module.exports = {
     }
     if (!user2) {
       if (!args[1]) {
-        user2 = await randUser(message, message.guild ? isServNick : false).catch((e) => {})
-        randomised += 1
+        if (message.guild) {
+          user2 = await randUser(message, isServNick).catch((e) => {})
+          randomised += 1
+        } else {
+          return argsError(this, message)
+        }
       } else {
         user2 = args[1]
         emotenum = 1
