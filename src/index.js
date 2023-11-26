@@ -116,7 +116,7 @@ async function onMessage(message, edit = false) {
     return errorParse(`You have insufficient permissions on the server.\n\nThis command requires the following permissions: \`${command.permissions}\``, message)
   }
 
-  let owners = client.config.OWNERS.split('\n')
+  let owners = client.config.OWNERS.split(' ')
   if (command.owner && !owners.includes(message.author.id)) {
     return errorParse('⛔ Owner Only', message)
   }

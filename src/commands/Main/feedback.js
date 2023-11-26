@@ -22,7 +22,7 @@ module.exports = {
     args = args.join(' ').trim()
 
     if (replying) {
-      if (!message.client.config.OWNERS.split('\n').includes(message.author.id)) return
+      if (!message.client.config.OWNERS.split(' ').includes(message.author.id)) return
       let msg = await repliedMessageObject(message)
       if (!msg) return
       if (msg.embeds.length && 

@@ -6,7 +6,7 @@ module.exports = {
   desc: 'Who made this',
   permissions: '',
   async execute(message, args) {
-    const ownersArray = message.client.config.OWNERS.split('\n')
+    const ownersArray = message.client.config.OWNERS.split(' ')
     let ownersInfo = []
     for (let i in ownersArray) {
       ownersInfo.push(`<@${ownersArray[i]}> (@${message.client.users.cache.get(ownersArray[i]).username})`)
