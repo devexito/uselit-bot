@@ -19,9 +19,7 @@ module.exports = class Util {
       clueless: '<:clueless:937532045364695142>',
       nice_shit: '<:nice_shit:937532782228406342>',
       hungary: '<a:hungary:843514096027959367>',
-    //badklass: '<:badklass:493361730160820234>',
       badklass: '<a:deeznuts:874607834061484082>',
-      // EMOJI EPTA
       losyash: '<:sillytime:854287027888979988>',
     }
     if (!emoteList[which]) throw new TypeError(`${which} is not a valid emote in emote list.`)
@@ -66,7 +64,7 @@ module.exports = class Util {
     return Math.floor(Math.random() * Math.floor(max))
   }
 
-  static errorParse(error, message, usage = false, edit = false) {
+  static errorParse(error, message, usage = false) {
     const embed = new MessageEmbed()
       .setColor('#A00000')
       .setTitle('⚠️ Command Error')
@@ -77,7 +75,7 @@ module.exports = class Util {
         .addField('Usage', usage)
     }
 
-    if (!edit) {
+    if (!message.edited) {
       message.reply({ embeds: [embed] })
     } else {
       message.edit({ content: '_ _', embeds: [embed] })
@@ -91,7 +89,11 @@ module.exports = class Util {
     if (command.description) embed.setDescription(command.description)
     if (command.aliases && command.aliases.length) embed.addField('Aliases', command.aliases.join('\n'))
     if (command.usage) embed.addField('Usage', '`' + command.usage + '`')
-    return message.reply({ embeds: [embed] })
+    if (!message.edited) {
+      return message.reply({ embeds: [embed] })
+    } else {
+      return message.edit({ content: '_ _', embeds: [embed] })
+    }
   }
 
   static validateUrl(value) {
