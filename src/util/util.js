@@ -75,10 +75,10 @@ module.exports = class Util {
         .addField('Usage', usage)
     }
 
-    if (!message.edited) {
-      message.reply({ embeds: [embed] })
+    if (!message.botReply) {
+      return message.reply({ embeds: [embed] })
     } else {
-      message.edit({ content: '_ _', embeds: [embed] })
+      return message.botReply.edit({ content: null, embeds: [embed] })
     }
   }
 
@@ -89,10 +89,10 @@ module.exports = class Util {
     if (command.description) embed.setDescription(command.description)
     if (command.aliases && command.aliases.length) embed.addField('Aliases', command.aliases.join('\n'))
     if (command.usage) embed.addField('Usage', '`' + command.usage + '`')
-    if (!message.edited) {
+    if (!message.botReply) {
       return message.reply({ embeds: [embed] })
     } else {
-      return message.edit({ content: '_ _', embeds: [embed] })
+      return message.botReply.edit({ content: null, embeds: [embed] })
     }
   }
 

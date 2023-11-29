@@ -31,7 +31,7 @@ function load(dir = './src/commands/') {
 
 load()
 
-Message.prototype.editOrReply = function(text, options = {}) {
+Message.prototype.editOrReply = function(text, options = { embeds: [], files: [] }) {
   console.log(this.content, text)
   let msg
   if (!this.botReply) {
@@ -64,9 +64,8 @@ client.on('ready', () => {
 
 client.on('messageCreate', onMessage)
 client.on('messageUpdate', (old, _new) => {
-  const storedData = storedMessageIDs.get(old.id)
-  console.log('чоч: ' + storedData)
-  if (old.content !== _new.content && storedData) {
+  const storedData = storedMessageIDs.has(old.id) ? storedMessageIDs.get(old.id) : null
+  if (old.content !== _new.content) {
     onMessage(_new, true, storedData)
   }
 })
@@ -98,7 +97,7 @@ async function onMessage(message, edit = false, botReply = null) {
   if (!message.guild) prefixes.push(client.config.DEFAULT_PREFIX)
   prefixes.push(prefix)
 
-  // if only mentioned, send a dummy message
+  // If only mentioned, send a dummy message
   if (message.content == `<@${client.user.id}>` || message.content == `<@!${client.user.id}>` ) {
     let desc = 'In direct messages, you can use commands without providing a prefix.'
     if (message.guild) desc = `My prefix is \`${prefix}\``
@@ -116,7 +115,7 @@ async function onMessage(message, edit = false, botReply = null) {
       break
     }
   }
-  // if in DMs, we can ignore the prefix
+  // If in DMs, we can ignore the prefix
   if (!message.content.startsWith(prefix) && message.guild) return
 
   const commandBody = message.content.slice(prefix.length)
@@ -166,21 +165,24 @@ async function onMessage(message, edit = false, botReply = null) {
   
   // EXECUTION
   await command.execute(message, args)
-  .catch((e) => {
-    errorParse('**Critical:** ' + e.message, message)
-    console.error(e)
-  })
-  .finally((msg) => {
-    if (!botReply) {
+  .then((msg) => {
+    if (!botReply && msg) {
+      console.log('msg: ', msg.id)
       storedMessageIDs.set(message.id, msg)
-      setTimeout(() => storedMessageIDs.delete(message.id), 60000)
+      setTimeout(() => storedMessageIDs.delete(message.id), 300000) // 5 min
     }
   })
+  .catch((e) => {
+    const msg = errorParse('**Critical:** ' + e.message, message)
+    if (!botReply && msg) {
+      storedMessageIDs.set(message.id, msg)
+      setTimeout(() => storedMessageIDs.delete(message.id), 300000) // 5 min
+    }
+    console.error(e)
+  })
   
+  // logs
   return !command || !prefix ? null : console.log(`${command.name}  ${shorten(args.join(' '), 1000)} in: ${message.guild?.name}, ${storedMessageIDs.get(message.id)}`)
-  if (!edit) {
-        //   logs   //
-  }
 }
 
 client.login(client.config.TOKEN)

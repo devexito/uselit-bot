@@ -7,7 +7,9 @@ module.exports = {
   permissions: '',
   async execute(message) {
     const msg = await message.editOrReply('Pinging...')
-    const ping = Math.round(msg.createdTimestamp - message.createdTimestamp)
+    let botTime = message.botReply ? msg.editedTimestamp : msg.createdTimestamp
+    let authorTime = message.edited ? message.editedTimestamp : message.createdTimestamp
+    const ping = Math.round(botTime - authorTime)
     return msg.edit(`Pong!\nMessage latency: \`${formatNumber(ping)}ms\`\nHeartbeat: \`${Math.round(message.client.ws.ping)}ms\``)
   }
 }

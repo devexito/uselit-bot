@@ -89,9 +89,9 @@ module.exports = {
 
     let msg 
     if (mess) {
-      msg = await mess.reply(emote('hmmm'))
+      msg = await mess.editOrReply(emote('hmmm'))
     } else {
-      msg = await message.reply(emote('hmmm'))
+      msg = await message.editOrReply(emote('hmmm'))
     }
 
     const options = {
@@ -140,7 +140,7 @@ module.exports = {
       } else {
         return msg.edit(`${anal.confidence < 0.4 ? 'I am not really confident, but ' : ''}I think it is ${anal.text} (${Math.ceil(anal.confidence * 100).toString()}% confidence)`).catch(() => {})
       }
-      msg.edit(`I really can't describe the image ` + emote('fluid'))
+      return msg.edit(`I really can't describe the image ` + emote('fluid'))
     }
   },
 }

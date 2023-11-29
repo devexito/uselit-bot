@@ -47,6 +47,6 @@ module.exports = {
       if (command.usage) embed.addField('Usage', '`' + prefix + command.name + ' ' + command.usage + '`')
     }
 
-    message.reply({ embeds: [embed] })
+    return message.editOrReply(null, { embeds: [embed] })
   },
 }
