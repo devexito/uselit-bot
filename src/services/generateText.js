@@ -68,7 +68,7 @@ async function fetchText(message, args, msg = false) {
         }
       })
     }).catch(async (e) => {
-      errorParse(e, message)
+      errorParse(e, message, false)
       console.error(e)
     })
 }

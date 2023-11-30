@@ -174,6 +174,6 @@ module.exports = {
       .addField('Professional ratings', rate.toString() + '/100' + newEmote)
     }
 
-    message.reply({ embeds: [embed] })
+    return message.editOrReply(null, { embeds: [embed], files: [] })
   }
 }

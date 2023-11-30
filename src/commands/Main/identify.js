@@ -21,7 +21,8 @@ module.exports = {
           var regEx = /<@\!?([0-9]{17,21})>/
           output = regEx.exec(input)[1]
         } catch {
-          return console.log(input)
+          console.log(input)
+          return null
         }
       } else {
         output = input
@@ -106,7 +107,7 @@ module.exports = {
       headers: {
         'content-type': 'application/json',
         'x-rapidapi-host': 'microsoft-computer-vision3.p.rapidapi.com',
-        'x-rapidapi-key': '9e3ceaef5emsh58cb033407ace61p16ab76jsn5510af64ae15'
+        'x-rapidapi-key': message.client.config.BING_KEY,
       },
       data: {
         url: url

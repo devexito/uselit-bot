@@ -45,7 +45,7 @@ module.exports = {
       return errorParse('Invalid channel.', message)
     await channel.messages.fetchPinned().then(m => {
       let pinCount = m.size.toString()
-      message.reply(`There ${pinCount == 1 ? `is 1 pin` : `are ${pinCount} pins`} in <#${channel.id}>`)
+      return message.editOrReply(`There ${pinCount == 1 ? `is 1 pin` : `are ${pinCount} pins`} in <#${channel.id}>`)
     }).catch(() => {
       return errorParse('Could not fetch channel.', message)
     })

@@ -75,7 +75,7 @@ module.exports = {
         url = messUrl.toString()
       }
       if (!validateUrl(url)) {
-        return errorParse('Malformed URL', message)
+        return errorParse('Invalid or malformed URL', message)
       }
     } else if (validateUrl(args)) {
       url = args[0]

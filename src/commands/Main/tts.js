@@ -34,14 +34,14 @@ module.exports = {
       return errorParse('Invalid format of the parameter!', message, '`' + this.usage + '`')
     }
 
-    const msg = await message.reply('Speaking text... ' + emote('hungary'))
+    const msg = await message.editOrReply('Speaking text... ' + emote('hungary'))
 
     let code = randomText()
     const tempPath = './tempmusic/translate' + code + '.mp3'
     let write = fs.createWriteStream(tempPath)
     
     const res = await axios.get(
-      'https://texttospeech.responsivevoice.org/v1/text:synthesize?text=' + encodeURI(arges.join(' ')) + '&lang=' + setting.split('_')[0] + '&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=kvfbSITh&gender=' + setting.split('_')[1],
+      `https://texttospeech.responsivevoice.org/v1/text:synthesize?text=${encodeURI(arges.join(' '))}&lang=${setting.split('_')[0]}&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=${message.client.config.SONG_KEY}&gender=${setting.split('_')[1]}`,
       {
         headers: {
           'accept': '*/*',
@@ -69,10 +69,11 @@ module.exports = {
           return msg.edit('Unable to attach the audio file ' + emote('perms'))
         })
         fs.unlinkSync(tempPath)
+        return msg
       } catch (e) {
         console.error(e)
         fs.unlinkSync(tempPath)
-        errorParse('Google did not want to sing that', message ? message : msg)
+        return errorParse('Google did not want to sing that', message ? message : msg)
       }
     })
   }

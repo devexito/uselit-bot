@@ -15,7 +15,7 @@ module.exports = class Util {
       fluid: '<:fluid:831795650219343912>',
       hmmm: '<:hmmm:814451433087827990>',
       heroin: '<:heroin:937532321148567604>',
-      suhariki: '<:gay_sex_minet_anal:937532440799502356>',
+      suhariki: '<:suhariki:937532440799502356>',
       clueless: '<:clueless:937532045364695142>',
       nice_shit: '<:nice_shit:937532782228406342>',
       hungary: '<a:hungary:843514096027959367>',

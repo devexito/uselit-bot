@@ -19,7 +19,7 @@ module.exports = {
     }
     message.channel.bulkDelete(amount, true).catch(err => {
       console.error(err)
-      errorParse('Couldn\'t bulk delete the messages: ' + err.message, message)
+      return errorParse('Couldn\'t bulk delete the messages: ' + err.message, message)
     })
   },
 }

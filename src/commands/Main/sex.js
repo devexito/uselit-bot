@@ -52,6 +52,7 @@ module.exports = {
       .setDescription(emote('nice_shit'))
       .addField('Sex level', randomNumber.toString(), true)
       .addField('Virgin', virgin.toString() + '%', true)
-    message.reply({ embeds: [embed] })
+    
+    return message.editOrReply(null, { embeds: [embed], files: [] })
   }
 }

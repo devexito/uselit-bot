@@ -25,6 +25,6 @@ module.exports = {
       .setColor('#3131BB')
       .setTitle('✅ Prefix updated')
       .setDescription(desc)
-    message.reply({ embeds: [embed] })
+    return message.editOrReply(null, { embeds: [embed], files: [] })
   }
 }

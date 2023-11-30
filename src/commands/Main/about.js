@@ -26,6 +26,6 @@ module.exports = {
       
      // .setAuthor(message.author.tag, message.author.displayAvatarURL())
      // .setTimestamp(new Date())
-    message.reply({ embeds: [embed] })
+    message.editOrReply(null, { embeds: [embed], files: [] })
   },
 }
