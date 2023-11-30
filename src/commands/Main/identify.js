@@ -10,7 +10,7 @@ module.exports = {
   desc: 'Identify an image',
   permissions: '',
   usage: '<image url/attachment/user mention>',
-  cooldown: 9,
+  cooldown: 5,
   async execute(message, args) {
     async function mentionCheck(input, message) {
       input = input.join('')
@@ -145,7 +145,7 @@ module.exports = {
       if (!anal || !anal.text) {
         if (tags.length) {
           if (tags.length > 3) tags.splice(2, tags.length - 3)
-          return `I can't really describe the image but I do see ${tags.join(', ')}`
+          return `I can't really describe the image, but I do see ${tags.join(', ')}`
         }
       } else {
         return `${anal.confidence < 0.4 ? 'I am not really confident, but ' : ''}I think it is ${anal.text}.`

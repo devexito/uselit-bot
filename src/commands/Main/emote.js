@@ -5,7 +5,7 @@ module.exports = {
   description: 'Sends URL of a server emoji',
   desc: 'Image link of a server emoji',
   permissions: '',
-  aliases: ['e', 'emote', 'emoji', 'enlarge'],
+  aliases: ['emote', 'emoji', 'enlarge'],
   args: true,
   usage: '<emoji>',
   async execute(message, args) {
@@ -23,11 +23,14 @@ module.exports = {
     }
 
     let strIn = args.join('')
-
-    let output = emoteCheck(strIn).catch((e) => {
+    let output
+    
+    try {
+      output = emoteCheck(strIn)
+    } catch (e) {
       console.error(e)
       return errorParse('Emote Check Failed', message)
-    })
+    }
 
     if (output) {
       return message.editOrReply('https://cdn.discordapp.com/emojis/' + output)

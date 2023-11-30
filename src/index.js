@@ -32,7 +32,7 @@ function load(dir = './src/commands/') {
 load()
 
 Message.prototype.editOrReply = function(text, options = { embeds: [], files: [] }) {
-  console.log(this.content, text)
+  //console.log(this.content, text)
   let msg
   if (!this.botReply) {
     msg = this.reply({ content: text, ...options })
@@ -54,7 +54,7 @@ client.on('ready', () => {
   setInterval(() => {
     client.user.setPresence({
       activities: [{
-        name: 'the largest amount of undefined', 
+        name: 'the undefined of undefined, with undefined under undefined', 
         type: 'COMPETING'
       }],
       status: 'online'
@@ -172,7 +172,7 @@ async function onMessage(message, edit = false, botReply = null) {
   await command.execute(message, args)
   .then(async (msg) => {
     if (msg) {
-      console.log('msg: ', msg.id)
+      //console.log('msg: ', msg.id)
       await storeBotReply(message, msg)
     }
   })
@@ -189,7 +189,7 @@ async function onMessage(message, edit = false, botReply = null) {
 async function storeBotReply(message, msg) {
   if (!message.botReply && msg) {
     await storedMessageIDs.set(message.id, msg)
-    console.log(await storedMessageIDs.get(message.id))
+    //console.log(await storedMessageIDs.get(message.id))
     setTimeout(() => storedMessageIDs.delete(message.id), 300000) // 5 min
   }
 }

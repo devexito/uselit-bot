@@ -58,11 +58,13 @@ module.exports = {
         'Text': '' + untranslated.trim() + ''
       }
     ])
+    let msg
 
-    reqTr.end(function (res) {
+    reqTr.end((res) => {
       if (res.error) {
         console.error(res.error)
-        return errorParse('API error! Please try again later', message)
+        msg = errorParse('API error! Please try again later', message)
+        return msg
       }
       let outFrom
       
@@ -70,7 +72,8 @@ module.exports = {
         outFrom = res.body.map(a => a.detectedLanguage['language'])
       } catch (e) {
         console.error(e)
-        return message.editOrReply('error')
+        msg = errorParse(e.toString(), message)
+        return msg
       }
       let output = res.body.map(a => a.translations.map(b => b.text)[0])
 
@@ -80,7 +83,8 @@ module.exports = {
       let parsedOutText = ''
 
       if (!output) {
-        return errorParse('API returned empty output', message)
+        msg = errorParse('API returned empty output', message)
+        return msg
       } else {
 
         parsedOutText = shorten(output[0])
@@ -88,11 +92,13 @@ module.exports = {
         embed.setTitle('`' + outFrom[0] + '` → `' + langInput + '`')
           .setDescription(parsedOutText)
 
-        return message.editOrReply(null, { embeds: [embed], files: [] }).catch((e) => {
-          return errorParse(e.toString(), message)
+        msg = message.editOrReply(null, { embeds: [embed], files: [] }).catch((e) => {
+          msg = errorParse(e.toString(), message)
         })
       }
     })
+    console.log(msg)
+    return msg
     
     //end of bing translate code
   },
