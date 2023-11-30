@@ -63,8 +63,8 @@ client.on('ready', () => {
 })
 
 client.on('messageCreate', onMessage)
-client.on('messageUpdate', (old, _new) => {
-  const storedData = storedMessageIDs.has(old.id) ? storedMessageIDs.get(old.id) : null
+client.on('messageUpdate', async (old, _new) => {
+  const storedData = await storedMessageIDs.has(old.id) ? await storedMessageIDs.get(old.id) : null
   if (old.content !== _new.content) {
     onMessage(_new, true, storedData)
   }
@@ -106,7 +106,8 @@ async function onMessage(message, edit = false, botReply = null) {
       .setColor('#3131BB')
       .setTitle(client.user.username)
       .setDescription(desc)
-    return message.reply({ embeds: [embed] })
+    const msg = message.editOrReply(null, { embeds: [embed], files: [] })
+    return storeBotReply(message, msg)
   }
 
   for (i in prefixes) {
@@ -128,17 +129,21 @@ async function onMessage(message, edit = false, botReply = null) {
   
   // Command arguments parser
   if (command.args && !args.length) {
-    return argsError(command, message)
+    const msg = argsError(command, message)
+    return await storeBotReply(message, msg)
   }
   if (command.ignore_dms && command.ignore_dms === true && message.guild == null) {
-    return errorParse(`This command cannot be used in private messages.`, message)
+    const msg = errorParse(`This command cannot be used in private messages.`, message)
+    return await storeBotReply(message, msg)
   }
   if (command.permissions?.length && !message.member?.permissions?.has(Permissions.FLAGS[command.permissions])) {
-    return errorParse(`You have insufficient permissions on the server.\n\nThis command requires the following permissions: \`${command.permissions}\``, message)
+    const msg = errorParse(`You have insufficient permissions on the server.\n\nThis command requires the following permissions: \`${command.permissions}\``, message)
+    return await storeBotReply(message, msg)
   }
-  let owners = client.config.OWNERS.split(' ')
+  const owners = client.config.OWNERS.split(' ')
   if (command.owner && !owners.includes(message.author.id)) {
-    return errorParse('⛔ Owner Only', message)
+    const msg = errorParse('⛔ Owner Only', message)
+    return await storeBotReply(message, msg)
   }
 
   // COOLDOWNS
@@ -165,24 +170,28 @@ async function onMessage(message, edit = false, botReply = null) {
   
   // EXECUTION
   await command.execute(message, args)
-  .then((msg) => {
-    if (!botReply && msg) {
+  .then(async (msg) => {
+    if (msg) {
       console.log('msg: ', msg.id)
-      storedMessageIDs.set(message.id, msg)
-      setTimeout(() => storedMessageIDs.delete(message.id), 300000) // 5 min
+      await storeBotReply(message, msg)
     }
   })
-  .catch((e) => {
+  .catch(async (e) => {
     const msg = errorParse('**Critical:** ' + e.message, message)
-    if (!botReply && msg) {
-      storedMessageIDs.set(message.id, msg)
-      setTimeout(() => storedMessageIDs.delete(message.id), 300000) // 5 min
-    }
+    await storeBotReply(message, msg)
     console.error(e)
   })
   
   // logs
   return !command || !prefix ? null : console.log(`${command.name}  ${shorten(args.join(' '), 1000)} in: ${message.guild?.name}, ${storedMessageIDs.get(message.id)}`)
+}
+
+async function storeBotReply(message, msg) {
+  if (!message.botReply && msg) {
+    await storedMessageIDs.set(message.id, msg)
+    console.log(await storedMessageIDs.get(message.id))
+    setTimeout(() => storedMessageIDs.delete(message.id), 300000) // 5 min
+  }
 }
 
 client.login(client.config.TOKEN)

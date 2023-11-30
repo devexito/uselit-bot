@@ -81,13 +81,8 @@ module.exports = {
       url = args[0]
     } else return errorParse(errorText, message)
 
-    let msg
     const attachment = new Discord.MessageAttachment(url, 'attachment.png')
-    if (mess) {
-      return msg = await mess.editOrReply(null, { embeds: [], files: [ attachment ] })
-    } else {
-      return msg = await message.editOrReply(null, { embeds: [], files: [ attachment ] })
-    }
+    return await message.editOrReply(null, { embeds: [], files: [ attachment ] })
   },
 }
 
