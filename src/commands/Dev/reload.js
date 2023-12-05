@@ -26,7 +26,7 @@ module.exports = {
           message.client.commands.set(newCommand.name, newCommand)
       
 
-          message.reply(`✅ Command \`${command.name}\` successfully reloaded`)
+          return message.editOrReply(`✅ Command \`${command.name}\` successfully reloaded`)
         } catch (err) {
           console.error(err.stack || err)
           return errorParse(`Reload Failure:\n\`${err.message}\``, message)

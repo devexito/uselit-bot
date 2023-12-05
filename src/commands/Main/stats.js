@@ -36,6 +36,6 @@ module.exports = {
       .setTitle('Bot statistics')
      // .setAuthor(message.author.tag, message.author.displayAvatarURL())
      // .setTimestamp(new Date())
-    message.reply({ embeds: [embed] })
+    return message.editOrReply(null, { embeds: [embed], files: [] })
   },
 }

@@ -1,4 +1,4 @@
-const { Client, Collection, Intents, MessageEmbed, Permissions } = require('discord.js')
+const { Client, Collection, Intents, MessageEmbed, Permissions, Message } = require('discord.js')
 const myintents = new Intents(32767)
 myintents.add('DIRECT_MESSAGES')
 const client = new Client({ intents: myintents, allowedMentions: { repliedUser: false, parse: ['users'] }, partials: ['CHANNEL']})
@@ -10,7 +10,8 @@ const { readdirSync } = require('fs')
 const { sep } = require('path')
 client.cooldowns = new Collection()
 client.commands = new Collection()
-const { cooldowns } = client
+client.storedMessageIDs = new Collection()
+const { cooldowns, storedMessageIDs } = client
 
 const { QuickDB } = require('quick.db')
 db = new QuickDB({ filePath: '../db.sqlite' })
@@ -30,6 +31,17 @@ function load(dir = './src/commands/') {
 
 load()
 
+Message.prototype.editOrReply = function(text, options = { embeds: [], files: [] }) {
+  //console.log(this.content, text)
+  let msg
+  if (!this.botReply) {
+    msg = this.reply({ content: text, ...options })
+  } else {
+    msg = this.botReply.edit({ content: text, ...options })
+  }
+  return msg
+}
+
 client.on('ready', () => {
   console.log(`[READY] Logged in as ${client.user.tag}`)
 
@@ -42,7 +54,7 @@ client.on('ready', () => {
   setInterval(() => {
     client.user.setPresence({
       activities: [{
-        name: 'the largest amount of undefined', 
+        name: 'the undefined of undefined, with undefined under undefined', 
         type: 'COMPETING'
       }],
       status: 'online'
@@ -51,31 +63,41 @@ client.on('ready', () => {
 })
 
 client.on('messageCreate', onMessage)
-//client.on('messageUpdate', (old, _new) => old.content !== _new.content && onMessage(_new, true))
+client.on('messageUpdate', async (old, _new) => {
+  const storedData = await storedMessageIDs.has(old.id) ? await storedMessageIDs.get(old.id) : null
+  if (old.content !== _new.content) {
+    onMessage(_new, true, storedData)
+  }
+})
 
-async function onMessage(message, edit = false) {
-
+async function onMessage(message, edit = false, botReply = null) {
   // костыль для статуса печатания
   if (message.author.id === client.user.id) {
     return
-  } else if (message.content == 'undefined') {
-    message.channel.send('undefined.')
-    return message.react(emote('dieass')).catch(() => {})
-  } else if (message.content == 'null') {
-    return message.channel.send('null.')
-  } else if (message.content == 'NaN') {
-    return message.channel.send('NaN.')
+  } else if (!edit) {
+    if (message.content == 'undefined') {
+      message.channel.send('undefined.')
+      return message.react(emote('dieass')).catch(() => {})
+    } else if (message.content == 'null') {
+      return message.channel.send('null.')
+    } else if (message.content == 'NaN') {
+      return message.channel.send('NaN.')
+    }
   }
-
+  
+  message.edited = edit
+  message.botReply = botReply
   // ограничения
   if (message.author.bot) return
   
+  // CHECK FOR PREFIX
   let prefixes = [`<@${client.user.id}>`, `<@!${client.user.id}>`]
   let prefix = message.guild ? await db.get(`prefix_${message.guild.id}`) : ''
   if (prefix === null || prefix === undefined) prefix = client.config.DEFAULT_PREFIX
   if (!message.guild) prefixes.push(client.config.DEFAULT_PREFIX)
   prefixes.push(prefix)
 
+  // If only mentioned, send a dummy message
   if (message.content == `<@${client.user.id}>` || message.content == `<@!${client.user.id}>` ) {
     let desc = 'In direct messages, you can use commands without providing a prefix.'
     if (message.guild) desc = `My prefix is \`${prefix}\``
@@ -84,7 +106,8 @@ async function onMessage(message, edit = false) {
       .setColor('#3131BB')
       .setTitle(client.user.username)
       .setDescription(desc)
-    return message.reply({ embeds: [embed] })
+    const msg = message.editOrReply(null, { embeds: [embed], files: [] })
+    return storeBotReply(message, msg)
   }
 
   for (i in prefixes) {
@@ -93,6 +116,7 @@ async function onMessage(message, edit = false) {
       break
     }
   }
+  // If in DMs, we can ignore the prefix
   if (!message.content.startsWith(prefix) && message.guild) return
 
   const commandBody = message.content.slice(prefix.length)
@@ -101,27 +125,28 @@ async function onMessage(message, edit = false) {
 
   const command = client.commands.get(commandName) 
     || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName))
-
   if (!command) return
-
+  
+  // Command arguments parser
   if (command.args && !args.length) {
-    return argsError(command, message)
+    const msg = argsError(command, message)
+    return await storeBotReply(message, msg)
   }
-
   if (command.ignore_dms && command.ignore_dms === true && message.guild == null) {
-    return errorParse(`This command cannot be used in private messages.`, message)
+    const msg = errorParse(`This command cannot be used in private messages.`, message)
+    return await storeBotReply(message, msg)
   }
-
   if (command.permissions?.length && !message.member?.permissions?.has(Permissions.FLAGS[command.permissions])) {
-    return errorParse(`You have insufficient permissions on the server.\n\nThis command requires the following permissions: \`${command.permissions}\``, message)
+    const msg = errorParse(`You have insufficient permissions on the server.\n\nThis command requires the following permissions: \`${command.permissions}\``, message)
+    return await storeBotReply(message, msg)
   }
-
-  let owners = client.config.OWNERS.split(' ')
+  const owners = client.config.OWNERS.split(' ')
   if (command.owner && !owners.includes(message.author.id)) {
-    return errorParse('⛔ Owner Only', message)
+    const msg = errorParse('⛔ Owner Only', message)
+    return await storeBotReply(message, msg)
   }
 
-    // COOLDOWNS
+  // COOLDOWNS
   if (!cooldowns.has(command.name)) {
     cooldowns.set(command.name, new Collection())
   }
@@ -142,20 +167,32 @@ async function onMessage(message, edit = false) {
 
   timestamps.set(message.author.id, now)
   setTimeout(() => timestamps.delete(message.author.id), cooldownAmount)
-
+  
   // EXECUTION
   await command.execute(message, args)
-  .catch((e) => {
-    errorParse('**Critical:** ' + e.message, message)
+  .then(async (msg) => {
+    if (msg) {
+      //console.log('msg: ', msg.id)
+      await storeBotReply(message, msg)
+    }
+  })
+  .catch(async (e) => {
+    const msg = errorParse('**Critical:** ' + e.message, message)
+    await storeBotReply(message, msg)
     console.error(e)
   })
   
-  if (!edit) {
-        //   logs   //
-    return !command || !prefix ? null : console.log(`${command.name}  ${shorten(args.join(' '), 1000)} in: ${message.guild?.name}`)
-  }
+  // logs
+  return !command || !prefix ? null : console.log(`${command.name}  ${shorten(args.join(' '), 1000)} in: ${message.guild?.name}, ${storedMessageIDs.get(message.id)}`)
 }
 
+async function storeBotReply(message, msg) {
+  if (!message.botReply && msg) {
+    await storedMessageIDs.set(message.id, msg)
+    //console.log(await storedMessageIDs.get(message.id))
+    setTimeout(() => storedMessageIDs.delete(message.id), 300000) // 5 min
+  }
+}
 
 client.login(client.config.TOKEN)
 

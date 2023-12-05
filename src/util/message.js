@@ -114,7 +114,6 @@ async function findImageUrlInEmbed(embed, ignoreGIFV = false) {
   if (video && video.proxyURL && (video.height || video.width)) {
     return video.proxyURL + '?format=png'
   }
-  console.log('embed check fail')
   return null
 }
 

@@ -22,9 +22,9 @@ module.exports = {
     args = args.join(' ').trim()
 
     if (replying) {
-      if (!message.client.config.OWNERS.split(' ').includes(message.author.id)) return
+      if (!message.client.config.OWNERS.split(' ').includes(message.author.id)) return null
       let msg = await repliedMessageObject(message)
-      if (!msg) return
+      if (!msg) return null
       if (msg.embeds.length && 
 msg.embeds[0].fields && 
 msg.embeds[0].fields.length && 
@@ -34,17 +34,19 @@ msg.embeds[0].fields[0].value) {
 
           message.client.channels.cache.get(chId).messages.cache.get(msgId).reply({ content: `**Feedback Response:** ${args}`, allowedMentions: { repliedUser: true } })
           .then(() => {
-            return message.react('✅')
+            message.react('✅')
+            return null
           })
           .catch((e) => {
             message.react('❌')
             return errorParse(e, message)
           })
         } catch (e) {
-          return console.log(e)
+          console.log(e)
+          return null
         }
-      } else return
-      return
+      }
+      return null
     }
 
     if (args.length < 4 || args.length > 1024) {
@@ -69,6 +71,6 @@ Channel: \`${message.channel.name}\`\n(||${message.channel.id}||)
 \nMessage:\`\`\`\n${comment.join(' ')}\n\`\`\``)
       .addField('IDs', `${message.channel.id}, ${message.id}`)
     message.client.channels.cache.get(FEEDBACK_CHANNEL).send({ embeds: [embed] })
-    message.reply('Feedback sent.')
+    return message.editOrReply('Feedback sent.')
   }
 }

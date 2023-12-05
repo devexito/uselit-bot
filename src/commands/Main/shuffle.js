@@ -30,12 +30,12 @@ module.exports = {
     let reply = await repliedMessage(message).catch((e) => console.error(e))
     if (undefined != args && args.length) {
       shuffle(args)
-      message.reply(shorten(args.join(' ').trim(), 2000)).catch(e => errorParse(e.toString(), message))
+      return message.editOrReply(shorten(args.join(' ').trim(), 2000)).catch(e => errorParse(e.toString(), message))
     } else if (undefined != reply && reply.length) {
       shuffle(reply)
-      message.reply(shorten(reply.join(' ').trim(), 2000)).catch(e => errorParse(e.toString(), message))
+      return message.editOrReply(shorten(reply.join(' ').trim(), 2000)).catch(e => errorParse(e.toString(), message))
     } else {
-      argsError(this, message)
+      return argsError(this, message)
     }
   },
 }

@@ -75,19 +75,14 @@ module.exports = {
         url = messUrl.toString()
       }
       if (!validateUrl(url)) {
-        return errorParse('Malformed URL', message)
+        return errorParse('Invalid or malformed URL', message)
       }
     } else if (validateUrl(args)) {
       url = args[0]
     } else return errorParse(errorText, message)
 
-    let msg
     const attachment = new Discord.MessageAttachment(url, 'attachment.png')
-    if (mess) {
-      msg = await mess.reply({ files: [ attachment ] })
-    } else {
-      msg = await message.reply({ files: [ attachment ] })
-    }
+    return await message.editOrReply(null, { embeds: [], files: [ attachment ] })
   },
 }
 

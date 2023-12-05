@@ -34,7 +34,7 @@ module.exports = {
       reply = reply.join(' ')
       let output = replace(reply, args, trim)
       if (output === reply) return errorParse('Output is the same as input', message)
-      return message.reply(shorten(output, 2000)).catch((e) => {})
+      return message.editOrReply(shorten(output, 2000)).catch((e) => {})
     } else {
       await findTextInMessageHistory(message, args[0]).then((out) => {
         if (!out) return argsError(this, message)
@@ -44,7 +44,7 @@ module.exports = {
           return errorParse('I received nothing', message)
         }
         if (outReplaced === out) return errorParse('Output is the same as input', message)
-        return message.reply(shorten(outReplaced, 2000)).catch(() => {})
+        return message.editOrReply(shorten(outReplaced, 2000)).catch(() => {})
       }).catch((e) => { errorParse(e, message) })
     }
   },

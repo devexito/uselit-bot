@@ -44,7 +44,7 @@ module.exports = {
     }
 
 // ������ �������� ��������
-    const msg = await message.reply('Making a song... ' + emote('shue'))
+    const msg = await message.editOrReply('Making a song... ' + emote('shue'))
 
     let imgPath = ''
    // img${getRandomInt(1, 4) || 0}.png
@@ -54,7 +54,7 @@ module.exports = {
     let write = fs.createWriteStream('./tempmusic/translate' + code + '.mp3')
     
     const res = await axios.get(
-      'https://texttospeech.responsivevoice.org/v1/text:synthesize?text=' + encodeURI(arges.join(' ')) + '&lang=' + setting.split('_')[0] + '&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=kvfbSITh&gender=' + setting.split('_')[1],
+      'https://texttospeech.responsivevoice.org/v1/text:synthesize?text=' + encodeURI(arges.join(' ')) + '&lang=' + setting.split('_')[0] + '&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=' + message.client.config.SONG_KEY + '&gender=' + setting.split('_')[1],
       {
         headers: {
           'accept': '*/*',
@@ -82,17 +82,18 @@ module.exports = {
               console.error(e)
               fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
               fs.unlinkSync('./tempmusic/msg' + code + outFormat)
-              msg.edit('Unable to attach the audio file ' + emote('perms'))
+              return msg.edit('Unable to attach the audio file ' + emote('perms'))
             })
             fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
             fs.unlinkSync('./tempmusic/msg' + code + outFormat)
+            return msg
           })
         })
       } catch (e) {
         console.error(e)
         fs.unlinkSync('./tempmusic/translate' + code + '.mp3')
         fs.unlinkSync('./tempmusic/msg' + code + outFormat)
-        errorParse('Google did not want to sing that', message ? message : msg)
+        return errorParse('Google did not want to sing that', message ? message : msg)
       }
     })
   }

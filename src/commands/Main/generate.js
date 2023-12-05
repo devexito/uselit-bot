@@ -25,9 +25,10 @@ module.exports = {
       .setColor('#3131BB')
       .setTitle('Generating text...')
       .setDescription(emote('shue'))
-    const msg = await message.reply({ embeds: [embed] }).catch(e => errorParse(e.toString(), message))
+    const msg = await message.editOrReply(null, { embeds: [embed], files: [] }).catch(e => errorParse(e.toString(), message))
     if (!msg) return
-    const out = await gen.fetchText(message, args, msg)
+    
+    await gen.fetchText(message, args, msg)
     .then(async (output) => {
       if (!output) return msg.delete()
       await createPages({
@@ -74,7 +75,7 @@ module.exports = {
         button4,
         button5
       ]
-      msg ? paginationEmbed(msg, pages, buttonList, timeout = 120000, message, args) : errorParse('Unexpected error occurred!', message)
+      return msg ? paginationEmbed(msg, pages, buttonList, timeout = 120000, message, args) : errorParse('Unexpected error occurred!', message)
     }
   },
 }
