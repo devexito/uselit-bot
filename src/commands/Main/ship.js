@@ -81,11 +81,9 @@ module.exports = {
     }
 
     async function mentionCheck(input, message, isServNick) {
-      //console.log('eba ' + input)
       if (isNaN(input)) {
         var regEx = /<@\!?([0-9]{17,21})>/
         input = regEx.exec(input)[1]
-        //console.log('blya ' + input)
       }
 
       if (!isNaN(input) && message.client.users.cache.get(input)) {
@@ -174,6 +172,6 @@ module.exports = {
       .addField('Professional ratings', rate.toString() + '/100' + newEmote)
     }
 
-    message.reply({ embeds: [embed] })
+    return message.editOrReply(null, { embeds: [embed], files: [] })
   }
 }

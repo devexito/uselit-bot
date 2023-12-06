@@ -19,21 +19,31 @@ module.exports = {
     try {
       evaled = await eval(args.join(' ').trim())
     } catch (e) {
-      if (e.message == 'Cannot send an empty message') return message.react('🏴')
+      if (e.message == 'Cannot send an empty message') {
+        message.react('🏴')
+        return null
+      }
       console.error(e)
       return errorParse('```\n' + e.toString() + '\n```', message)
     }
 
     // output
     console.log(inspect(evaled))
-    if (inspect(evaled) == 'undefined') return message.react('♿')
-    if (inspect(evaled).length > 4000) return message.react('🏳️')
+    if (inspect(evaled) == 'undefined') {
+      message.react('♿');
+      return null
+    }
+    if (inspect(evaled).length > 4000) {
+      message.react('🏳️')
+      return null
+    }
     if (noOutput) {
-      return message.react('🆙')
+      message.react('🆙')
+      return null
     } else {
       const embed = new MessageEmbed()
         .setDescription('```js\n' + inspect(evaled) + '\n```')
-      message.reply({embeds: [embed]})
+      return message.editOrReply(null, { embeds: [embed] })
     }
   },
 }

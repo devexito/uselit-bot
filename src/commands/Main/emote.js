@@ -5,11 +5,11 @@ module.exports = {
   description: 'Sends URL of a server emoji',
   desc: 'Image link of a server emoji',
   permissions: '',
-  aliases: ['e', 'emote', 'emoji', 'enlarge'],
+  aliases: ['emote', 'emoji', 'enlarge'],
   args: true,
   usage: '<emoji>',
   async execute(message, args) {
-    async function emoteCheck(input) {
+    function emoteCheck(input) {
       var regEx = /<(a?):[\w]{2,40}:([0-9]{16,21})>/
       if (regEx.test(input)) {
         let format = '.png'
@@ -23,16 +23,19 @@ module.exports = {
     }
 
     let strIn = args.join('')
-
-    let output = await emoteCheck(strIn).catch((e) => {
-      errorParse('Emote Check Fail', message)
-      return console.error(e)
-    })
+    let output
+    
+    try {
+      output = emoteCheck(strIn)
+    } catch (e) {
+      console.error(e)
+      return errorParse('Emote Check Failed', message)
+    }
 
     if (output) {
-      message.reply('https://cdn.discordapp.com/emojis/' + output)
+      return message.editOrReply('https://cdn.discordapp.com/emojis/' + output)
     } else {
-      errorParse('i cannot do this :(', message)
+      return errorParse('i cannot do this :(', message)
     }
   }
 }

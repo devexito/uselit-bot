@@ -10,6 +10,6 @@
     
     message.delete().catch((e) => console.log(e))
     
-    message.channel.send(text).catch(() => message.react('🚽'))
+    return message.channel.send(text).catch(() => message.react('🚽'))
   },
 }

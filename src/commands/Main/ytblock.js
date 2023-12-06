@@ -114,15 +114,14 @@ module.exports = {
         })
         
 
-        message.reply({ embeds: [embed] })
+        return message.editOrReply(null, { embeds: [embed], files: [] })
       } else {
         try {
-          errorParse(out, message)
           console.log(`'${args}' - ${res.body}`)
-        }
-        catch (e) {
-          errorParse('Empty response.', message)
+          return errorParse(out, message)
+        } catch (e) {
           console.log(e)
+          return errorParse('Empty response.', message)
         }
       }
     })

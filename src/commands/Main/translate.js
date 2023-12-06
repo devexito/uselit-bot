@@ -1,4 +1,3 @@
-const bingkey = '9e3ceaef5emsh58cb033407ace61p16ab76jsn5510af64ae15'
 const unirest = require('unirest')
 const { MessageEmbed } = require('discord.js')
 const { errorParse, shorten, argsError } = require('../../util/util')
@@ -24,7 +23,8 @@ module.exports = {
     }
     
     const reqTr = unirest('POST', 'https://microsoft-translator-text.p.rapidapi.com/translate')
-
+
+
     //start of bing translate code
     reqTr.query({
       'to': langInput,
@@ -35,7 +35,7 @@ module.exports = {
 
     reqTr.headers({
       'content-type': 'application/json',
-      'x-rapidapi-key': bingkey,
+      'x-rapidapi-key': message.client.config.BING_KEY,
       'x-rapidapi-host': 'microsoft-translator-text.p.rapidapi.com',
       'useQueryString': true
     })
@@ -58,11 +58,13 @@ module.exports = {
         'Text': '' + untranslated.trim() + ''
       }
     ])
+    let msg
 
-    reqTr.end(function (res) {
+    reqTr.end((res) => {
       if (res.error) {
-        errorParse('API error! Please try again later', message)
-        return console.error(res.error)
+        console.error(res.error)
+        msg = errorParse('API error! Please try again later', message)
+        return msg
       }
       let outFrom
       
@@ -70,7 +72,8 @@ module.exports = {
         outFrom = res.body.map(a => a.detectedLanguage['language'])
       } catch (e) {
         console.error(e)
-        return message.reply('error')
+        msg = errorParse(e.toString(), message)
+        return msg
       }
       let output = res.body.map(a => a.translations.map(b => b.text)[0])
 
@@ -80,14 +83,22 @@ module.exports = {
       let parsedOutText = ''
 
       if (!output) {
-        errorParse('API returned empty output', message)
-      } else {
-        parsedOutText = shorten(output[0])
+        msg = errorParse('API returned empty output', message)
+        return msg
+      } else {
+
+        parsedOutText = shorten(output[0])
+
         embed.setTitle('`' + outFrom[0] + '` → `' + langInput + '`')
-          .setDescription(parsedOutText)
-        message.reply({ embeds: [embed] }).catch(e => errorParse(e.toString(), message))
+          .setDescription(parsedOutText)
+
+        msg = message.editOrReply(null, { embeds: [embed], files: [] }).catch((e) => {
+          msg = errorParse(e.toString(), message)
+        })
       }
     })
+    console.log(msg)
+    return msg
     
     //end of bing translate code
   },

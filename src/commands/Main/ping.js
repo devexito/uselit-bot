@@ -6,8 +6,10 @@ module.exports = {
   desc: 'Pong',
   permissions: '',
   async execute(message) {
-    const msg = await message.reply('Pinging...')
-    const ping = Math.round(msg.createdTimestamp - message.createdTimestamp)
+    const msg = await message.editOrReply('Pinging...')
+    let botTime = message.botReply ? msg.editedTimestamp : msg.createdTimestamp
+    let authorTime = message.edited ? message.editedTimestamp : message.createdTimestamp
+    const ping = Math.round(botTime - authorTime)
     return msg.edit(`Pong!\nMessage latency: \`${formatNumber(ping)}ms\`\nHeartbeat: \`${Math.round(message.client.ws.ping)}ms\``)
   }
 }

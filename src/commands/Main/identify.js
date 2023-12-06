@@ -1,6 +1,7 @@
 ﻿const axios = require('axios').default
 const { emote, errorParse, validateUrl } = require('../../util/util')
 const { repliedMessageObject, findImageUrlInMessage, findImageUrlInMessageHistory } = require('../../util/message')
+const { MessageEmbed } = require('discord.js')
 
 module.exports = {
   name: 'identify',
@@ -9,7 +10,7 @@ module.exports = {
   desc: 'Identify an image',
   permissions: '',
   usage: '<image url/attachment/user mention>',
-  cooldown: 9,
+  cooldown: 5,
   async execute(message, args) {
     async function mentionCheck(input, message) {
       input = input.join('')
@@ -21,7 +22,8 @@ module.exports = {
           var regEx = /<@\!?([0-9]{17,21})>/
           output = regEx.exec(input)[1]
         } catch {
-          return console.log(input)
+          console.log(input)
+          return null
         }
       } else {
         output = input
@@ -81,18 +83,14 @@ module.exports = {
         url = messUrl.toString()
       }
       if (!validateUrl(url)) {
-        return errorParse('Malformed URL', message)
+        return errorParse('Invalid or malformed URL', message)
       }
     } else if (validateUrl(args)) {
       url = args[0]
     } else return errorParse(errorText, message)
 
-    let msg 
-    if (mess) {
-      msg = await mess.reply(emote('hmmm'))
-    } else {
-      msg = await message.reply(emote('hmmm'))
-    }
+    let msg
+    msg = await message.editOrReply(emote('hmmm'))
 
     const options = {
       method: 'POST',
@@ -106,7 +104,7 @@ module.exports = {
       headers: {
         'content-type': 'application/json',
         'x-rapidapi-host': 'microsoft-computer-vision3.p.rapidapi.com',
-        'x-rapidapi-key': '9e3ceaef5emsh58cb033407ace61p16ab76jsn5510af64ae15'
+        'x-rapidapi-key': message.client.config.BING_KEY,
       },
       data: {
         url: url
@@ -123,25 +121,47 @@ module.exports = {
           erCode += `${er.response.data.messages}`
         }
       } else erCode = ''
-      return errorParse(`${er.toString()}${erCode}`, msg, false, true)
+      msg.delete()
+      return errorParse(`${er.toString()}${erCode}`, msg, false)
     })
+
+    let botResponse = ''
+    let anal
+
     if (res && res.data) {
-      let anal = res.data.description.captions[0]
+      anal = res.data.description.captions[0]
       let tags = res.data.description.tags
+      botResponse = getBotResponse(anal, tags)
+    } else {
+      msg.delete()
+      return errorParse('No API response. Try again later.', message)
+    }
+
+    function getBotResponse(anal, tags) {
       if (onlyTags && tags.length) {
         if (tags.length > 25) tags.splice(24, tags.length - 25)
-        return msg.edit(`I see ${tags.join(', ')}`)
+        return `I see ${tags.join(', ')}`
       }
       if (!anal || !anal.text) {
         if (tags.length) {
           if (tags.length > 3) tags.splice(2, tags.length - 3)
-          return msg.edit(`I can't really describe the image but I do see ${tags.join(', ')}`)
+          return `I can't really describe the image, but I do see ${tags.join(', ')}`
         }
       } else {
-        return msg.edit(`${anal.confidence < 0.4 ? 'I am not really confident, but ' : ''}I think it is ${anal.text} (${Math.ceil(anal.confidence * 100).toString()}% confidence)`).catch(() => {})
+        return `${anal.confidence < 0.4 ? 'I am not really confident, but ' : ''}I think it is ${anal.text}.`
       }
-      msg.edit(`I really can't describe the image ` + emote('fluid'))
+      return `I really can't describe the image ` + emote('fluid')
     }
+
+    const embed = new MessageEmbed()
+      .setColor('#3131BB')
+      .setDescription(botResponse)
+      .setTitle('Image Recognition Result')
+      .setAuthor(message.author.tag, message.author.displayAvatarURL())
+      .setThumbnail(url)
+      .setFooter(`(${Math.round(anal.confidence * 100).toString()}% confidence)`)
+    msg.edit({ content: null, embeds: [embed] })
+    return msg
   },
 }
 
