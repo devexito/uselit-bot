@@ -14,10 +14,12 @@ module.exports = {
     let prefix = message.guild ? await db.get(`prefix_${message.guild.id}`) : ''
     if (!prefix) prefix = message.client.config.DEFAULT_PREFIX
 
+/*
     const revision = require('child_process')
       .execSync('git rev-parse HEAD')
       .toString().trim()
       .slice(0, 7)
+*/
 
     const embed = new MessageEmbed()
       .setColor('#3131BB')
@@ -26,7 +28,7 @@ module.exports = {
       .addField('Support', 'Use the feedback command', true)
       .addField('Prefix', '@mention or ' + prefix, true)
       .addField('Source', 'https://github.com/devexito/uselit-bot', true)
-      .addField('Commit', revision, true)
+      //.addField('Commit', revision, true)
       .addField('Discord.js Version', version.toString(), true)
 
       .setTitle('About Uselit')
