@@ -26,7 +26,7 @@ module.exports = {
       embed
         .setTitle('Command List')
         .setDescription('```\n' + commandList.join('\n') + '```')
-        .setFooter(`Type ${prefix}help [command name] to show more info about a specific command.\nHint: Commands with any text input support message references. Try replying to a message while executing a "${prefix}generate", "${prefix}shuffle" or "${prefix}identify" command without arguments!`)
+        .setFooter(`Type ${prefix}help [command name] to show more info about a specific command.\nHint: Commands with any text input support message references. Try replying to a message while executing a "${prefix}generate", "${prefix}shuffle" or "${prefix}translate" command without arguments!`)
     } else {
       const name = args[0].toLowerCase()
       const command = allcommands.get(name)

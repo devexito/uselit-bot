@@ -6,7 +6,7 @@ const clm = require('../../util/clm')
 
 module.exports = {
   name: 'ytblock',
-  aliases: ['ytb', 'isblocked', 'youtubeblock', 'checkvideo', 'checkvid', 'checkv', 'checkyt', 'checkyoutube', 'isvideoblocked', 'ytblock', 'checkblock'],
+  aliases: ['ytb', 'youtubeblock'],
   description: 'Check YouTube video restrictions. Supported by unblockvideos.com',
   desc: 'Check yt video restrictions',
   permissions: '',

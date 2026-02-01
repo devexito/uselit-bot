@@ -5,7 +5,7 @@ const { errorParse } = require('../../util/util')
 module.exports = {
   name: 'ship',
   permissions: '',
-  aliases: ['c', 'child'],
+  aliases: ['c'],
   description: `Ships two user names (or thing names?)\nSkip arguments for random users. You can either enter two mentions, id or words separated by spaces, or use a \`|\` as a separator for words.\n\nUse \`-s\` for server nicknames.\nUse \`-f\` to floor odd amount of characters instead of ceiling it.`,
   desc: 'Lovely shipping...',
   usage: '[first mention or id] [second mention or id] [-s] [-f]\`\n**OR**\n\`[text] | [another text]',
@@ -27,8 +27,8 @@ module.exports = {
       if (a > 35 && a < 50) str = 'Hot 🤒'
       if (a > 49 && a < 65) str = 'Hotdamn it ' + emote('fluid')
       if (a > 64 && a < 80) str = 'Very damn hot 🥵🥵🥵'
-      if (a > 79 && a < 98) str = 'What the hell! 🔥🔥🔥 That is so hot 😍'
-      if (a > 97 && a < 101) str = 'Boiled alive. I\'d not be proud of this.'
+      if (a > 79 && a < 95) str = 'What the hell! 🔥🔥🔥 That is so hot 😍'
+      if (a > 94 && a < 101) str = 'Boiled alive. I\'d not be proud of this.'
       return [ a, str ]
     }
     const emoteList = [

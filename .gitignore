@@ -32,3 +32,5 @@ config.json
 count.json
 nicks.json
 *.env
+
+db.sqlite

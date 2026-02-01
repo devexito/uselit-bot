@@ -7,33 +7,6 @@ async function fetchText(message, args, msg = false) {
 
   if (!args || !args.length) return errorParse('No args?', message)
 
-/* axios => socket hang up error :(
-
-  const headers = {
-    'content-type': 'application/json',
-   // 'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
-    'Accept-Encoding': 'gzip, deflate, br',
-    'Connection': 'keep-alive'
-  }
-    
-  const req = await axios.post('https://pelevin.gpt.dobro.ai/generate/', {
-    prompt: args.join(' ').trim(),
-    length: 60
-  }, {
-    headers: headers,
-    responseType: 'json',
-    transformResponse: [v => v]
-  })
-  .then((res) => {
-    console.log('Body: ', res.body)
-  })
-  .catch((er) => {
-    if (msg) msg.delete()
-    console.error(er)
-    return errorParse(er, message)
-  })
-*/
-
     req.query({
       'Accept-Encoding': 'gzip, deflate, br',
       'content-type': 'text/plain;charset=UTF-8'
