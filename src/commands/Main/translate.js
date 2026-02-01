@@ -9,7 +9,6 @@ module.exports = {
   description: `Translates text using PROMT 7.8. Only English and Russian are supported.\nThanks to @nonk123 for hosting this API.`,
   desc: 'Translate text with PROMT',
   permissions: '',
-  args: true,
   usage: '<text>',
   typing: true,
   async execute(message, args) {
