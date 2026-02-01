@@ -1,7 +1,7 @@
-const unirest = require('unirest')
 const { MessageEmbed } = require('discord.js')
 const { errorParse, shorten, argsError } = require('../../util/util')
 const { repliedMessage } = require('../../util/message')
+const { isCyrillic } = require('../../util/util')
 
 module.exports = {
   name: 'translate',
@@ -23,59 +23,37 @@ module.exports = {
       return argsError(this, message)
     }
 
-    untranslated = shorten(untranslated.join(' '), 2000)
+    untranslated = shorten(untranslated.join(' '), 2000).trim()
 
-    const cyrillicPattern = /[\u0400-\u045F]+/
-    const isCyrillic = cyrillicPattern.test(untranslated)
-    const langInput = isCyrillic ? 'en' : 'ru'
-    const langOutput = isCyrillic ? 'ru' : 'en'
+    const langInput = isCyrillic(untranslated) ? 'ru' : 'en'
+    const langOutput = langInput == 'ru' ? 'en' : 'ru'
     
-    const reqTr = unirest('POST', 'https://' + message.client.config.NONK_PROMT_URL)
-
-    //start of bing translate code
-    reqTr.query({
-      'to': langInput
-    })
-
-    reqTr.headers({
-      'content-type': 'application/json'
-    })
-    
-    reqTr.type('json')
-    reqTr.send([
-      {
-        'data': '' + untranslated.trim() + ''
-      }
-    ])
     let msg
 
-    reqTr.end((res) => {
-      if (res.error) {
-        console.error(res.error)
-        msg = errorParse('API error: ' + res.error.status + '! Please try again later', message)
-        return msg
-      }
-      const output = res.body[0].data//.map(a => a.translations.map(b => b.text)[0])
-      console.log(output)
+    const request = fetch(`https://${message.client.config.NONK_PROMT_URL}`, {
+      method: 'POST',
+      body: untranslated,
+    }).then((response) => response.text()).catch(() => {})
+    
+    await request
+      .then((res) => {
+        console.log(res)
+        const embed = new MessageEmbed()
+          .setColor('#3131BB')
+          .setTitle('`' + langInput + '` → `' + langOutput + '`')
+          .setDescription(shorten(res))
 
-      const embed = new MessageEmbed()
-        .setColor('#3131BB')
-      
-      let parsedOutText = shorten(output)
+        msg = message
+          .editOrReply(null, { embeds: [embed], files: [] })
+          .catch((e) => {
+            msg = errorParse(e.toString(), message)
+          })
+      }).catch((err) => {
+        console.error(err)
+        msg = errorParse('API error! Please try again later', message)
+      })
 
-      if (!output || typeof parsedOutText !== 'string') {
-        msg = errorParse('API returned empty output', message)
-        return msg
-      } else {
-        embed.setTitle('`' + langOutput + '` → `' + langInput + '`')
-          .setDescription(parsedOutText)
-
-        msg = message.editOrReply(null, { embeds: [embed], files: [] }).catch((e) => {
-          msg = errorParse(e.toString(), message)
-        })
-      }
-    })
-    console.log(msg)
+    if (!msg) return errorParse('API returned empty output', message)
     return msg
   },
 }

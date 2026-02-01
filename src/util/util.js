@@ -27,7 +27,7 @@ module.exports = class Util {
   }
 
   static shorten(text, maxLen = 4000) {
-    return text.length > maxLen ? `${text.substr(0, maxLen - 3)}…` : text
+    return text?.length > maxLen ? `${text.substr(0, maxLen - 3)}…` : text
   }
   
   static formatNumber(number, minimumFractionDigits = 0) {
@@ -98,5 +98,13 @@ module.exports = class Util {
 
   static validateUrl(value) {
     return /^(?:(?:(?:https?):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(value)
+  }
+
+  static isCyrillic(text) {
+    const cyrillicCount = (text.match(/\p{Script=Cyrl}/gu) || []).length
+    const nonWhitespaceCount = (text.match(/\S/gu) || []).length
+    const latinEtcCount = nonWhitespaceCount - cyrillicCount
+    
+    return cyrillicCount > latinEtcCount
   }
 }

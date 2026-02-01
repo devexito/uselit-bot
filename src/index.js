@@ -183,7 +183,7 @@ async function onMessage(message, edit = false, botReply = null) {
   })
   
   // logs
-  return !command || !prefix ? null : console.log(`${command.name}  ${shorten(args.join(' '), 1000)} in: ${message.guild?.name}, ${storedMessageIDs.get(message.id)}`)
+  return !command || !prefix ? null : console.log(`${command.name} ${shorten(args.join(' '), 1000)} in: ${message.guild?.name}`)
 }
 
 async function storeBotReply(message, msg) {
