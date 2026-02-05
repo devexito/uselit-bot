@@ -12,7 +12,6 @@ module.exports = {
   usage: '<text>',
   typing: true,
   async execute(message, args) {
-    //const usage = '`' + this.usage + '`'
     let untranslated = args
 
     let reply = await repliedMessage(message).catch((e) => console.error(e))
@@ -30,30 +29,37 @@ module.exports = {
     
     let msg
 
-    const request = fetch(`https://${message.client.config.NONK_PROMT_URL}`, {
+    const response = await fetch(`https://${message.client.config.NONK_PROMT_URL}?to=${langOutput}`, {
       method: 'POST',
       body: untranslated,
-    }).then((response) => response.text()).catch(() => {})
+    }).catch(() => {})
+	
+	if (!response.ok) {
+		console.log(response)
+		msg = errorParse(`API error! Please try again later\n**${response.status.toString()}**: ${response.statusText}`, message)
+		return
+	}
     
-    await request
-      .then((res) => {
-        console.log(res)
-        const embed = new MessageEmbed()
-          .setColor('#3131BB')
-          .setTitle('`' + langInput + '` → `' + langOutput + '`')
-          .setDescription(shorten(res))
+    const text = await response.text()
+	console.log(text)
+	
+	const translatedText = shorten(text)
+	if (!translatedText) {
+		msg = errorParse('API returned empty output', message)
+		return
+	}
+	
+	const embed = new MessageEmbed()
+	  .setColor('#3131BB')
+	  .setTitle('`' + langInput + '` → `' + langOutput + '`')
+	  .setDescription(translatedText)
 
-        msg = message
-          .editOrReply(null, { embeds: [embed], files: [] })
-          .catch((e) => {
-            msg = errorParse(e.toString(), message)
-          })
-      }).catch((err) => {
-        console.error(err)
-        msg = errorParse('API error! Please try again later', message)
-      })
+	msg = message
+	  .editOrReply(null, { embeds: [embed], files: [] })
+	  .catch((e) => {
+		msg = errorParse(e.toString(), message)
+	  })
 
-    if (!msg) return errorParse('API returned empty output', message)
     return msg
   },
 }
