@@ -69,7 +69,6 @@ module.exports = class Util {
       .setColor('#A00000')
       .setTitle('⚠️ Command Error')
       .setDescription(error?.toString() || 'unknown error')
-      .setAuthor(message.author.tag, message.author.displayAvatarURL())
     if (usage) {
       embed
         .addField('Usage', usage)
