@@ -34,31 +34,32 @@ module.exports = {
       body: untranslated,
     }).catch(() => {})
 	
-	if (!response.ok) {
-		console.log(response)
-		msg = errorParse(`API error! Please try again later\n**${response.status.toString()}**: ${response.statusText}`, message)
-		return
-	}
+    if (!response?.ok) {
+      console.log(response)
+      let errReason = response === undefined ? 'the api is dead lol.' : `**${response.status.toString()}**: ${response.statusText}`
+      msg = errorParse(`API error! Please try again later\n${errReason}`, message)
+      return
+    }
     
     const text = await response.text()
-	console.log(text)
-	
-	const translatedText = shorten(text)
-	if (!translatedText) {
-		msg = errorParse('API returned empty output', message)
-		return
-	}
-	
-	const embed = new MessageEmbed()
-	  .setColor('#3131BB')
-	  .setTitle('`' + langInput + '` → `' + langOutput + '`')
-	  .setDescription(translatedText)
+    console.log(text)
+    
+    const translatedText = shorten(text)
+    if (!translatedText) {
+      msg = errorParse('API returned empty output', message)
+      return
+    }
+    
+    const embed = new MessageEmbed()
+      .setColor('#3131BB')
+      .setTitle('`' + langInput + '` → `' + langOutput + '`')
+      .setDescription(translatedText)
 
-	msg = message
-	  .editOrReply(null, { embeds: [embed], files: [] })
-	  .catch((e) => {
-		msg = errorParse(e.toString(), message)
-	  })
+    msg = message
+      .editOrReply(null, { embeds: [embed], files: [] })
+      .catch((e) => {
+        msg = errorParse(e.toString(), message)
+      })
 
     return msg
   },
