@@ -1,7 +1,6 @@
-const { MessageEmbed } = require('discord.js')
-const { errorParse, shorten, argsError } = require('../../util/util')
+const { argsError } = require('../../util/util')
 const { repliedMessage } = require('../../util/message')
-const { isCyrillic } = require('../../util/util')
+const { translateText, sendMessage } = require('../../services/translateText')
 
 module.exports = {
   name: 'translate',
@@ -22,45 +21,13 @@ module.exports = {
       return argsError(this, message)
     }
 
-    untranslated = shorten(untranslated.join(' '), 2000).trim()
-
-    const langInput = isCyrillic(untranslated) ? 'ru' : 'en'
-    const langOutput = langInput == 'ru' ? 'en' : 'ru'
-    
-    let msg
-
-    const response = await fetch(`https://${message.client.config.NONK_PROMT_URL}?to=${langOutput}`, {
-      method: 'POST',
-      body: untranslated,
-    }).catch(() => {})
-	
-    if (!response?.ok) {
-      console.log(response)
-      let errReason = response === undefined ? 'the api is dead lol.' : `**${response.status.toString()}**: ${response.statusText}`
-      msg = errorParse(`API error! Please try again later\n${errReason}`, message)
+    const text = await translateText(untranslated, message)
+    if (text === undefined) {
       return
     }
-    
-    const text = await response.text()
-    console.log(text)
-    
-    const translatedText = shorten(text)
-    if (!translatedText) {
-      msg = errorParse('API returned empty output', message)
-      return
-    }
-    
-    const embed = new MessageEmbed()
-      .setColor('#3131BB')
-      .setTitle('`' + langInput + '` → `' + langOutput + '`')
-      .setDescription(translatedText)
 
-    msg = message
-      .editOrReply(null, { embeds: [embed], files: [] })
-      .catch((e) => {
-        msg = errorParse(e.toString(), message)
-      })
-
-    return msg
+    //console.log(text)
+    
+    return sendMessage(text, message)
   },
 }
